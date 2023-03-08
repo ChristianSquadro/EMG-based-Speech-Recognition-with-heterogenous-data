@@ -56,7 +56,7 @@ def test(model, testset, device):
             predictions.append(pred_text)
 
     model.train()
-    #remove empty strings
+    #remove empty strings because I had an error in the calculation of WER
     predictions = [predictions[i] for i in range(len(predictions)) if len(references[i]) > 0]
     references = [references[i] for i in range(len(references)) if len(references[i]) > 0]
     return jiwer.wer(references, predictions)
