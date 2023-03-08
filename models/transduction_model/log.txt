@@ -1,0 +1,3 @@
+
+
+['transduction_model.py', '--hifigan_checkpoint', 'hifigan_finetuned/checkpoint', '--output_directory', './models/transduction_model/']

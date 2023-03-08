@@ -1,0 +1,5 @@
+
+
+['recognition_model.py', '--output_directory', './models/recognition_model/']
+output example: (./emg_data/silent_parallel_data/5-6_silent, 208)
+train / dev split: 8055 200

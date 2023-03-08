@@ -1,0 +1,3 @@
+
+
+['/home/christian/storage/EMG-christian/silent_speech-main/recognition_model.py']
