@@ -6,3 +6,4 @@ lm.binary
 deepspeech-0.7.0-models.scorer
 deepspeech-0.7.0-models.pbmm
 models/recognition_model/model.pt
+hifi_gan
