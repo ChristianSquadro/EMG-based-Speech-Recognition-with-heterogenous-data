@@ -2,3 +2,7 @@ emg_data
 emg_data.tar.gz
 __pycache__
 .vscode
+lm.binary
+deepspeech-0.7.0-models.scorer
+deepspeech-0.7.0-models.pbmm
+models/recognition_model/model.pt
