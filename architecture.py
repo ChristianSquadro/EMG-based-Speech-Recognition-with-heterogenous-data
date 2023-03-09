@@ -4,7 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from transformer import TransformerEncoderLayer
+from transformer import TransformerEncoderLayer, TransformerDecoderLayer
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -52,7 +52,9 @@ class Model(nn.Module):
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        self.transformer = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
+        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
+        self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
+        self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs)
 
         self.has_aux_out = num_aux_outs is not None
@@ -76,7 +78,8 @@ class Model(nn.Module):
         x = x_raw
 
         x = x.transpose(0,1) # put time first
-        x = self.transformer(x)
+        x = self.transformerEncoder(x)
+        x = self.transformerDecoder(x) #TODO I need the target EMG
         x = x.transpose(0,1)
 
         if self.has_aux_out:
