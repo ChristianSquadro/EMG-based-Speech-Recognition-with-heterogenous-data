@@ -51,6 +51,8 @@ class Model(nn.Module):
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
+        self.embedding_tgt = nn.Embedding(num_outs,FLAGS.model_size, padding_idx=0)#TODO insert the padding ID
+
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
@@ -61,7 +63,7 @@ class Model(nn.Module):
         if self.has_aux_out:
             self.w_aux = nn.Linear(FLAGS.model_size, num_aux_outs)
 
-    def forward(self, x_feat, x_raw, session_ids):
+    def forward(self, x_feat, x_raw, y,session_ids):
         # x shape is (batch, time, electrode)
 
         if self.training:
@@ -76,10 +78,12 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
 
         x = x_raw
+        tgt=self.embedding_tgt(y)
 
         x = x.transpose(0,1) # put time first
+        tgt = tgt.transpose(0,1) # put channel after
         x = self.transformerEncoder(x)
-        x = self.transformerDecoder(x) #TODO I need the target EMG
+        x = self.transformerDecoder(tgt, x)
         x = x.transpose(0,1)
 
         if self.has_aux_out:

@@ -244,6 +244,7 @@ class TextTransform(object):
     def __init__(self):
         self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
         self.chars = string.ascii_lowercase+string.digits+' '
+        self.vocabulary_size=len(self.chars)
 
     def clean_text(self, text):
         text = unidecode(text)

@@ -95,9 +95,11 @@ def train_model(trainset, devset, device, n_epochs=200):
 
             X = combine_fixed_length(example['emg'], 200).to(device)
             X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            y=nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+            tgt = combine_fixed_length(example['text_int'], 27).to(device)#TODO ???
             sess = combine_fixed_length(example['session_ids'], 200).to(device)
 
-            pred = model(X, X_raw, sess)
+            pred = model(X, X_raw, tgt, sess)
             pred = F.log_softmax(pred, 2)
 
             pred = nn.utils.rnn.pad_sequence(decollate_tensor(pred, example['lengths']), batch_first=False) # seq first, as required by ctc
