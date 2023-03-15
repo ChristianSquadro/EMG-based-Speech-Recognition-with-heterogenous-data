@@ -41,7 +41,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs, num_aux_outs=None):
+    def __init__(self, num_features, num_outs, has_aux_loss=False):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
@@ -59,9 +59,7 @@ class Model(nn.Module):
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs)
 
-        self.has_aux_out = num_aux_outs is not None
-        if self.has_aux_out:
-            self.w_aux = nn.Linear(FLAGS.model_size, num_aux_outs)
+        self.has_aux_loss = has_aux_loss
 
     def forward(self, x_feat, x_raw, y,session_ids):
         # x shape is (batch, time, electrode)
@@ -82,12 +80,14 @@ class Model(nn.Module):
 
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put channel after
-        x = self.transformerEncoder(x)
-        x = self.transformerDecoder(tgt, x)
-        x = x.transpose(0,1)
+        x_encoder = self.transformerEncoder(x)
+        x_decoder = self.transformerDecoder(tgt, x_encoder)
 
-        if self.has_aux_out:
-            return self.w_out(x), self.w_aux(x)
+        x_encoder = x_encoder.transpose(0,1)
+        x_decoder = x_decoder.transpose(0,1)
+
+        if self.has_aux_loss:
+            return self.w_out(x_encoder), self.w_out(x_decoder)
         else:
             return self.w_out(x)
 

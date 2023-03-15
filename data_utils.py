@@ -169,9 +169,9 @@ def combine_fixed_length(tensor_list, length):
 
 def combine_fixed_length_tgt(tensor_list, n_batch):
     total_length = sum(t.size(0) for t in tensor_list)
+    tensor_list = list(tensor_list) # copy
     if total_length % n_batch != 0:
         pad_length = (math.ceil(total_length / n_batch) * n_batch) - total_length
-        tensor_list = list(tensor_list) # copy
         tensor_list.append(torch.zeros(pad_length,*tensor_list[0].size()[1:], dtype=tensor_list[0].dtype, device=tensor_list[0].device))
         total_length += pad_length
     tensor = torch.cat(tensor_list, 0)

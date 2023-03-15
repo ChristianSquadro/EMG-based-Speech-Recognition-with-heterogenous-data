@@ -63,14 +63,14 @@ def test(model, testset, device):
     return jiwer.wer(references, predictions)
 
 
-def train_model(trainset, devset, device, writer, n_epochs=200, report_every=10):
+def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, alpha=0.7):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, collate_fn=EMGDataset.collate_raw, batch_sampler=SizeAwareSampler(trainset, 128000))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, batch_size=1)
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars+1).to(device)
+    model = Model(devset.num_features, n_chars+1, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -112,40 +112,47 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=10)
             target= y[:,1:]
 
             #Prediction
-            pred = model(X, X_raw, tgt, sess)
+            out_enc, out_dec = model(X, X_raw, tgt, sess)
 
             #Primary Loss
-            pred=pred.permute(0,2,1)
-            loss = loss_fn(pred, target)
+            out_dec=out_dec.permute(0,2,1)
+            loss_dec = loss_fn(out_dec, target)
 
             #Auxiliary Loss
-            #pred = F.log_softmax(pred, 2)
-            #pred = nn.utils.rnn.pad_sequence(decollate_tensor(pred, example['text_int_lengths']), batch_first=False) # seq first, as required by ctc
-            #y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
-            #loss = F.ctc_loss(pred, y, example['text_int_lengths'], example['text_int_lengths'], blank=n_chars)
+            out_enc = F.log_softmax(out_enc, 2)
+            out_enc = nn.utils.rnn.pad_sequence(decollate_tensor(out_enc, example['lengths']), batch_first=False) # seq first, as required by ctc
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank=n_chars)
+
+            #Combination the two losses
+            loss = (1 - alpha) * loss_dec + alpha * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
 
+            #Gradient Update
             loss.backward()
             if (batch_idx+1) % 2 == 0:
                 optim.step()
                 optim.zero_grad()
-
-            if batch_idx % report_every == report_every - 2:     
+            
+            if False:
+            #if batch_idx % report_every == report_every - 2:     
                 #Evaluation
                 model.eval()
                 with torch.no_grad():
                     for example, idx in zip(dataloader_evaluation, range(len(dataloader_evaluation))):
-                        X_raw = example['raw_emg'].to(device)
-                        sess = example['session_ids'].to(device)
-                        y = example['text_int'].to(device)
+                        X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
+                        sess = combine_fixed_length(example['session_ids'], 200).to(device)
+                        y = combine_fixed_length_tgt(example['text_int'], X_raw.shape[0]).to(device)
 
                         #Shifting target for input decoder and loss
                         tgt= y[:,:-1]
                         target= y[:,1:]
 
+                        print(idx)
+
                         #Prediction without the 197-th batch because of missing label
-                        if idx != 197:
+                        if idx != 181:
                             pred = model(X, X_raw, tgt, sess)
                             #Primary Loss
                             pred=pred.permute(0,2,1)
@@ -160,6 +167,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=10)
 
             #Increment counter        
             batch_idx += 1
+            writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
 
         #Testing and change learning rate
         val = test(model, devset, device)
