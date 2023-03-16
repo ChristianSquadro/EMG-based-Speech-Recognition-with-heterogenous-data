@@ -70,7 +70,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars+1, True).to(device)
+    model = Model(devset.num_features, n_chars+1, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:

@@ -1,3 +1,4 @@
+import math
 from typing import Optional
 
 import torch
@@ -51,7 +52,7 @@ class TransformerEncoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        src2 = self.self_attn(src, src, src)
+        src2 = self.self_attn(src, src, src, src_key_padding_mask)
         src = src + self.dropout1(src2)
         src = self.norm1(src)
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
@@ -122,11 +123,12 @@ class TransformerDecoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        tgt2 = self.self_attn(tgt, tgt, tgt)
+        self_att_mask = torch.logical_or(tgt_mask, tgt_key_padding_mask) 
+        tgt2 = self.self_attn(tgt, tgt, tgt, self_att_mask)
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
-        tgt2=self.multihead_attn(tgt, memory, memory)
+        tgt2=self.multihead_attn(tgt, memory, memory, memory_key_padding_mask)
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
@@ -145,9 +147,6 @@ class MultiHeadAttention(nn.Module):
     assert d_qkv * n_head == d_model, 'd_model must be divisible by n_head'
     self.d_qkv = d_qkv
 
-    #self.kdim = kdim if kdim is not None else embed_dim
-    #self.vdim = vdim if vdim is not None else embed_dim
-
     self.w_q = nn.Parameter(torch.Tensor(n_head, d_model, d_qkv))
     self.w_k = nn.Parameter(torch.Tensor(n_head, d_model, d_qkv))
     self.w_v = nn.Parameter(torch.Tensor(n_head, d_model, d_qkv))
@@ -164,7 +163,7 @@ class MultiHeadAttention(nn.Module):
     else:
         self.relative_positional = None
 
-  def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor):
+  def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, attn_mask: Optional[torch.Tensor] = None):
     """Runs the multi-head self-attention layer.
 
     Args:
@@ -177,6 +176,10 @@ class MultiHeadAttention(nn.Module):
     k = torch.einsum('tbf,hfa->bhta', key, self.w_k)
     v = torch.einsum('tbf,hfa->bhta', value, self.w_v)
     logits = torch.einsum('bhqa,bhka->bhqk', q, k) / (self.d_qkv ** 0.5)
+
+    if attn_mask is not None:
+        attn_mask = torch.unsqueeze(attn_mask, 1)  # Shape: (batch_size, 1, tgt_seq_len)
+        logits = logits.masked_fill(attn_mask == 0, float('-inf'))
 
     if self.relative_positional is not None:
         q_pos = q.permute(2,0,1,3) #bhqd->qbhd
@@ -383,3 +386,39 @@ class LearnedRelativePositionalEmbedding(nn.Module):
             x = x.transpose(0, 1)
             x = x.contiguous().view(bsz_heads, length+1, length)
             return x[:, 1:, :]
+        
+
+########
+# Taken from:
+# https://pytorch.org/tutorials/beginner/transformer_tutorial.html
+# or also here:
+# https://github.com/pytorch/examples/blob/master/word_language_model/model.py
+class PositionalEncoding(nn.Module):
+
+    def __init__(self, d_model, dropout=0.0, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(p=dropout)
+        self.max_len = max_len
+
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float()
+                             * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0).transpose(0, 1)  # shape (max_len, 1, dim)
+        self.register_buffer('pe', pe)  # Will not be trained.
+
+    def forward(self, x):
+        """Inputs of forward function
+        Args:
+            x: the sequence fed to the positional encoder model (required).
+        Shape:
+            x: [sequence length, batch size, embed dim]
+            output: [sequence length, batch size, embed dim]
+        """
+        assert x.size(0) < self.max_len, (
+            f"Too long sequence length: increase `max_len` of pos encoding")
+        # shape of x (len, B, dim)
+        x = x + self.pe[:x.size(0), :]
+        return self.dropout(x)

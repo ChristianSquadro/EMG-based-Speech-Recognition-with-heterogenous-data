@@ -4,7 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from transformer import TransformerEncoderLayer, TransformerDecoderLayer
+from transformer import TransformerEncoderLayer, TransformerDecoderLayer, PositionalEncoding
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -41,7 +41,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs, has_aux_loss=False):
+    def __init__(self, num_features, num_outs, device ,has_aux_loss=False):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
@@ -52,6 +52,7 @@ class Model(nn.Module):
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
         self.embedding_tgt = nn.Embedding(num_outs,FLAGS.model_size, padding_idx=0)#TODO insert the padding ID
+        self.pos_encoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
@@ -60,9 +61,25 @@ class Model(nn.Module):
         self.w_out = nn.Linear(FLAGS.model_size, num_outs)
 
         self.has_aux_loss = has_aux_loss
+        self.device=device
 
-    def forward(self, x_feat, x_raw, y,session_ids):
+    def create_src_padding_mask(self, src):
+        # input src of shape ()
+        src_padding_mask = src.transpose(1, 0) == 0
+        return src_padding_mask
+
+    def create_tgt_padding_mask(self, tgt):
+        # input tgt of shape ()
+        tgt_padding_mask = tgt.transpose(1, 0) == 0
+        return tgt_padding_mask
+    
+    def forward(self, x_feat, x_raw, y, session_ids):
         # x shape is (batch, time, electrode)
+        # y shape is (batch, sequence_length)
+        src_key_padding_mask = self.create_src_padding_mask(x_raw).to(self.device)
+        tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+        memory_key_padding_mask = src_key_padding_mask
+        tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
         if self.training:
             r = random.randrange(8)
@@ -74,14 +91,16 @@ class Model(nn.Module):
         x_raw = self.conv_blocks(x_raw)
         x_raw = x_raw.transpose(1,2)
         x_raw = self.w_raw_in(x_raw)
-
         x = x_raw
+
+        #Embedding and positional encoding of tgt
         tgt=self.embedding_tgt(y)
+        tgt=self.pos_encoder(tgt)
 
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put channel after
-        x_encoder = self.transformerEncoder(x)
-        x_decoder = self.transformerDecoder(tgt, x_encoder)
+        x_encoder = self.transformerEncoder(x,src_key_padding_mask=src_key_padding_mask)
+        x_decoder = self.transformerDecoder(tgt, x_encoder,tgt_key_padding_mask=tgt_key_padding_mask, memory_key_padding_mask=memory_key_padding_mask, tgt_mask=tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)
