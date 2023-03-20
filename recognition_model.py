@@ -39,23 +39,28 @@ def test(model, testset, device):
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
     references = []
     predictions = []
+    batch_idx = 0
     with torch.no_grad():
         for example in dataloader:
-            X = example['emg'].to(device)
             X_raw = example['raw_emg'].to(device)
-            sess = example['session_ids'].to(device)
+            tgt = example['text_int'].to(device)
 
-            pred  = F.log_softmax(model(X, X_raw, sess), -1)
+            #Prediction without the 197-th batch because of missing label
+            if batch_idx != 181:
+                out_enc, out_dec = model(X_raw, tgt)
+                pred  = F.log_softmax(out_dec, -1)
 
-            beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
-            pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
+                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
+                pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
 
-            pred_text = testset.text_transform.int_to_text(pred_int)
-            target_text = testset.text_transform.clean_text(example['text'][0])
+                pred_text = testset.text_transform.int_to_text(pred_int)
+                target_text = testset.text_transform.clean_text(example['text'][0])
 
-            references.append(target_text)
-            predictions.append(pred_text)
+                references.append(target_text)
+                predictions.append(pred_text)
 
+        batch_idx += 1
+        
     model.train()
     #remove empty strings because I had an error in the calculation of WER function
     predictions = [predictions[i] for i in range(len(predictions)) if len(references[i]) > 0]
@@ -102,17 +107,17 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             schedule_lr(batch_idx)
 
             #Preprosessing of the input and target for the model
-            X = combine_fixed_length(example['emg'], 200).to(device)
             X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            sess = combine_fixed_length(example['session_ids'], 200).to(device)
             y = combine_fixed_length_tgt(example['text_int'], X_raw.shape[0]).to(device)
+            #X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+            #y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
 
             #Shifting target for input decoder and loss
             tgt= y[:,:-1]
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(X, X_raw, tgt, sess)
+            out_enc, out_dec = model(X_raw, tgt)
 
             #Primary Loss
             out_dec=out_dec.permute(0,2,1)
@@ -168,6 +173,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             #Increment counter        
             batch_idx += 1
             writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
+            val = test(model, devset, device)
 
         #Testing and change learning rate
         val = test(model, devset, device)
