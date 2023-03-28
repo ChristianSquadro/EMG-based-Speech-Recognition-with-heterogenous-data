@@ -170,22 +170,6 @@ class MultiHeadAttention(nn.Module):
     Returns:
       A single tensor containing the output from this layer
     """
-    # Apply mask to the keys if provided
-    if attn_mask is not None:
-        attn_mask = attn_mask.unsqueeze(2)
-        attn_mask = attn_mask.unsqueeze(3)
-        key = key.masked_fill(attn_mask == float('-inf'), float('-inf'))[0,:,:,:]
-    
-    # Apply mask to the query if provided
-    if key_padding_mask is not None:
-        query = query.float().masked_fill(
-            key_padding_mask, float('-inf')).type_as(query)  
-    
-    # Apply mask to the values if provided
-    if key_padding_mask is not None:
-        value = value.float().masked_fill(
-            key_padding_mask, float(0)).type_as(value) 
-
     #Computes projections
     q = torch.einsum('tbf,hfa->bhta', query, self.w_q)
     k = torch.einsum('tbf,hfa->bhta', key, self.w_k)
@@ -194,16 +178,18 @@ class MultiHeadAttention(nn.Module):
     # Compute scaled dot-product attention
     logits = torch.einsum('bhqa,bhka->bhqk', q, k) / (self.d_qkv ** 0.5)
 
-    
-    # Apply mask to the attention weights if provided
+    # Apply att_mask to the attention weights if provided
     if attn_mask is not None:
-        attn_mask = attn_mask.squeeze(2)       
-        attn_mask = attn_mask.squeeze(2)
-        attn_mask = attn_mask.unsqueeze(0)
-        attn_mask = attn_mask.unsqueeze(1)
+        attn_mask=attn_mask.unsqueeze(0)
+        attn_mask=attn_mask.unsqueeze(1)
         logits = logits.masked_fill(attn_mask == float('-inf'), float('-inf'))
     
-
+    
+    # Apply padding_mask to the attention weights if provided
+    if key_padding_mask is not None:
+        logits = logits.masked_fill(key_padding_mask.unsqueeze(1).unsqueeze(2), float('-inf'))
+    
+    
     if self.relative_positional is not None:
         q_pos = q.permute(2,0,1,3) #bhqd->qbhd
         l,b,h,d = q_pos.size()

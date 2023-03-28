@@ -72,8 +72,8 @@ def load_utterance(base_dir, index, limit_length=False, debug=False, text_align_
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0]:x.shape[0]-raw_emg_after.shape[0],:]
-    emg_orig = apply_to_all(subsample, x, 689.06, 1000)
-    x = apply_to_all(subsample, x, 516.79, 1000)
+    emg_orig = apply_to_all(subsample, x, 400.00, 1000)
+    x = apply_to_all(subsample, x, 300, 1000)
     emg = x
 
     for c in FLAGS.remove_channels:
@@ -240,6 +240,7 @@ class EMGDataset(torch.utils.data.Dataset):
         session_ids = np.full(emg.shape[0], directory_info.session_index, dtype=np.int64)
         audio_file = f'{directory_info.directory}/{idx}_audio_clean.flac'
 
+        #self.text_transform.add_new_words(text)
         text_int = np.array(self.text_transform.text_to_int(text), dtype=np.int64)
 
         result = {'audio_features':torch.from_numpy(mfccs).pin_memory(), 'emg':torch.from_numpy(emg).pin_memory(), 'text':text, 'text_int': torch.from_numpy(text_int).pin_memory(), 'file_label':idx, 'session_ids':torch.from_numpy(session_ids).pin_memory(), 'book_location':book_location, 'silent':directory_info.silent, 'raw_emg':torch.from_numpy(raw_emg).pin_memory()}

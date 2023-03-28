@@ -167,17 +167,6 @@ def combine_fixed_length(tensor_list, length):
     n = total_length // length
     return tensor.view(n, length, *tensor.size()[1:])
 
-def combine_fixed_length_tgt(tensor_list, n_batch):
-    total_length = sum(t.size(0) for t in tensor_list)
-    tensor_list = list(tensor_list) # copy
-    if total_length % n_batch != 0:
-        pad_length = (math.ceil(total_length / n_batch) * n_batch) - total_length
-        tensor_list.append(torch.zeros(pad_length,*tensor_list[0].size()[1:], dtype=tensor_list[0].dtype, device=tensor_list[0].device))
-        total_length += pad_length
-    tensor = torch.cat(tensor_list, 0)
-    length = total_length // n_batch
-    return tensor.view(n_batch, length, *tensor.size()[1:])
-
 def decollate_tensor(tensor, lengths):
     b, s, d = tensor.size()
     tensor = tensor.view(b*s, d)
@@ -253,6 +242,61 @@ def read_phonemes(textgrid_fname, max_len=None):
     return phone_ids
 
 class TextTransform(object):
+    '''
+    def __init__(self, pad_token="<pad>", blank_token='_', eos_token='<eos>', sos_token='<sos>'):
+        self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
+        self.id_to_string = {}
+        self.string_to_id = {}
+        
+        # add the default pad token
+        self.id_to_string[0] = pad_token
+        self.string_to_id[pad_token] = 0
+        
+        # add the default unknown token
+        self.id_to_string[1] = blank_token
+        self.string_to_id[blank_token] = 1
+        
+        # add the default unknown token
+        self.id_to_string[2] = eos_token
+        self.string_to_id[eos_token] = 2   
+
+        # add the default unknown token
+        self.id_to_string[3] = sos_token
+        self.string_to_id[sos_token] = 3
+
+        # shortcut access
+        self.pad_id = 0
+        self.blank_id = 1
+        self.eos_id = 2
+        self.sos_id = 3
+
+    def __len__(self):
+        return len('<pad>'+'_'+'<eos>'+'<sos>'+string.ascii_lowercase+string.digits+' ')
+    
+    def clean_text(self, text):
+        text = unidecode(text)
+        text = self.transformation(text)
+        return text
+    
+    def add_new_words(self, text):
+        text = self.clean_text(text)
+        for c in text:
+            if c not in self.string_to_id:
+                self.string_to_id[c] = len(self.string_to_id)
+                self.id_to_string[len(self.id_to_string)] = c
+    
+    def get_labels(self):
+        return  '<pad>'+'_'+'<eos>'+'<sos>'+string.ascii_lowercase+string.digits+' '
+            
+    def text_to_int(self, text):
+        text = self.clean_text(text)
+        return [self.string_to_id[c] for c in text]
+
+    def int_to_text(self, ints):
+        return ''.join(self.id_to_string[i] for i in ints)
+    '''
+    
+
     def __init__(self):
         self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
         self.chars = string.ascii_lowercase+string.digits+' '
@@ -269,3 +313,4 @@ class TextTransform(object):
 
     def int_to_text(self, ints):
         return ''.join(self.chars[i] for i in ints)
+    

@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import logging
 import subprocess
-from ctcdecode import CTCBeamDecoder
+from ctcdecode import OnlineCTCBeamDecoder, DecoderState
 import jiwer
 import random
 from torch.utils.tensorboard import SummaryWriter
@@ -14,8 +14,7 @@ import torch.nn.functional as F
 
 from read_emg import EMGDataset, SizeAwareSampler
 from architecture import Model
-from data_utils import combine_fixed_length, decollate_tensor, combine_fixed_length_tgt
-from transformer import TransformerEncoderLayer
+from data_utils import combine_fixed_length, decollate_tensor
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -32,32 +31,32 @@ flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file'
 def test(model, testset, device):
     model.eval()
 
-    blank_id = len(testset.text_transform.chars)
-    decoder = CTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
+    blank_id = 1
+    decoder = OnlineCTCBeamDecoder(testset.text_transform.chars, blank_id=blank_id, log_probs_input=True,
             model_path='lm.binary', alpha=1.5, beta=1.85)
-
+    state = DecoderState(decoder)
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
     references = []
     predictions = []
     batch_idx = 0
     with torch.no_grad():
         for example in dataloader:
-            X_raw = example['raw_emg'].to(device)
-            tgt = example['text_int'].to(device)
+            X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+            tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
 
             #Prediction without the 197-th batch because of missing label
             if batch_idx != 181:
                 out_enc, out_dec = model(X_raw, tgt)
                 pred  = F.log_softmax(out_dec, -1)
 
-                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
-                pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
+                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred, [state], [False])
+                #pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
 
-                pred_text = testset.text_transform.int_to_text(pred_int)
-                target_text = testset.text_transform.clean_text(example['text'][0])
+                #pred_text = testset.text_transform.int_to_text(pred_int)
+                #target_text = testset.text_transform.clean_text(example['text'][0])
 
-                references.append(target_text)
-                predictions.append(pred_text)
+                #references.append(target_text)
+                #predictions.append(pred_text)
 
         batch_idx += 1
         
@@ -70,12 +69,12 @@ def test(model, testset, device):
 
 def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, alpha=0.7):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, collate_fn=EMGDataset.collate_raw, batch_sampler=SizeAwareSampler(trainset, 128000))
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, collate_fn=EMGDataset.collate_raw, batch_size=2)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, batch_size=1)
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars+1, device, True).to(device)
+    model = Model(devset.num_features, n_chars, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -107,10 +106,8 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             schedule_lr(batch_idx)
 
             #Preprosessing of the input and target for the model
-            X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            y = combine_fixed_length_tgt(example['text_int'], X_raw.shape[0]).to(device)
-            #X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
-            #y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+            X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
 
             #Shifting target for input decoder and loss
             tgt= y[:,:-1]
@@ -119,15 +116,14 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             #Prediction
             out_enc, out_dec = model(X_raw, tgt)
 
-            #Primary Loss
+            #Decoder Loss
             out_dec=out_dec.permute(0,2,1)
             loss_dec = loss_fn(out_dec, target)
 
-            #Auxiliary Loss
+            #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
-            out_enc = nn.utils.rnn.pad_sequence(decollate_tensor(out_enc, example['lengths']), batch_first=False) # seq first, as required by ctc
-            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank=n_chars)
+            out_enc = out_enc.transpose(1,0)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = 1) # 1 is the blank token according to TextTransform
 
             #Combination the two losses
             loss = (1 - alpha) * loss_dec + alpha * loss_enc
@@ -140,40 +136,42 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
                 optim.step()
                 optim.zero_grad()
             
-            if False:
-            #if batch_idx % report_every == report_every - 2:     
+            
+            #Increment counter and print the loss training       
+            batch_idx += 1
+            writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
+            train_loss= 0
+
+
+            #Debug
+            val = test(model, devset, device)
+
+            if batch_idx % report_every == 0:     
                 #Evaluation
                 model.eval()
                 with torch.no_grad():
-                    for example, idx in zip(dataloader_evaluation, range(len(dataloader_evaluation))):
-                        X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-                        sess = combine_fixed_length(example['session_ids'], 200).to(device)
-                        y = combine_fixed_length_tgt(example['text_int'], X_raw.shape[0]).to(device)
-
+                    for idx, example in enumerate(dataloader_evaluation):
+                        X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+                        y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+                    
                         #Shifting target for input decoder and loss
                         tgt= y[:,:-1]
                         target= y[:,1:]
 
-                        print(idx)
-
                         #Prediction without the 197-th batch because of missing label
-                        if idx != 181:
-                            pred = model(X, X_raw, tgt, sess)
-                            #Primary Loss
-                            pred=pred.permute(0,2,1)
-                            loss = loss_fn(pred, target)
-                            eval_loss += loss.item()
+                        out_enc, out_dec = model(X_raw, tgt)
+                        #Decoder Loss
+                        out_dec=out_dec.permute(0,2,1)
+                        loss = loss_fn(out_dec, target)
+                        eval_loss += loss.item()
+                        
+                        #just for now
+                        if idx == 10:
+                            break
 
                 #Writing on tensorboard
                 writer.add_scalar('Loss/Evaluation', eval_loss / batch_idx, batch_idx)
-                writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx) 
-                train_loss= 0
                 eval_loss= 0
-
-            #Increment counter        
-            batch_idx += 1
-            writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
-            val = test(model, devset, device)
 
         #Testing and change learning rate
         val = test(model, devset, device)
