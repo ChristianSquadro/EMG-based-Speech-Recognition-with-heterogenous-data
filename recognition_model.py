@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import logging
 import subprocess
-from ctcdecode import OnlineCTCBeamDecoder, DecoderState
+from ctcdecode import CTCBeamDecoder, DecoderState
 import jiwer
 import random
 from torch.utils.tensorboard import SummaryWriter
@@ -32,7 +32,7 @@ def test(model, testset, device):
     model.eval()
 
     blank_id = 1
-    decoder = OnlineCTCBeamDecoder(testset.text_transform.chars, blank_id=blank_id, log_probs_input=True,
+    decoder = CTCBeamDecoder(testset.text_transform.chars, blank_id=blank_id, log_probs_input=True,
             model_path='lm.binary', alpha=1.5, beta=1.85)
     state = DecoderState(decoder)
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
@@ -49,14 +49,14 @@ def test(model, testset, device):
                 out_enc, out_dec = model(X_raw, tgt)
                 pred  = F.log_softmax(out_dec, -1)
 
-                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred, [state], [False])
-                #pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
+                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
+                pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
 
-                #pred_text = testset.text_transform.int_to_text(pred_int)
-                #target_text = testset.text_transform.clean_text(example['text'][0])
+                pred_text = testset.text_transform.int_to_text(pred_int)
+                target_text = testset.text_transform.clean_text(example['text'][0])
 
-                #references.append(target_text)
-                #predictions.append(pred_text)
+                references.append(target_text)
+                predictions.append(pred_text)
 
         batch_idx += 1
         
@@ -74,7 +74,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars, device, True).to(device)
+    model = Model(devset.num_features, n_chars + 1, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -123,7 +123,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = 1) # 1 is the blank token according to TextTransform
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)+1) 
 
             #Combination the two losses
             loss = (1 - alpha) * loss_dec + alpha * loss_enc
@@ -142,9 +142,6 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
             train_loss= 0
 
-
-            #Debug
-            val = test(model, devset, device)
 
             if batch_idx % report_every == 0:     
                 #Evaluation
