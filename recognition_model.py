@@ -123,7 +123,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)+1) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)) 
 
             #Combination the two losses
             loss = (1 - alpha) * loss_dec + alpha * loss_enc
