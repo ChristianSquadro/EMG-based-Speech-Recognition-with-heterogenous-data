@@ -170,6 +170,7 @@ class MultiHeadAttention(nn.Module):
     Returns:
       A single tensor containing the output from this layer
     """
+
     #Computes projections
     q = torch.einsum('tbf,hfa->bhta', query, self.w_q)
     k = torch.einsum('tbf,hfa->bhta', key, self.w_k)

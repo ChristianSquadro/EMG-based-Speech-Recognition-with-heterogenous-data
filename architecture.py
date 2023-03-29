@@ -9,7 +9,7 @@ from transformer import TransformerEncoderLayer, TransformerDecoderLayer, Positi
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
-flags.DEFINE_integer('num_layers', 3, 'number of layers')
+flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
 
 class ResBlock(nn.Module):
