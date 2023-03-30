@@ -21,12 +21,13 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-12, 'learning rate')
+flags.DEFINE_float('learning_rate', 3e-5, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0, 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.65, 'parameter alpha for the two losses')
+flags.DEFINE_float('alpha_loss', 0.8, 'parameter alpha for the two losses')
+flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 
 def test(model, testset, device):
@@ -69,7 +70,7 @@ def test(model, testset, device):
     return jiwer.wer(references, predictions)
 
 
-def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1):
+def train_model(trainset, devset, device, writer, n_epochs=200):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, shuffle= True ,collate_fn=EMGDataset.collate_raw, batch_size=2)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, collate_fn=EMGDataset.collate_raw, batch_size=1)
@@ -101,7 +102,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1):
     batch_idx = 0
     train_loss= 0
     eval_loss = 0
-    run_step_eval=0
+    run_steps=0
     optim.zero_grad()
     for epoch_idx in range(n_epochs):
         model.train()
@@ -136,20 +137,17 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1):
 
             #Gradient Update
             loss.backward()
-            if (batch_idx+1) % 2 == 0:
+            if (batch_idx+1) % 30 == 0:
                 optim.step()
                 optim.zero_grad()
-            
-            
-            #Increment counter and print the loss training       
-            batch_idx += 1
-            writer.add_scalar('Loss/Training', train_loss, batch_idx)
-            train_loss= 0
 
             #Debug
             #val = test(model, devset, device)
 
-            if batch_idx % report_every == 0:     
+            #Increment counter and print the loss training       
+            batch_idx += 1
+
+            if batch_idx % FLAGS.report_every == FLAGS.report_every - 2:     
                 #Evaluation
                 model.eval()
                 with torch.no_grad():
@@ -163,8 +161,10 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1):
 
                         #Prediction without the 197-th batch because of missing label
                         out_enc, out_dec = model(X_raw, tgt)
+
                         #Decoder Loss
                         out_dec=out_dec.permute(0,2,1)
+                        loss = loss_fn(out_dec, target)
                         loss_dec = loss_fn(out_dec, target)
 
                         #Encoder Loss
@@ -175,16 +175,18 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1):
                         #Combination the two losses
                         loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
                         eval_loss += loss.item()
-                        run_step_eval += 1
+                        run_steps += 1
                         
                         #just for now
                         if idx == 10:
                             break
 
                 #Writing on tensorboard
-                writer.add_scalar('Loss/Evaluation', eval_loss/ run_step_eval, batch_idx)
+                writer.add_scalar('Loss/Evaluation', eval_loss / run_steps, batch_idx)
+                writer.add_scalar('Loss/Training', train_loss / run_steps, batch_idx)
+                train_loss= 0
                 eval_loss= 0
-                run_step_eval=0
+                run_steps=0
 
         #Testing and change learning rate
         #val = test(model, devset, device)

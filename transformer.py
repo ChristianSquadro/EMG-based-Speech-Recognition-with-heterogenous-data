@@ -181,14 +181,12 @@ class MultiHeadAttention(nn.Module):
 
     # Apply att_mask to the attention weights if provided
     if attn_mask is not None:
-        attn_mask=attn_mask.unsqueeze(0)
-        attn_mask=attn_mask.unsqueeze(1)
-        logits = logits.masked_fill(attn_mask == float('-inf'), float('-inf'))
+        logits = logits.masked_fill(attn_mask == float('-inf'), -1e20)
     
     
-    # Apply padding_mask to the attention weights if provided
+    #Apply padding_mask to the attention weights if provided
     if key_padding_mask is not None:
-        logits = logits.masked_fill(key_padding_mask.unsqueeze(1).unsqueeze(2), float('-inf'))
+       logits = logits.masked_fill(key_padding_mask.unsqueeze(1).unsqueeze(3), -1e20)
     
     
     if self.relative_positional is not None:
