@@ -5,7 +5,7 @@ from torch import nn
 import torch.nn.functional as F
 
 from transformer import TransformerEncoderLayer, TransformerDecoderLayer, PositionalEncoding
-
+from data_utils import decollate_tensor
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
@@ -70,7 +70,12 @@ class Model(nn.Module):
         tgt_padding_mask = tgt == 0
         return tgt_padding_mask
     
-    def forward(self, x_raw, y):
+    def create_src_padding_mask(self, src):
+        # input tgt of shape ()
+        src_padding_mask = src == 0
+        return src_padding_mask
+    
+    def forward(self, x_raw, y, length_raw_signal):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
 
@@ -88,8 +93,13 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
         x = x_raw
 
+        x=decollate_tensor(x, length_raw_signal)
+        x=nn.utils.rnn.pad_sequence(x, batch_first=True)
+
         #Padding Target Mask and attention mask
         tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+        src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
+        memory_key_padding_mask = src_key_padding_mask
         tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
         #Embedding and positional encoding of tgt
@@ -98,8 +108,8 @@ class Model(nn.Module):
         
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x)
-        x_decoder = self.transformerDecoder(tgt, x_encoder, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
+        x_encoder = self.transformerEncoder(x, src_key_padding_mask=src_key_padding_mask)
+        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask=memory_key_padding_mask, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)

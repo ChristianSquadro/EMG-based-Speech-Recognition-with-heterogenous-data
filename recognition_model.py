@@ -13,7 +13,7 @@ import torch.nn.functional as F
 
 from read_emg import EMGDataset, SizeAwareSampler
 from architecture import Model
-from data_utils import combine_fixed_length, decollate_tensor
+from data_utils import combine_fixed_length
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -73,7 +73,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
-            X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+            X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
             y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
 
             #Shifting target for input decoder and loss
@@ -81,7 +81,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(X_raw, tgt)
+            out_enc, out_dec = model(X_raw, tgt, example['lengths'])
 
             #Decoder Loss
             out_dec=out_dec.permute(0,2,1)
@@ -114,7 +114,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
                 model.eval()
                 with torch.no_grad():
                     for idx, example in enumerate(dataloader_evaluation):
-                        X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+                        X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
                         y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
                     
                         #Shifting target for input decoder and loss
@@ -122,7 +122,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
                         target= y[:,1:]
 
                         #Prediction without the 197-th batch because of missing label
-                        out_enc, out_dec = model(X_raw, tgt)
+                        out_enc, out_dec = model(X_raw, tgt, example['lengths'])
 
                         #Decoder Loss
                         out_dec=out_dec.permute(0,2,1)

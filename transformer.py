@@ -52,7 +52,7 @@ class TransformerEncoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        src2 = self.self_attn(src, src, src)
+        src2 = self.self_attn(src, src, src, src_key_padding_mask=src_key_padding_mask)
         src = src + self.dropout1(src2)
         src = self.norm1(src)
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
@@ -117,11 +117,11 @@ class TransformerDecoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        tgt2 = self.self_attn(tgt, tgt, tgt, tgt_key_padding_mask, tgt_mask)
+        tgt2 = self.self_attn(tgt, tgt, tgt,tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
-        tgt2=self.multihead_attn(tgt, memory, memory)
+        tgt2=self.multihead_attn(tgt, memory, memory, memory_key_padding_mask=memory_key_padding_mask)
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
@@ -156,7 +156,7 @@ class MultiHeadAttention(nn.Module):
     else:
         self.relative_positional = None
 
-  def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, key_padding_mask: Optional[torch.Tensor] = None, attn_mask: Optional[torch.Tensor] = None):
+  def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, tgt_key_padding_mask: Optional[torch.Tensor] = None, tgt_mask: Optional[torch.Tensor] = None, src_key_padding_mask: Optional[torch.Tensor] = None, memory_key_padding_mask: Optional[torch.Tensor] = None):
     """Runs the multi-head self-attention layer.
 
     Args:
@@ -174,13 +174,21 @@ class MultiHeadAttention(nn.Module):
     logits = torch.einsum('bhqa,bhka->bhqk', q, k) / (self.d_qkv ** 0.5)
 
     # Apply att_mask to the attention weights if provided
-    if attn_mask is not None:
-        logits = logits.masked_fill(attn_mask == float('-inf'), -1e20)
+    if tgt_mask is not None:
+        logits = logits.masked_fill(tgt_mask == float('-inf'), -1e8)
     
     
     #Apply padding_mask to the attention weights if provided
-    if key_padding_mask is not None:
-       logits = logits.masked_fill(key_padding_mask.unsqueeze(1).unsqueeze(3), -1e20)
+    if tgt_key_padding_mask is not None:
+       logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
+
+    #Apply padding_mask to the attention weights if provided
+    if src_key_padding_mask is not None:
+       logits = logits.masked_fill(src_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
+
+    #Apply padding_mask to the attention weights if provided
+    if memory_key_padding_mask is not None:
+       logits = logits.masked_fill(memory_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8)
     
     
     if self.relative_positional is not None:
