@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import logging
 import subprocess
-from ctcdecode import OnlineCTCBeamDecoder, DecoderState
 import jiwer
 import random
 from torch.utils.tensorboard import SummaryWriter
@@ -31,44 +30,7 @@ flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 
 def test(model, testset, device):
-    model.eval()
-
-    blank_id = len(testset.text_transform.chars)
-    decoder = OnlineCTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
-            model_path='lm.binary', alpha=1.5, beta=1.85)
-    state = DecoderState(decoder)
-    dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
-    references = []
-    predictions = []
-    batch_idx = 0
-    with torch.no_grad():
-        for example in dataloader:
-            X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
-            tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
-
-            #Prediction without the 197-th batch because of missing label
-            if batch_idx != 181:
-                tgt=tgt[:1,:1]
-                out_enc, out_dec = model(X_raw, tgt)
-                pred  = F.log_softmax(out_dec, -1)
-
-                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred, [state], [True])
-                pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
-
-                pred_text = testset.text_transform.int_to_text(pred_int)
-                target_text = testset.text_transform.clean_text(example['text'][0])
-
-                references.append(target_text)
-                predictions.append(pred_text)
-
-        batch_idx += 1
-        
-    model.train()
-    #remove empty strings because I had an error in the calculation of WER function
-    predictions = [predictions[i] for i in range(len(predictions)) if len(references[i]) > 0]
-    references = [references[i] for i in range(len(references)) if len(references[i]) > 0]
-    return jiwer.wer(references, predictions)
-
+    return
 
 def train_model(trainset, devset, device, writer, n_epochs=200):
     #Define Dataloader
@@ -77,7 +39,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars + 1, device, True).to(device)
+    model = Model(devset.num_features, n_chars + 1, n_chars, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -195,7 +157,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200):
     
         #Logging
         train_loss = np.mean(losses)
-        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f} validation WER: {val*100:.2f}')
+        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f}')
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
 
     model.load_state_dict(torch.load(os.path.join(FLAGS.output_directory,'model.pt'))) # re-load best parameters

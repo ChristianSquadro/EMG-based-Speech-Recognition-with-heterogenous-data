@@ -41,7 +41,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs, device , has_aux_loss=False):
+    def __init__(self, num_features, num_outs_enc, num_outs_dec, device , has_aux_loss=False):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
@@ -51,18 +51,18 @@ class Model(nn.Module):
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
-        self.embedding_tgt = nn.Embedding(num_outs,FLAGS.model_size, padding_idx=0)
+        self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=0)
         self.pos_encoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
-        self.w_out = nn.Linear(FLAGS.model_size, num_outs)
+        self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
 
         self.has_aux_loss = has_aux_loss
         if self.has_aux_loss:
-            self.w_aux = nn.Linear(FLAGS.model_size, num_outs)
+            self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
         self.device=device
 
     def create_tgt_padding_mask(self, tgt):
@@ -99,7 +99,7 @@ class Model(nn.Module):
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
         x_encoder = self.transformerEncoder(x)
-        x_decoder = self.transformerDecoder(tgt, x_encoder,tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
+        x_decoder = self.transformerDecoder(tgt, x_encoder, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)

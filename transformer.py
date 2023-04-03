@@ -81,13 +81,7 @@ class TransformerDecoderLayer(nn.Module):
         norm_first: if ``True``, layer norm is done prior to self attention, multihead
             attention and feedforward operations, respectively. Otherwise it's done after.
             Default: ``False`` (after).
-
-    Examples::
-        >>> decoder_layer = nn.TransformerDecoderLayer(d_model=512, nhead=8)
-        >>> memory = torch.rand(10, 32, 512)
-        >>> tgt = torch.rand(20, 32, 512)
-        >>> out = decoder_layer(tgt, memory)
-    """
+        """
     # Adapted from pytorch source
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
         super(TransformerDecoderLayer, self).__init__()
