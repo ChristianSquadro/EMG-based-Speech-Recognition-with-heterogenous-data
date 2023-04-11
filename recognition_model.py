@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import logging
 import subprocess
-from ctcdecode import CTCBeamDecoder, DecoderState
+from ctcdecode import OnlineCTCBeamDecoder, DecoderState
 import jiwer
 import random
 from torch.utils.tensorboard import SummaryWriter
@@ -31,8 +31,8 @@ flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file'
 def test(model, testset, device):
     model.eval()
 
-    blank_id = 1
-    decoder = CTCBeamDecoder(testset.text_transform.chars, blank_id=blank_id, log_probs_input=True,
+    blank_id = len(testset.text_transform.chars)
+    decoder = OnlineCTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
             model_path='lm.binary', alpha=1.5, beta=1.85)
     state = DecoderState(decoder)
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
@@ -46,10 +46,11 @@ def test(model, testset, device):
 
             #Prediction without the 197-th batch because of missing label
             if batch_idx != 181:
+                tgt=tgt[0,0]
                 out_enc, out_dec = model(X_raw, tgt)
                 pred  = F.log_softmax(out_dec, -1)
 
-                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
+                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred, [state], [True])
                 pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
 
                 pred_text = testset.text_transform.int_to_text(pred_int)
@@ -142,6 +143,8 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
             train_loss= 0
 
+            #Debug
+            val = test(model, devset, device)
 
             if batch_idx % report_every == 0:     
                 #Evaluation
