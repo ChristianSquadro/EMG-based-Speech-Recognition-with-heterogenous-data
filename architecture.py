@@ -5,11 +5,11 @@ from torch import nn
 import torch.nn.functional as F
 
 from transformer import TransformerEncoderLayer, TransformerDecoderLayer, PositionalEncoding
-
+from data_utils import decollate_tensor
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
-flags.DEFINE_integer('num_layers', 3, 'number of layers')
+flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
 
 class ResBlock(nn.Module):
@@ -41,7 +41,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs, device , has_aux_loss=False):
+    def __init__(self, num_features, num_outs_enc, num_outs_dec, device , has_aux_loss=False):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
@@ -51,18 +51,18 @@ class Model(nn.Module):
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
-        self.embedding_tgt = nn.Embedding(num_outs,FLAGS.model_size, padding_idx=0)
+        self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=0)
         self.pos_encoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
-        self.w_out = nn.Linear(FLAGS.model_size, num_outs)
+        self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
 
         self.has_aux_loss = has_aux_loss
         if self.has_aux_loss:
-            self.w_aux = nn.Linear(FLAGS.model_size, num_outs)
+            self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
         self.device=device
 
     def create_tgt_padding_mask(self, tgt):
@@ -70,7 +70,12 @@ class Model(nn.Module):
         tgt_padding_mask = tgt == 0
         return tgt_padding_mask
     
-    def forward(self, x_raw, y):
+    def create_src_padding_mask(self, src):
+        # input tgt of shape ()
+        src_padding_mask = src == 0
+        return src_padding_mask
+    
+    def forward(self, x_raw, y, length_raw_signal):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
 
@@ -88,8 +93,13 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
         x = x_raw
 
+        x=decollate_tensor(x, length_raw_signal)
+        x=nn.utils.rnn.pad_sequence(x, batch_first=True)
+
         #Padding Target Mask and attention mask
         tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+        src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
+        memory_key_padding_mask = src_key_padding_mask
         tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
         #Embedding and positional encoding of tgt
@@ -98,8 +108,8 @@ class Model(nn.Module):
         
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x)
-        x_decoder = self.transformerDecoder(tgt, x_encoder,tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
+        x_encoder = self.transformerEncoder(x, src_key_padding_mask=src_key_padding_mask)
+        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask=memory_key_padding_mask, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)

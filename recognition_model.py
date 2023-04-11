@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import logging
 import subprocess
-from ctcdecode import OnlineCTCBeamDecoder, DecoderState
+from ctcdecode import CTCBeamDecoder, DecoderState
 import jiwer
 import random
 from torch.utils.tensorboard import SummaryWriter
@@ -14,25 +14,27 @@ import torch.nn.functional as F
 
 from read_emg import EMGDataset, SizeAwareSampler
 from architecture import Model
-from data_utils import combine_fixed_length, decollate_tensor
+from data_utils import combine_fixed_length
 
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
+flags.DEFINE_float('learning_rate', 3e-5, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0, 'weight decay')
+flags.DEFINE_float('alpha_loss', 0.8, 'parameter alpha for the two losses')
+flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 
 def test(model, testset, device):
     model.eval()
 
-    blank_id = len(testset.text_transform.chars)
-    decoder = OnlineCTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
+    blank_id = 1
+    decoder = CTCBeamDecoder(testset.text_transform.chars, blank_id=blank_id, log_probs_input=True,
             model_path='lm.binary', alpha=1.5, beta=1.85)
     state = DecoderState(decoder)
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
@@ -46,11 +48,10 @@ def test(model, testset, device):
 
             #Prediction without the 197-th batch because of missing label
             if batch_idx != 181:
-                tgt=tgt[0,0]
                 out_enc, out_dec = model(X_raw, tgt)
                 pred  = F.log_softmax(out_dec, -1)
 
-                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred, [state], [True])
+                beam_results, beam_scores, timesteps, out_lens = decoder.decode(pred)
                 pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
 
                 pred_text = testset.text_transform.int_to_text(pred_int)
@@ -70,12 +71,12 @@ def test(model, testset, device):
 
 def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, alpha=0.7):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, collate_fn=EMGDataset.collate_raw, batch_size=2)
-    dataloader_evaluation = torch.utils.data.DataLoader(devset, batch_size=1)
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, shuffle= True ,collate_fn=EMGDataset.collate_raw, batch_size=2)
+    dataloader_evaluation = torch.utils.data.DataLoader(devset, collate_fn=EMGDataset.collate_raw, batch_size=1)
 
     #Define model and loss function
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars + 1, device, True).to(device)
+    model = Model(devset.num_features, n_chars + 1, n_chars, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -85,6 +86,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
     lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[125,150,175], gamma=.5)
+
 
     def set_lr(new_lr):
         for param_group in optim.param_groups:
@@ -99,15 +101,16 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
     batch_idx = 0
     train_loss= 0
     eval_loss = 0
+    run_steps=0
     optim.zero_grad()
     for epoch_idx in range(n_epochs):
         model.train()
         losses = []
         for example in dataloader_training:
             schedule_lr(batch_idx)
-
+            
             #Preprosessing of the input and target for the model
-            X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+            X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
             y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
 
             #Shifting target for input decoder and loss
@@ -115,7 +118,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(X_raw, tgt)
+            out_enc, out_dec = model(X_raw, tgt, example['lengths'])
 
             #Decoder Loss
             out_dec=out_dec.permute(0,2,1)
@@ -127,31 +130,29 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)) 
 
             #Combination the two losses
-            loss = (1 - alpha) * loss_dec + alpha * loss_enc
+            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
 
             #Gradient Update
             loss.backward()
-            if (batch_idx+1) % 2 == 0:
+            if (batch_idx+1) % 30 == 0:
                 optim.step()
                 optim.zero_grad()
-            
-            
-            #Increment counter and print the loss training       
-            batch_idx += 1
-            writer.add_scalar('Loss/Training', train_loss / batch_idx, batch_idx)
-            train_loss= 0
 
             #Debug
-            val = test(model, devset, device)
+            #val = test(model, devset, device)
+
+            #Increment counter and print the loss training       
+            batch_idx += 1
+
 
             if batch_idx % report_every == 0:     
                 #Evaluation
                 model.eval()
                 with torch.no_grad():
                     for idx, example in enumerate(dataloader_evaluation):
-                        X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
+                        X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
                         y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
                     
                         #Shifting target for input decoder and loss
@@ -159,28 +160,42 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
                         target= y[:,1:]
 
                         #Prediction without the 197-th batch because of missing label
-                        out_enc, out_dec = model(X_raw, tgt)
+                        out_enc, out_dec = model(X_raw, tgt, example['lengths'])
+
                         #Decoder Loss
                         out_dec=out_dec.permute(0,2,1)
                         loss = loss_fn(out_dec, target)
+                        loss_dec = loss_fn(out_dec, target)
+
+                        #Encoder Loss
+                        out_enc = F.log_softmax(out_enc, 2)
+                        out_enc = out_enc.transpose(1,0)
+                        loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)) 
+
+                        #Combination the two losses
+                        loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
                         eval_loss += loss.item()
+                        run_steps += 1
                         
                         #just for now
                         if idx == 10:
                             break
 
                 #Writing on tensorboard
-                writer.add_scalar('Loss/Evaluation', eval_loss / batch_idx, batch_idx)
+                writer.add_scalar('Loss/Evaluation', eval_loss / run_steps, batch_idx)
+                writer.add_scalar('Loss/Training', train_loss / run_steps, batch_idx)
+                train_loss= 0
                 eval_loss= 0
+                run_steps=0
 
         #Testing and change learning rate
-        val = test(model, devset, device)
-        writer.add_scalar('WER/Evaluation',val, batch_idx)
+        #val = test(model, devset, device)
+        #writer.add_scalar('WER/Evaluation',val, batch_idx)
         lr_sched.step()
     
         #Logging
         train_loss = np.mean(losses)
-        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f} validation WER: {val*100:.2f}')
+        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f}')
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
 
     model.load_state_dict(torch.load(os.path.join(FLAGS.output_directory,'model.pt'))) # re-load best parameters
