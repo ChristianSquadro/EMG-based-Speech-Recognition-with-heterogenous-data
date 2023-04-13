@@ -4,8 +4,8 @@ import string
 import numpy as np
 import librosa
 import soundfile as sf
+from textgrids import TextGrid
 import jiwer
-from num2words import num2words
 from unidecode import unidecode
 
 import torch
@@ -15,9 +15,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
-#phoneme_inventory = ['aa','ae','ah','ao','aw','ax','axr','ay','b','ch','d','dh','dx','eh','el','em','en','er','ey','f','g','hh','hv','ih','iy','jh','k','l','m','n','nx','ng','ow','oy','p','r','s','sh','t','th','uh','uw','v','w','y','z','zh','sil']
-phoneme_inventory = ['AA0', 'AA1', 'AA2', 'AE0', 'AE1', 'AE2', 'AH0', 'AH1', 'AH2', 'AO0', 'AO1', 'AO2', 'AW0', 'AW1', 'AW2', 'AY0', 'AY1', 'AY2', 'B', 'CH', 'D', 'DH', 'EH0', 'EH1', 'EH2', 'ER0', 'ER1', 'ER2', 'EY0', 'EY1', 'EY2', 'F', 'G', 'HH', 'IH0', 'IH1', 'IH2', 'IY0', 'IY1', 'IY2', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW0', 'OW1', 'OW2', 'OY0', 'OY1', 'OY2', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH0', 'UH1', 'UH2', 'UW0', 'UW1', 'UW2', 'V', 'W', 'Y', 'Z', 'ZH']
-pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/librispeech-lexicon.txt') if line.split() != [] }
+phoneme_inventory = ['aa','ae','ah','ao','aw','ax','axr','ay','b','ch','d','dh','dx','eh','el','em','en','er','ey','f','g','hh','hv','ih','iy','jh','k','l','m','n','nx','ng','ow','oy','p','r','s','sh','t','th','uh','uw','v','w','y','z','zh','sil']
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)
@@ -223,28 +221,25 @@ def print_confusion(confusion_mat, n=10):
         p2s = phoneme_inventory[p2]
         print(f'{p1s} {p2s} {v*100:.1f} {(confusion_mat[p1,p1]+confusion_mat[p2,p2])/(target_counts[p1]+target_counts[p2])*100:.1f}')
 
-def read_phonemes(sentence):
-    #Transform digits into words
-    digits=[]
-    new_sentence=""
-    for unit in sentence:
-        if unit.isdigit():
-            digits.append(unit)
-        elif unit == ' ' and digits:
-            new_sentence += num2words(int(''.join(digits))) + ' '
-            digits=[]  
-        elif unit.isalpha() or unit == ' ':
-            new_sentence += unit     
-            
-    #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"-": r" ",}),jiwer.RemovePunctuation(), jiwer.ToUpperCase()])(new_sentence).split()
-    
-    #Transform the words into sequences of phones
-    phones = []
-    for n in new_sentence:
-        p = pron_dct[n]
-        phones.append(p)
-    return np.array([np.array([phoneme_inventory.index(phone) for phone in word_phone], dtype=np.int32) for word_phone in phones], dtype=np.int32)
+def read_phonemes(textgrid_fname, max_len=None):
+    tg = TextGrid(textgrid_fname)
+    phone_ids = np.zeros(int(tg['phones'][-1].xmax*86.133)+1, dtype=np.int64)
+    phone_ids[:] = -1
+    phone_ids[-1] = phoneme_inventory.index('sil') # make sure list is long enough to cover full length of original sequence
+    for interval in tg['phones']:
+        phone = interval.text.lower()
+        if phone in ['', 'sp', 'spn']:
+            phone = 'sil'
+        if phone[-1] in string.digits:
+            phone = phone[:-1]
+        ph_id = phoneme_inventory.index(phone)
+        phone_ids[int(interval.xmin*86.133):int(interval.xmax*86.133)] = ph_id
+    assert (phone_ids >= 0).all(), 'missing aligned phones'
+
+    if max_len is not None:
+        phone_ids = phone_ids[:max_len]
+        assert phone_ids.shape[0] == max_len
+    return phone_ids
 
 class TextTransform(object):
     def __init__(self):

@@ -54,7 +54,7 @@ def apply_to_all(function, signal_array, *args, **kwargs):
         results.append(function(signal_array[:,i], *args, **kwargs))
     return np.stack(results, 1)
 
-def load_utterance(base_dir, index, limit_length=False, debug=False):
+def load_utterance(base_dir, index, limit_length=False, debug=False, text_align_directory=None):
     index = int(index)
     raw_emg = np.load(os.path.join(base_dir, f'{index}_emg.npy'))
     before = os.path.join(base_dir, f'{index-1}_emg.npy')
@@ -96,9 +96,12 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
         info = json.load(f)
 
     sess = os.path.basename(base_dir)
-    
-    phonemes=read_phonemes(info['text'])
-    
+    tg_fname = f'{text_align_directory}/{sess}/{sess}_{index}_audio.TextGrid'
+    if os.path.exists(tg_fname):
+        phonemes = read_phonemes(tg_fname, mfccs.shape[0])
+    else:
+        phonemes = np.zeros(mfccs.shape[0], dtype=np.int64)+phoneme_inventory.index('sil')
+
     return mfccs, emg_features, info['text'], (info['book'],info['sentence_index']), phonemes, emg_orig.astype(np.float32)
 
 class EMGDirectory(object):
@@ -225,7 +228,7 @@ class EMGDataset(torch.utils.data.Dataset):
     @lru_cache(maxsize=None)
     def __getitem__(self, i):
         directory_info, idx = self.example_indices[i]
-        mfccs, emg, text, book_location, phonemes, raw_emg = load_utterance(directory_info.directory, idx, self.limit_length)
+        mfccs, emg, text, book_location, phonemes, raw_emg = load_utterance(directory_info.directory, idx, self.limit_length, text_align_directory=self.text_align_directory)
         raw_emg = raw_emg / 20
         raw_emg = 50*np.tanh(raw_emg/50.)
 
@@ -244,7 +247,7 @@ class EMGDataset(torch.utils.data.Dataset):
 
         if directory_info.silent:
             voiced_directory, voiced_idx = self.voiced_data_locations[book_location]
-            voiced_mfccs, voiced_emg, _, _, phonemes, _ = load_utterance(voiced_directory.directory, voiced_idx, False)
+            voiced_mfccs, voiced_emg, _, _, phonemes, _ = load_utterance(voiced_directory.directory, voiced_idx, False, text_align_directory=self.text_align_directory)
 
             if not self.no_normalizers:
                 voiced_mfccs = self.mfcc_norm.normalize(voiced_mfccs)

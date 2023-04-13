@@ -9,3 +9,5 @@ models/recognition_model/model.pt
 hifi_gan
 content/runs
 models/recognition_model/log.txt
+descriptions
+text_alignments
