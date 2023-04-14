@@ -1,5 +1,6 @@
 import math
 import string
+import logging
 
 import numpy as np
 import librosa
@@ -224,6 +225,10 @@ def print_confusion(confusion_mat, n=10):
         print(f'{p1s} {p2s} {v*100:.1f} {(confusion_mat[p1,p1]+confusion_mat[p2,p2])/(target_counts[p1]+target_counts[p2])*100:.1f}')
 
 def read_phonemes(sentence):
+    
+    #Premanipulation to avoid issues with num2words
+    sentence=jiwer.SubstituteRegexes({r"_": r" ", r"th": r" th", r"£": r"pound "})(sentence)
+    
     #Transform digits into words
     digits=[]
     new_sentence=""
@@ -233,18 +238,21 @@ def read_phonemes(sentence):
         elif unit == ' ' and digits:
             new_sentence += num2words(int(''.join(digits))) + ' '
             digits=[]  
-        elif unit.isalpha() or unit == ' ':
+        else:
             new_sentence += unit     
             
     #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"-": r" ",}),jiwer.RemovePunctuation(), jiwer.ToUpperCase()])(new_sentence).split()
+    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’s": r"'s",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
     
     #Transform the words into sequences of phones
     phones = []
     for n in new_sentence:
-        p = pron_dct[n]
-        phones.append(p)
-    return np.array([np.array([phoneme_inventory.index(phone) for phone in word_phone], dtype=np.int32) for word_phone in phones], dtype=np.int32)
+        try:
+            p = pron_dct[n]
+            phones.append(p)
+        except KeyError as e:
+            logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
+    return np.array([ phoneme_inventory.index(phone) for word_phone in phones for phone in word_phone], dtype=np.int64)
 
 class TextTransform(object):
     def __init__(self):
