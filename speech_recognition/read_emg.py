@@ -19,7 +19,7 @@ import soundfile as sf
 
 import torch
 
-from data_utils import load_audio, get_emg_features, FeatureNormalizer, phoneme_inventory, read_phonemes, TextTransform
+from data_utils import load_audio, get_emg_features, FeatureNormalizer, phoneme_inventory, read_phonemes, TextTransform, PhoneTransform
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -204,6 +204,7 @@ class EMGDataset(torch.utils.data.Dataset):
         self.num_sessions = len(directories)
 
         self.text_transform = TextTransform()
+        self.phone_transform = PhoneTransform()
 
     def silent_subset(self):
         result = copy(self)
@@ -240,6 +241,7 @@ class EMGDataset(torch.utils.data.Dataset):
         #self.text_transform.add_new_words(text)
         text_int = np.array(self.text_transform.text_to_int(text), dtype=np.int64)
 
+
         result = {'audio_features':torch.from_numpy(mfccs).pin_memory(), 'emg':torch.from_numpy(emg).pin_memory(), 'text':text, 'text_int': torch.from_numpy(text_int).pin_memory(), 'file_label':idx, 'session_ids':torch.from_numpy(session_ids).pin_memory(), 'book_location':book_location, 'silent':directory_info.silent, 'raw_emg':torch.from_numpy(raw_emg).pin_memory()}
 
         if directory_info.silent:
@@ -255,7 +257,8 @@ class EMGDataset(torch.utils.data.Dataset):
             result['parallel_voiced_emg'] = torch.from_numpy(voiced_emg).pin_memory()
 
             audio_file = f'{voiced_directory.directory}/{voiced_idx}_audio_clean.flac'
-
+        
+        phonemes=np.array(self.phone_transform.phone_to_int(phonemes), dtype=np.int64)
         result['phonemes'] = torch.from_numpy(phonemes).pin_memory() # either from this example if vocalized or aligned example if silent
         result['audio_file'] = audio_file
 
@@ -277,6 +280,7 @@ class EMGDataset(torch.utils.data.Dataset):
                 audio_feature_lengths.append(ex['audio_features'].shape[0])
                 parallel_emg.append(np.zeros(1))
         phonemes = [ex['phonemes'] for ex in batch]
+        phonemes_lengths = [ex['phonemes'].shape[0] for ex in batch]
         emg = [ex['emg'] for ex in batch]
         raw_emg = [ex['raw_emg'] for ex in batch]
         session_ids = [ex['session_ids'] for ex in batch]
@@ -291,6 +295,7 @@ class EMGDataset(torch.utils.data.Dataset):
                   'raw_emg':raw_emg,
                   'parallel_voiced_emg':parallel_emg,
                   'phonemes':phonemes,
+                  'phonemes_lengths': phonemes_lengths,
                   'session_ids':session_ids,
                   'lengths':lengths,
                   'silent':silent,

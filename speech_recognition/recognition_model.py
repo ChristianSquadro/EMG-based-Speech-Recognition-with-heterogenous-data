@@ -20,7 +20,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-5, 'learning rate')
+flags.DEFINE_float('learning_rate', 3e-7, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
@@ -72,8 +72,8 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
     dataloader_evaluation = torch.utils.data.DataLoader(devset, collate_fn=EMGDataset.collate_raw, batch_size=1)
 
     #Define model and loss function
-    n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars + 1, n_chars, device, True).to(device)
+    n_phones = len(devset.phone_transform.phoneme_inventory)
+    model = Model(devset.num_features, n_phones + 1, n_phones, device, True).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -108,7 +108,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             
             #Preprosessing of the input and target for the model
             X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+            y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True).to(device)
 
             #Shifting target for input decoder and loss
             tgt= y[:,:-1]
@@ -124,7 +124,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_lengths'], blank = len(devset.text_transform.chars)) 
 
             #Combination the two losses
             loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
@@ -150,7 +150,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
                 with torch.no_grad():
                     for idx, example in enumerate(dataloader_evaluation):
                         X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-                        y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True).to(device)
+                        y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True).to(device)
                     
                         #Shifting target for input decoder and loss
                         tgt= y[:,:-1]
@@ -167,7 +167,7 @@ def train_model(trainset, devset, device, writer, n_epochs=200, report_every=1, 
                         #Encoder Loss
                         out_enc = F.log_softmax(out_enc, 2)
                         out_enc = out_enc.transpose(1,0)
-                        loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = len(devset.text_transform.chars)) 
+                        loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_lengths'], blank = len(devset.text_transform.chars)) 
 
                         #Combination the two losses
                         loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
@@ -213,14 +213,14 @@ def main():
             logging.StreamHandler()
             ], level=logging.INFO, format="%(message)s")
 
-    logging.info(subprocess.run(['git','rev-parse','HEAD'], stdout=subprocess.PIPE, universal_newlines=True).stdout)
-    logging.info(subprocess.run(['git','diff'], stdout=subprocess.PIPE, universal_newlines=True).stdout)
+  #  logging.info(subprocess.run(['git','rev-parse','HEAD'], stdout=subprocess.PIPE, universal_newlines=True).stdout)
+  #  logging.info(subprocess.run(['git','diff'], stdout=subprocess.PIPE, universal_newlines=True).stdout)
 
-    logging.info(sys.argv)
+  #  logging.info(sys.argv)
 
     trainset = EMGDataset(dev=False,test=False)
     devset = EMGDataset(dev=True)
-    logging.info('output example: %s', devset.example_indices[0])
+  #  logging.info('output example: %s', devset.example_indices[0])
     logging.info('train / dev split: %d %d',len(trainset),len(devset))
 
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'

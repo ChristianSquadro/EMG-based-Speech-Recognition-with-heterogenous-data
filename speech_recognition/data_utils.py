@@ -17,8 +17,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
 #phoneme_inventory = ['aa','ae','ah','ao','aw','ax','axr','ay','b','ch','d','dh','dx','eh','el','em','en','er','ey','f','g','hh','hv','ih','iy','jh','k','l','m','n','nx','ng','ow','oy','p','r','s','sh','t','th','uh','uw','v','w','y','z','zh','sil']
-phoneme_inventory = ['AA0', 'AA1', 'AA2', 'AE0', 'AE1', 'AE2', 'AH0', 'AH1', 'AH2', 'AO0', 'AO1', 'AO2', 'AW0', 'AW1', 'AW2', 'AY0', 'AY1', 'AY2', 'B', 'CH', 'D', 'DH', 'EH0', 'EH1', 'EH2', 'ER0', 'ER1', 'ER2', 'EY0', 'EY1', 'EY2', 'F', 'G', 'HH', 'IH0', 'IH1', 'IH2', 'IY0', 'IY1', 'IY2', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW0', 'OW1', 'OW2', 'OY0', 'OY1', 'OY2', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH0', 'UH1', 'UH2', 'UW0', 'UW1', 'UW2', 'V', 'W', 'Y', 'Z', 'ZH']
-pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/librispeech-lexicon.txt') if line.split() != [] }
+phoneme_inventory = ['<PAD>','AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH']
+pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)
@@ -252,12 +252,12 @@ def read_phonemes(sentence):
             phones.append(p)
         except KeyError as e:
             logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
-    return np.array([ phoneme_inventory.index(phone) for word_phone in phones for phone in word_phone], dtype=np.int64)
+    return [phone for word_phone in phones for phone in word_phone]
 
 class TextTransform(object):
     def __init__(self):
         self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
-        self.chars = "*" + string.ascii_lowercase+string.digits+ ' '
+        self.chars = "*" + string.ascii_lowercase+string.digits+ ' ' #TODO remove *
         self.vocabulary_size=len(self.chars)
 
     def clean_text(self, text):
@@ -271,4 +271,15 @@ class TextTransform(object):
 
     def int_to_text(self, ints):
         return ''.join(self.chars[i] for i in ints)
+    
+class PhoneTransform(object):
+    def __init__(self):
+        self.phoneme_inventory = phoneme_inventory
+        self.vocabulary_size=len(self.phoneme_inventory)
+
+    def phone_to_int(self, phone):
+        return [self.phoneme_inventory.index(c) for c in phone]
+
+    def int_to_phone(self, ints):
+        return ''.join(self.phoneme_inventory[i] for i in ints)
     
