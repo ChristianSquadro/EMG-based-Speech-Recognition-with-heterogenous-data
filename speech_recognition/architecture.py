@@ -41,7 +41,7 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs_enc, num_outs_dec, device , has_aux_loss=False):
+    def __init__(self, num_features, num_outs_enc, num_outs_dec, device):
         super().__init__()
 
         self.conv_blocks = nn.Sequential(
@@ -59,11 +59,14 @@ class Model(nn.Module):
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
-
-        self.has_aux_loss = has_aux_loss
-        if self.has_aux_loss:
-            self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
+        self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
+        
         self.device=device
+        
+        self.tgt_key_padding_mask=None
+        self.src_key_padding_mask=None
+        self.memory_key_padding_mask=None
+        self.tgt_mask=None
 
     def create_tgt_padding_mask(self, tgt):
         # input tgt of shape ()
@@ -97,10 +100,10 @@ class Model(nn.Module):
         x=nn.utils.rnn.pad_sequence(x, batch_first=True)
 
         #Padding Target Mask and attention mask
-        tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-        src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
-        memory_key_padding_mask = src_key_padding_mask
-        tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+        self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+        self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
+        self.memory_key_padding_mask = self.src_key_padding_mask
+        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
         #Embedding and positional encoding of tgt
         tgt=self.embedding_tgt(y)
@@ -108,14 +111,52 @@ class Model(nn.Module):
         
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x, src_key_padding_mask=src_key_padding_mask)
-        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask=memory_key_padding_mask, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
+        x_encoder = self.transformerEncoder(x, src_key_padding_mask=self.src_key_padding_mask)
+        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask=self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)
 
-        if self.has_aux_loss:
-            return self.w_aux(x_encoder), self.w_out(x_decoder)
-        else:
-            return self.w_out(x)
+        
+        return self.w_aux(x_encoder), self.w_out(x_decoder)
+        
+    def forward_separate(self, mode , x_raw=None, y=None, memory=None):
+        # x shape is (batch, time, electrode)
+        # y shape is (batch, sequence_length)
+
+        if mode == 'encoder':
+            if self.training:
+                r = random.randrange(8)
+                if r > 0:
+                    x_raw_clone = x_raw.clone()
+                    x_raw_clone[:,:-r,:] = x_raw[:,r:,:] # shift left r
+                    x_raw_clone[:,-r:,:] = 0
+                    x_raw = x_raw_clone
+
+            x_raw = x_raw.transpose(1,2) # put channel before time for conv
+            x_raw = self.conv_blocks(x_raw)
+            x_raw = x_raw.transpose(1,2)
+            x_raw = self.w_raw_in(x_raw)
+            x = x_raw
+
+            
+            x = x.transpose(0,1) # put time first
+            x_encoder = self.transformerEncoder(x)
+            x_encoder = x_encoder.transpose(0,1)
+            
+            return self.w_aux(x_encoder)
+            
+        elif mode == 'decoder':
+            #Padding Target Mask and attention mask
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+
+            #Embedding and positional encoding of tgt
+            tgt=self.embedding_tgt(y)
+            tgt=self.pos_encoder(tgt)
+            
+            tgt = tgt.transpose(0,1) # put sequence_length first
+            x_decoder = self.transformerDecoder(tgt, memory,tgt_mask=self.tgt_mask)
+            x_decoder = x_decoder.transpose(0,1)
+            
+            return self.w_out(x_decoder)
 
