@@ -277,6 +277,7 @@ class PhoneTransform(object):
         self.vocabulary_size=len(self.phoneme_inventory)
 
     def phone_to_int(self, phone):
+        phone= ['<S>']+ phone + ['</S>']
         return [self.phoneme_inventory.index(c) for c in phone]
 
     def int_to_phone(self, ints):

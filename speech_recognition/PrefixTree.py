@@ -18,7 +18,7 @@ class Node:
         self.phone = phone # may be None for start node
         self.words = [] if words is None else words
         self._phone_count = phone_count
-        self.probs = np.full(phone_count+1,-np.inf) # +1 for end token
+        self.probs = np.full(phone_count+3,-np.inf) # +3 for end token,start token and padding token
         self.children = {} # all child elements indexed by PHONE 
 #         self.cont = False # does a word have a continuation? 
         self._id = Node._id
@@ -267,7 +267,8 @@ def coverage_penalty():
     return 0
 
 def check_language_model(lm, sentence):
-    # Get sentence where the new word was added
+    # tranform from list of word into a string (lm accepts only string)
+    sentence= ' '.join(sentence)
     logprob = lm.score(sentence, bos = False, eos = False)
     return logprob
 

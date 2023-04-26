@@ -17,7 +17,7 @@ from BeamSearch import run_single_bs
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('debug', False, 'debug')
+flags.DEFINE_boolean('debug', True, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
 flags.DEFINE_float('learning_rate', 3e-7, 'learning rate')
@@ -61,14 +61,14 @@ def test(model, testset, device, tree, language_model):
     #references = [references[i] for i in range(len(references)) if len(references[i]) > 0]
     return jiwer.wer(references, predictions)
 
-def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=1):
+def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=50):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, shuffle= True ,collate_fn=EMGDataset.collate_raw, batch_size=2)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, collate_fn=EMGDataset.collate_raw, batch_size=1)
 
     #Define model and loss function
     n_phones = len(devset.phone_transform.phoneme_inventory)
-    model = Model(devset.num_features, n_phones + 1, n_phones, device).to(device)
+    model = Model(devset.num_features, n_phones + 1, n_phones, device).to(device) #plus 1 for the blank symbol of CTC loss
     loss_fn=nn.CrossEntropyLoss(ignore_index=0)
 
     if FLAGS.start_training_from is not None:
@@ -132,8 +132,6 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
                 optim.step()
                 optim.zero_grad()
 
-            #Debug
-            test(model, devset, device, tree, language_model)
 
             #Increment counter and print the loss training       
             batch_idx += 1
@@ -142,6 +140,10 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             if batch_idx % report_every == 0:     
                 #Evaluation
                 model.eval()
+                
+                #Debug
+                test(model, devset, device, tree, language_model)
+                
                 with torch.no_grad():
                     for idx, example in enumerate(dataloader_evaluation):
                         X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)

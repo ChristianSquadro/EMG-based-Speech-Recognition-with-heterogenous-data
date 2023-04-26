@@ -144,18 +144,16 @@ class Model(nn.Module):
             x_encoder = self.transformerEncoder(x)
             x_encoder = x_encoder.transpose(0,1)
             
-            return self.w_aux(x_encoder)
+            return x_encoder
             
         elif mode == 'decoder':
-            #Padding Target Mask and attention mask
-            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
-
             #Embedding and positional encoding of tgt
             tgt=self.embedding_tgt(y)
             tgt=self.pos_encoder(tgt)
             
             tgt = tgt.transpose(0,1) # put sequence_length first
-            x_decoder = self.transformerDecoder(tgt, memory,tgt_mask=self.tgt_mask)
+            memory = memory.transpose(0,1) # put sequence_length first
+            x_decoder = self.transformerDecoder(tgt, memory)
             x_decoder = x_decoder.transpose(0,1)
             
             return self.w_out(x_decoder)

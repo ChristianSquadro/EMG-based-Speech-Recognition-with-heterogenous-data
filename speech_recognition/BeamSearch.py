@@ -14,7 +14,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
-flags.DEFINE_float('LM_Weight', 0.9 , 'importance for language model scoring')
+flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
 flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
     
 # Helpers
@@ -34,7 +34,7 @@ def decode(l,dct,start_tok,end_tok):
         result.append(dct.lookupPhoneByIndex(p).name)
     return result
 
-HypoHolder = collections.namedtuple('HypoHolder',['histories','probs','memory','words','nodes'])
+HypoHolder = collections.namedtuple('HypoHolder',['histories','probs','words','nodes'])
 
 def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     def check_hypos_are_consistent(h,step):
@@ -52,7 +52,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         #assert real_state[0].shape[0] == h.histories.shape[0]
         #assert real_state[1].shape[0] == h.histories.shape[0]
 
-    def update_hypos(old_hypos,filter_list,this_step_probs,unfiltered_new_state,dct):
+    def update_hypos(old_hypos,filter_list,this_step_probs,dct):
         assert type(old_hypos) == HypoHolder
         assert filter_list.shape[1] == 2 # 
         # note: we have to update the elements of old_hypos: histories, probs, state, aligns, words, nodes
@@ -67,20 +67,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         pre_probs = old_hypos.probs[filter_list[:,0]]
         flt_probs = this_step_probs[filter_list[:,0],filter_list[:,1]][:,None]
         new_probs = torch.cat([pre_probs,flt_probs],1)
-    
-        new_state = filter_state(unfiltered_new_state,filter_list[:,0])
-        flt_att = new_state[1]
-
-        # filter and extend alignments
-        pre_align = [ old_hypos.aligns[p] for p in filter_list[:,0] ]
-        assert len(pre_align) == flt_att[0].shape[0]
-        head_count = len(flt_att)
-        new_att = []
-        for pos in range(len(pre_align)):
-            this_new_att = [ flt_att[h][pos] for h in range(head_count) ]
-            new_att.append(this_new_att)
-
-        new_aligns = [ (pr + n) for (pr,n) in zip(pre_align,new_att) ]
 
         if FLAGS.Constrained:
             # filter words, but do not add new words
@@ -93,7 +79,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             accu_probs = torch.sum(flt_probs,1) 
             probs = flt_probs
 
-        new_hypos = HypoHolder(histories=new_histories,probs=new_probs,state=new_state,aligns=new_aligns,words=new_words,nodes=new_nodes)
+        new_hypos = HypoHolder(histories=new_histories,probs=new_probs,words=new_words,nodes=new_nodes)
         return new_hypos
 
 
@@ -116,7 +102,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     hypos = HypoHolder(
             histories = torch.tensor([[ start_tok ]],device=device) ,
             probs = torch.zeros(1,0,dtype=torch.float32,device=device),
-            memory= memory,
             words = [[]], 
             nodes = [tree._root] 
         )
@@ -130,21 +115,23 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             print('--- BEGIN STEP %d ---' % step)
 
         # start here
-        last_frame_hypo = hypos.histories[:,-1] # hypos is always the MOST RECENT hypo in the history
+        last_frame_hypo = hypos.histories[:,-1].unsqueeze(1) # hypos is always the MOST RECENT hypo in the history
+        memory_stub= memory.repeat(last_frame_hypo.shape[0], 1, 1) 
         
         # decode_step treats the different hypos as though they were different elements of a batch
-        step_logits, new_state = model.forward_separate('decoder',y=last_frame_hypo,memory=hypos.memory)
+        step_logits = model.forward_separate('decoder',y=last_frame_hypo,memory=memory_stub)
 
         # step_logits and step_probs have the shape (hypos * tokens)
         step_probs = torch.nn.functional.log_softmax(step_logits,1)
         
         if step == 0:
+            step_probs=step_probs[0,:,:] #to remove the batch dimension (the code doesn't take into account batches)
             full_probs = step_probs
         else:
+            step_probs=step_probs[:,0,:] #to remove the batch dimension (the code doesn't take into account batches)
             full_probs = step_probs + torch.sum(hypos.probs,1,keepdim=True)
         
         if FLAGS.Constrained:
-            old_full_probs = torch.clone(full_probs) # not needed
             full_probs = PrefixTree.filter_valid_cont(hypos.nodes, full_probs,device) 
             # this step sets all possible combinations of hypo and new phone to zero which do NOT correspond to valid words
             
@@ -156,7 +143,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         # now update the relevant variables which carry hypo information and must be aligned: histories, probs, state, align, words, nodes (the latter two only for constrained search)
 
         # normal propagation
-        new_hypos = update_hypos(hypos,top_hypos,step_probs,new_state,dct)
+        new_hypos = update_hypos(hypos,top_hypos,step_probs,dct)
 
         # save and remove finished hypos
         unfinished_hypos = save_finished_hypos(new_hypos,finished_hypos,end_tok, language_model, target.shape[1]) 
@@ -207,8 +194,6 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
     # let's make this simple, will see later how it goes best
     remaining_histories = hypos.histories[active]
     remaining_probs = hypos.probs[active]
-    remaining_state = filter_state(hypos.state,active_pos)
-    remaining_aligns = [ hypos.aligns[p] for p in active_pos ]
     remaining_words = [ hypos.words[p] for p in active_pos ]
     remaining_nodes = [ hypos.nodes[p] for p in active_pos ]
     
@@ -218,14 +203,12 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
     remaining_hypos = HypoHolder(
             histories = remaining_histories,
             probs = remaining_probs,
-            state = remaining_state,
-            aligns = remaining_aligns,
             words = remaining_words,
             nodes = remaining_nodes
             )
     return remaining_hypos
 
-def save_finished_hypo(finished_hypos,history, probs, state, align, words, nodes, language_model, len_target):
+def save_finished_hypo(finished_hypos,history, probs, words, nodes, language_model, len_target):
     score = 0
 
     # logP(Y|X) where X is the source, Y is the current target ??
@@ -245,20 +228,6 @@ def save_finished_hypo(finished_hypos,history, probs, state, align, words, nodes
         tup = (history, [])
     
     finished_hypos[torch.mean(final_prob).item()] = tup
-
-# filter the state tuple of a hypo holder according to an array of positions (as integers)
-def filter_state(state,pos_list):
-    hidden,att,annotation = state
-    if type(hidden[0]) is tuple: # depends on the kind of RNN cell
-        flt_hidden = [ (x[pos_list],y[pos_list]) for (x,y) in hidden ]
-    else:
-        flt_hidden = [ x[pos_list] for x in hidden ]
-    
-    flt_att = [na[pos_list] for na in att] # highly advanced indexing, no idea what this does 
-    flt_annotation = annotation[pos_list]
-
-    new_state = (flt_hidden,flt_att,flt_annotation)
-    return new_state
 
 # Propagate hypos across word boundaries. This works by duplicating each hypo which is at a word boundary to the tree root, adding the language model probability
 # and the new word; everything else remains unchanged. Should be done as a final step after pruning. The existing hypos will remain as they are
@@ -302,9 +271,7 @@ def check_words(tree, hypos, language_model,device):
     # collect and return
     filter_positions = torch.tensor(filter_positions,device=device)
     joint_histories = hypos.histories[filter_positions]
-    joint_state = filter_state(hypos.state,filter_positions)
     joint_probs = torch.cat([hypos.probs,torch.stack(new_probs,0)],0)
-    joint_aligns = [ hypos.aligns[p] for p in filter_positions ]
     joint_words = hypos.words + new_words
     joint_nodes = hypos.nodes + new_nodes
 #     print('ADDED %d WORDS, %d hypos -> %d hypos' % (added_word_count,hypos.histories.shape[0],joint_histories.shape[0]))
@@ -312,8 +279,6 @@ def check_words(tree, hypos, language_model,device):
     joint_hypos = HypoHolder(
             histories = joint_histories,
             probs = joint_probs,
-            state = joint_state,
-            aligns = joint_aligns,
             words = joint_words,
             nodes = joint_nodes
             )
