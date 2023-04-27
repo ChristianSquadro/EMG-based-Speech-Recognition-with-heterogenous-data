@@ -44,11 +44,11 @@ def test(model, testset, device, tree, language_model):
     with torch.no_grad():
         for example in dataloader:
             X_raw = nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True).to(device)
-            tgt = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True).to(device)
+            tgt = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
             pred=run_single_bs(model,X_raw,tgt,n_phones,tree,language_model,device)
  
-            pred_text = testset.text_transform.int_to_text(pred[1])
+            pred_text = testset.text_transform.clean_text(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
             references.append(target_text)
             predictions.append(pred_text)
@@ -61,15 +61,15 @@ def test(model, testset, device, tree, language_model):
     #references = [references[i] for i in range(len(references)) if len(references[i]) > 0]
     return jiwer.wer(references, predictions)
 
-def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=50):
+def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=1):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, shuffle= True ,collate_fn=EMGDataset.collate_raw, batch_size=2)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, collate_fn=EMGDataset.collate_raw, batch_size=1)
 
     #Define model and loss function
-    n_phones = len(devset.phone_transform.phoneme_inventory)
-    model = Model(devset.num_features, n_phones + 1, n_phones, device).to(device) #plus 1 for the blank symbol of CTC loss
-    loss_fn=nn.CrossEntropyLoss(ignore_index=0)
+    n_phones = len(devset.phone_transform.phoneme_inventory) - 2 #we should remove from prediction the <S> and <PAD>
+    model = Model(devset.num_features, n_phones + 1, n_phones, device).to(device) #plus 1 for the blank symbol of CTC loss in the encoder
+    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
 
     if FLAGS.start_training_from is not None:
         state_dict = torch.load(FLAGS.start_training_from)
@@ -103,7 +103,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             
             #Preprosessing of the input and target for the model
             X_raw = combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True).to(device)
+            y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True,  padding_value= FLAGS.pad).to(device)
 
             #Shifting target for input decoder and loss
             tgt= y[:,:-1]

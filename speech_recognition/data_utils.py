@@ -16,7 +16,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
-phoneme_inventory = ['<PAD>','AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH','</S>','<S>']
+phoneme_inventory = ['AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH','</S>','<S>','<PAD>']
 pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
 
 def normalize_volume(audio):
@@ -163,7 +163,7 @@ def combine_fixed_length(tensor_list, length):
     if total_length % length != 0:
         pad_length = length - (total_length % length)
         tensor_list = list(tensor_list) # copy
-        tensor_list.append(torch.zeros(pad_length,*tensor_list[0].size()[1:], dtype=tensor_list[0].dtype, device=tensor_list[0].device))
+        tensor_list.append(torch.full((pad_length,*tensor_list[0].size()[1:]),FLAGS.pad, dtype=tensor_list[0].dtype, device=tensor_list[0].device))
         total_length += pad_length
     tensor = torch.cat(tensor_list, 0)
     n = total_length // length
@@ -251,7 +251,7 @@ def read_phonemes(sentence):
             phones.append(p)
         except KeyError as e:
             logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
-    return [phone for word_phone in phones for phone in word_phone]
+    return [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token but the start token is manually injected during beam search
 
 class TextTransform(object):
     def __init__(self):
@@ -277,7 +277,7 @@ class PhoneTransform(object):
         self.vocabulary_size=len(self.phoneme_inventory)
 
     def phone_to_int(self, phone):
-        phone= ['<S>']+ phone + ['</S>']
+        phone= phone
         return [self.phoneme_inventory.index(c) for c in phone]
 
     def int_to_phone(self, ints):

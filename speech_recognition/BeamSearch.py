@@ -92,8 +92,8 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     memory = model.forward_separate('encoder', x_raw= data)
 
     # prepare some constants
-    start_tok = vocab_size - 1
-    end_tok = vocab_size - 2
+    start_tok = vocab_size - 2
+    end_tok = vocab_size - 3
     max_len = torch.sum(target != end_tok) + 20
     
     # initialize
@@ -122,7 +122,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         step_logits = model.forward_separate('decoder',y=last_frame_hypo,memory=memory_stub)
 
         # step_logits and step_probs have the shape (hypos * tokens)
-        step_probs = torch.nn.functional.log_softmax(step_logits,1)
+        step_probs = torch.nn.functional.log_softmax(step_logits,2)
         
         if step == 0:
             step_probs=step_probs[0,:,:] #to remove the batch dimension (the code doesn't take into account batches)
@@ -132,16 +132,15 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             full_probs = step_probs + torch.sum(hypos.probs,1,keepdim=True)
         
         if FLAGS.Constrained:
+             # this step sets all possible combinations of hypo and new phone to zero which do NOT correspond to valid words
             full_probs = PrefixTree.filter_valid_cont(hypos.nodes, full_probs,device) 
-            # this step sets all possible combinations of hypo and new phone to zero which do NOT correspond to valid words
-            
+           
         # Compute the best hypos (requires some shape juggling), make sure that hypos with probability -inf are never taken
         pre_top_hypos = torch.topk(full_probs.flatten(),min(FLAGS.BeamWidth,torch.sum(torch.isfinite(full_probs)))).indices 
         top_hypos = torch.stack([pre_top_hypos // full_probs.shape[1],pre_top_hypos % full_probs.shape[1]],1) # rescaling
         assert top_hypos.shape[1] == 2 # numerical indexes, each row has the form (first idx, second idx) to index a two-dimensional matrix
         
-        # now update the relevant variables which carry hypo information and must be aligned: histories, probs, state, align, words, nodes (the latter two only for constrained search)
-
+        # now update the relevant variables which carry hypo information and must be aligned: histories, probs, words, nodes (the latter two only for constrained search)
         # normal propagation
         new_hypos = update_hypos(hypos,top_hypos,step_probs,dct)
 
@@ -198,7 +197,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
     remaining_nodes = [ hypos.nodes[p] for p in active_pos ]
     
     for p in end_reached_pos:
-        save_finished_hypo(finished_hypos,hypos.histories[p],hypos.probs[p],None,None,hypos.words[p],None,language_model,len_target)
+        save_finished_hypo(finished_hypos,hypos.histories[p],hypos.probs[p],hypos.words[p],language_model)
 
     remaining_hypos = HypoHolder(
             histories = remaining_histories,
@@ -208,21 +207,13 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
             )
     return remaining_hypos
 
-def save_finished_hypo(finished_hypos,history, probs, words, nodes, language_model, len_target):
-    score = 0
-
-    # logP(Y|X) where X is the source, Y is the current target ??
-        # coverage_penalty(len(finished_histories[i]), probs[i], max_len)
-#     n = normalize_length(len(history))
-    
-    score = language_model.getLogProb('</s>',tuple(words), maxN=3)
-# #     cov_pen = PrefixTree.coverage_penalty()
-#     prefinal_prob = torch.mean(probs)
-#     final_prob = prefinal_prob + (score * LMWeight) + LMPenalty
+def save_finished_hypo(finished_hypos,history, probs, words, language_model):
+    sentence= ' '.join([item.name for item in words])
+    logprob=language_model.score(sentence + '</S>',bos = False, eos = True)
     final_prob = torch.clone(probs)
-    final_prob[-1] += (score * FLAGS.LMWeight) + FLAGS.LMPenalty
+    final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 
-    if FLAGS.constrained:
+    if FLAGS.Constrained:
         tup = (history,[x.name for x in words])
     else:
         tup = (history, [])

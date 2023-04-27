@@ -11,6 +11,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
 flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
+flags.DEFINE_integer('pad', 42, 'Padding value according to the position on phoneme inventory')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
@@ -51,7 +52,7 @@ class Model(nn.Module):
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
 
-        self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=0)
+        self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of <S> and <PAD> without predicting them
         self.pos_encoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
@@ -70,12 +71,12 @@ class Model(nn.Module):
 
     def create_tgt_padding_mask(self, tgt):
         # input tgt of shape ()
-        tgt_padding_mask = tgt == 0
+        tgt_padding_mask = tgt == FLAGS.pad
         return tgt_padding_mask
     
     def create_src_padding_mask(self, src):
         # input tgt of shape ()
-        src_padding_mask = src == 0
+        src_padding_mask = src == FLAGS.pad
         return src_padding_mask
     
     def forward(self, x_raw, y, length_raw_signal):
@@ -87,7 +88,7 @@ class Model(nn.Module):
             if r > 0:
                 x_raw_clone = x_raw.clone()
                 x_raw_clone[:,:-r,:] = x_raw[:,r:,:] # shift left r
-                x_raw_clone[:,-r:,:] = 0
+                x_raw_clone[:,-r:,:] = 0 #TODO should i change it with padding value???
                 x_raw = x_raw_clone
 
         x_raw = x_raw.transpose(1,2) # put channel before time for conv
@@ -96,8 +97,9 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
         x = x_raw
 
+        #Momentary solution to handle the padding problem of VRAM overusage
         x=decollate_tensor(x, length_raw_signal)
-        x=nn.utils.rnn.pad_sequence(x, batch_first=True)
+        x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad)
 
         #Padding Target Mask and attention mask
         self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
