@@ -89,7 +89,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     pr2 = False
    
     # forward pass, attention is applied to data_encoded as trained
-    memory = model.forward_separate('encoder', x_raw= data)
+    memory = model(mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
     start_tok = vocab_size - 2
@@ -119,7 +119,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         memory_stub= memory.repeat(last_frame_hypo.shape[0], 1, 1) 
         
         # decode_step treats the different hypos as though they were different elements of a batch
-        step_logits = model.forward_separate('decoder',y=last_frame_hypo,memory=memory_stub)
+        step_logits = model(mode='beam_search', part='decoder',y=last_frame_hypo,memory=memory_stub)
 
         # step_logits and step_probs have the shape (hypos * tokens)
         step_probs = torch.nn.functional.log_softmax(step_logits,2)

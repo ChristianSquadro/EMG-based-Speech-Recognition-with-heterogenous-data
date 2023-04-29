@@ -72,8 +72,8 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0]:x.shape[0]-raw_emg_after.shape[0],:]
-    emg_orig = apply_to_all(subsample, x, 400.00, 1000)
-    x = apply_to_all(subsample, x, 300, 1000)
+    emg_orig = apply_to_all(subsample, x, 689.06, 1000)
+    x = apply_to_all(subsample, x, 516.79, 1000)
     emg = x
 
     for c in FLAGS.remove_channels:

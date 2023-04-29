@@ -79,10 +79,18 @@ class Model(nn.Module):
         src_padding_mask = src == FLAGS.pad
         return src_padding_mask
     
-    def forward(self, x_raw, y, length_raw_signal):
+    def forward(self, x_raw= None, y= None, mode = 'default', part = None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
-
+        if mode == "default":
+            return self.forward_training(x_raw=x_raw, y=y)
+        elif mode == "beam_search":
+            if part == 'encoder':
+                return self.forward_beam_search(part=part, x_raw=x_raw)
+            elif part == 'decoder':
+                return self.forward_beam_search(part=part, y=y, memory=memory)
+      
+    def forward_training (self, x_raw= None, y= None) :
         if self.training:
             r = random.randrange(8)
             if r > 0:
@@ -97,14 +105,14 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
         x = x_raw
 
-        #Momentary solution to handle the padding problem of VRAM overusage
-        x=decollate_tensor(x, length_raw_signal)
-        x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad)
+        #Momentary solution to handle the big amount of padding treated as real data by CNN and having the trace of the original padding
+        #x=decollate_tensor(x, length_raw_signal)
+        #x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad)
 
         #Padding Target Mask and attention mask
         self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-        self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
-        self.memory_key_padding_mask = self.src_key_padding_mask
+        #self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
+        #self.memory_key_padding_mask = self.src_key_padding_mask
         self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
         #Embedding and positional encoding of tgt
@@ -113,8 +121,8 @@ class Model(nn.Module):
         
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x, src_key_padding_mask=self.src_key_padding_mask)
-        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask=self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+        x_encoder = self.transformerEncoder(x)
+        x_decoder = self.transformerDecoder(tgt, x_encoder,tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
         x_decoder = x_decoder.transpose(0,1)
@@ -122,11 +130,11 @@ class Model(nn.Module):
         
         return self.w_aux(x_encoder), self.w_out(x_decoder)
         
-    def forward_separate(self, mode , x_raw=None, y=None, memory=None):
+    def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
 
-        if mode == 'encoder':
+        if part == 'encoder':
             if self.training:
                 r = random.randrange(8)
                 if r > 0:
@@ -148,7 +156,7 @@ class Model(nn.Module):
             
             return x_encoder
             
-        elif mode == 'decoder':
+        elif part == 'decoder':
             #Embedding and positional encoding of tgt
             tgt=self.embedding_tgt(y)
             tgt=self.pos_encoder(tgt)

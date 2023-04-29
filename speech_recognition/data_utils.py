@@ -226,16 +226,16 @@ def print_confusion(confusion_mat, n=10):
 def read_phonemes(sentence):
     
     #Premanipulation to avoid issues with num2words
-    sentence=jiwer.SubstituteRegexes({r"_": r" ", r"th": r" th", r"£": r"pound "})(sentence)
+    pre_sentence=jiwer.SubstituteRegexes({r"_": r" ", r"£": r"pound "})(sentence)
     
     #Transform digits into words
     digits=[]
     new_sentence=""
-    for unit in sentence:
+    for unit in pre_sentence:
         if unit.isdigit():
             digits.append(unit)
-        elif unit == ' ' and digits:
-            new_sentence += num2words(int(''.join(digits))) + ' '
+        elif digits:
+            new_sentence += num2words(int(''.join(digits))) + ' ' + unit
             digits=[]  
         else:
             new_sentence += unit     
