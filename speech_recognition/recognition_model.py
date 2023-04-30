@@ -11,7 +11,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from read_emg import EMGDataset, SizeAwareSampler
+from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from data_utils import combine_fixed_length
 from BeamSearch import run_single_bs
@@ -21,12 +21,12 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-7, 'learning rate')
+flags.DEFINE_float('learning_rate', 3e-10, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0, 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.7, 'parameter alpha for the two losses')
+flags.DEFINE_float('alpha_loss', 0.8, 'parameter alpha for the two losses')
 flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
@@ -64,7 +64,7 @@ def test(model, testset, device, tree, language_model):
 
 def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=5):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, shuffle= True ,collate_fn=EMGDataset.collate_raw, batch_size=2)
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 120000, 64, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, shuffle= True,collate_fn=EMGDataset.collate_raw, batch_size=1)
 
     #Define model and loss function
@@ -98,9 +98,10 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
     run_steps=0
     optim.zero_grad()
     for epoch_idx in range(n_epochs):
-        model.train()
         losses = []
         for example in dataloader_training:
+            #Model train mode enabled and schedule_lr to change learning rate during the warmup phase
+            model.train()
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
@@ -130,7 +131,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
 
             #Gradient Update
             loss.backward()
-            if (batch_idx+1) % 30 == 0:
+            if (batch_idx+1) % 2 == 0:
                 optim.step()
                 optim.zero_grad()
 

@@ -1,1 +1,80 @@
 train / dev split: 8055 200
+Batch quantisation in latent space
+Latent bucket boundary - buckets: ['1595.84', '2133.66', '2570.50', '2960.80', '3324.67', '3672.12', '4009.04', '4339.27', '4665.48', '4989.68', '5313.43', '5638.02', '5964.51', '6293.84', '6626.86', '6964.35', '7307.04', '7655.63', '8010.81', '8373.28', '8743.72', '9122.85', '9511.39', '9910.12', '10319.82', '10741.34', '11175.59', '11623.53', '12086.18', '12564.67', '13060.20', '13574.11', '14107.83', '14662.96', '15241.26', '15844.65', '16475.32', '17135.67', '17828.43', '18556.66', '19323.82', '20133.89', '20991.40', '21901.59', '22870.54', '23905.36', '25014.46', '26207.80', '27497.37', '28897.74', '30426.79', '32106.82', '33966.08', '36040.99', '38379.50', '41046.46', '44132.19', '47767.32', '52150.03', '57600.09', '64678.81', '74499.74', '89752.33', '120000.00'] - length multipliers: ['1.34', '1.20', '1.15', '1.12', '1.10', '1.09', '1.08', '1.08', '1.07', '1.06', '1.06', '1.06', '1.06', '1.05', '1.05', '1.05', '1.05', '1.05', '1.05', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.04', '1.05', '1.05', '1.05', '1.05', '1.05', '1.05', '1.06', '1.06', '1.06', '1.06', '1.07', '1.08', '1.08', '1.09', '1.10', '1.12', '1.15', '1.20', '1.34']
+DynamicBatchSampler: Generating dynamic batches
+DynamicBatchSampler: Bucket 0 with boundary 0.0-1595.8 and batch_size 75: Num Examples 158.0, Num Full Batches 1.000, Pad Factor 56.114.
+DynamicBatchSampler: Bucket 1 with boundary 1595.8-2133.7 and batch_size 56: Num Examples 318.0, Num Full Batches 4.000, Pad Factor 28.689.
+DynamicBatchSampler: Bucket 2 with boundary 2133.7-2570.5 and batch_size 46: Num Examples 381.0, Num Full Batches 7.000, Pad Factor 18.224.
+DynamicBatchSampler: Bucket 3 with boundary 2570.5-2960.8 and batch_size 40: Num Examples 362.0, Num Full Batches 8.000, Pad Factor 13.884.
+DynamicBatchSampler: Bucket 4 with boundary 2960.8-3324.7 and batch_size 36: Num Examples 362.0, Num Full Batches 9.000, Pad Factor 11.486.
+DynamicBatchSampler: Bucket 5 with boundary 3324.7-3672.1 and batch_size 32: Num Examples 349.0, Num Full Batches 10.000, Pad Factor 9.755.
+DynamicBatchSampler: Bucket 6 with boundary 3672.1-4009.0 and batch_size 29: Num Examples 317.0, Num Full Batches 10.000, Pad Factor 8.588.
+DynamicBatchSampler: Bucket 7 with boundary 4009.0-4339.3 and batch_size 27: Num Examples 284.0, Num Full Batches 9.000, Pad Factor 7.771.
+DynamicBatchSampler: Bucket 8 with boundary 4339.3-4665.5 and batch_size 25: Num Examples 265.0, Num Full Batches 9.000, Pad Factor 7.065.
+DynamicBatchSampler: Bucket 9 with boundary 4665.5-4989.7 and batch_size 24: Num Examples 256.0, Num Full Batches 10.000, Pad Factor 6.583.
+DynamicBatchSampler: Bucket 10 with boundary 4989.7-5313.4 and batch_size 22: Num Examples 250.0, Num Full Batches 10.000, Pad Factor 6.164.
+DynamicBatchSampler: Bucket 11 with boundary 5313.4-5638.0 and batch_size 21: Num Examples 233.0, Num Full Batches 10.000, Pad Factor 5.807.
+DynamicBatchSampler: Bucket 12 with boundary 5638.0-5964.5 and batch_size 20: Num Examples 248.0, Num Full Batches 11.000, Pad Factor 5.586.
+DynamicBatchSampler: Bucket 13 with boundary 5964.5-6293.8 and batch_size 19: Num Examples 228.0, Num Full Batches 11.000, Pad Factor 5.180.
+DynamicBatchSampler: Bucket 14 with boundary 6293.8-6626.9 and batch_size 18: Num Examples 225.0, Num Full Batches 12.000, Pad Factor 5.107.
+DynamicBatchSampler: Bucket 15 with boundary 6626.9-6964.3 and batch_size 17: Num Examples 205.0, Num Full Batches 11.000, Pad Factor 4.857.
+DynamicBatchSampler: Bucket 16 with boundary 6964.3-7307.0 and batch_size 16: Num Examples 189.0, Num Full Batches 11.000, Pad Factor 4.711.
+DynamicBatchSampler: Bucket 17 with boundary 7307.0-7655.6 and batch_size 15: Num Examples 207.0, Num Full Batches 12.000, Pad Factor 4.494.
+DynamicBatchSampler: Bucket 18 with boundary 7655.6-8010.8 and batch_size 14: Num Examples 180.0, Num Full Batches 11.000, Pad Factor 4.522.
+DynamicBatchSampler: Bucket 19 with boundary 8010.8-8373.3 and batch_size 14: Num Examples 192.0, Num Full Batches 13.000, Pad Factor 4.248.
+DynamicBatchSampler: Bucket 20 with boundary 8373.3-8743.7 and batch_size 13: Num Examples 201.0, Num Full Batches 14.000, Pad Factor 4.273.
+DynamicBatchSampler: Bucket 21 with boundary 8743.7-9122.8 and batch_size 13: Num Examples 171.0, Num Full Batches 12.000, Pad Factor 4.164.
+DynamicBatchSampler: Bucket 22 with boundary 9122.8-9511.4 and batch_size 12: Num Examples 188.0, Num Full Batches 14.000, Pad Factor 4.118.
+DynamicBatchSampler: Bucket 23 with boundary 9511.4-9910.1 and batch_size 12: Num Examples 183.0, Num Full Batches 14.000, Pad Factor 4.020.
+DynamicBatchSampler: Bucket 24 with boundary 9910.1-10319.8 and batch_size 11: Num Examples 162.0, Num Full Batches 13.000, Pad Factor 3.976.
+DynamicBatchSampler: Bucket 25 with boundary 10319.8-10741.3 and batch_size 11: Num Examples 161.0, Num Full Batches 14.000, Pad Factor 3.990.
+DynamicBatchSampler: Bucket 26 with boundary 10741.3-11175.6 and batch_size 10: Num Examples 156.0, Num Full Batches 14.000, Pad Factor 3.886.
+DynamicBatchSampler: Bucket 27 with boundary 11175.6-11623.5 and batch_size 10: Num Examples 152.0, Num Full Batches 14.000, Pad Factor 3.901.
+DynamicBatchSampler: Bucket 28 with boundary 11623.5-12086.2 and batch_size 9: Num Examples 149.0, Num Full Batches 14.000, Pad Factor 3.794.
+DynamicBatchSampler: Bucket 29 with boundary 12086.2-12564.7 and batch_size 9: Num Examples 133.0, Num Full Batches 13.000, Pad Factor 3.846.
+DynamicBatchSampler: Bucket 30 with boundary 12564.7-13060.2 and batch_size 9: Num Examples 132.0, Num Full Batches 14.000, Pad Factor 3.796.
+DynamicBatchSampler: Bucket 31 with boundary 13060.2-13574.1 and batch_size 8: Num Examples 116.0, Num Full Batches 12.000, Pad Factor 3.830.
+DynamicBatchSampler: Bucket 32 with boundary 13574.1-14107.8 and batch_size 8: Num Examples 104.0, Num Full Batches 11.000, Pad Factor 3.817.
+DynamicBatchSampler: Bucket 33 with boundary 14107.8-14663.0 and batch_size 8: Num Examples 96.0, Num Full Batches 11.000, Pad Factor 3.711.
+DynamicBatchSampler: Bucket 34 with boundary 14663.0-15241.3 and batch_size 7: Num Examples 102.0, Num Full Batches 12.000, Pad Factor 3.770.
+DynamicBatchSampler: Bucket 35 with boundary 15241.3-15844.7 and batch_size 7: Num Examples 91.0, Num Full Batches 11.000, Pad Factor 3.781.
+DynamicBatchSampler: Bucket 36 with boundary 15844.7-16475.3 and batch_size 7: Num Examples 71.0, Num Full Batches 9.000, Pad Factor 3.863.
+DynamicBatchSampler: Bucket 37 with boundary 16475.3-17135.7 and batch_size 7: Num Examples 69.0, Num Full Batches 9.000, Pad Factor 3.857.
+DynamicBatchSampler: Bucket 38 with boundary 17135.7-17828.4 and batch_size 6: Num Examples 57.0, Num Full Batches 8.000, Pad Factor 3.878.
+DynamicBatchSampler: Bucket 39 with boundary 17828.4-18556.7 and batch_size 6: Num Examples 67.0, Num Full Batches 10.000, Pad Factor 3.891.
+DynamicBatchSampler: Bucket 40 with boundary 18556.7-19323.8 and batch_size 6: Num Examples 42.0, Num Full Batches 6.000, Pad Factor 3.865.
+DynamicBatchSampler: Bucket 41 with boundary 19323.8-20133.9 and batch_size 5: Num Examples 44.0, Num Full Batches 7.000, Pad Factor 3.957.
+DynamicBatchSampler: Bucket 42 with boundary 20133.9-20991.4 and batch_size 5: Num Examples 25.0, Num Full Batches 4.000, Pad Factor 3.959.
+DynamicBatchSampler: Bucket 43 with boundary 20991.4-21901.6 and batch_size 5: Num Examples 32.0, Num Full Batches 5.000, Pad Factor 4.044.
+DynamicBatchSampler: Bucket 44 with boundary 21901.6-22870.5 and batch_size 5: Num Examples 28.0, Num Full Batches 5.000, Pad Factor 4.185.
+DynamicBatchSampler: Bucket 45 with boundary 22870.5-23905.4 and batch_size 5: Num Examples 14.0, Num Full Batches 2.000, Pad Factor 2.922.
+DynamicBatchSampler: Bucket 46 with boundary 23905.4-25014.5 and batch_size 4: Num Examples 5.0, Num Full Batches 1.000, Pad Factor 3.935.
+DynamicBatchSampler: Bucket 47 with boundary 25014.5-26207.8 and batch_size 4: Num Examples 10.0, Num Full Batches 2.000, Pad Factor 3.414.
+DynamicBatchSampler: Bucket 48 with boundary 26207.8-27497.4 and batch_size 4: Num Examples 13.0, Num Full Batches 2.000, Pad Factor 4.158.
+DynamicBatchSampler: Bucket 49 with boundary 27497.4-28897.7 and batch_size 4: Num Examples 14.0, Num Full Batches 3.000, Pad Factor 4.764.
+DynamicBatchSampler: Bucket 50 with boundary 28897.7-30426.8 and batch_size 3: Num Examples 11.0, Num Full Batches 2.000, Pad Factor 4.408.
+DynamicBatchSampler: Bucket 51 with boundary 30426.8-32106.8 and batch_size 3: Num Examples 7.0, Num Full Batches 1.000, Pad Factor 4.376.
+DynamicBatchSampler: Bucket 52 with boundary 32106.8-33966.1 and batch_size 3: Num Examples 8.0, Num Full Batches 2.000, Pad Factor 4.377.
+DynamicBatchSampler: Bucket 53 with boundary 33966.1-36041.0 and batch_size 3: Num Examples 4.0, Num Full Batches 1.000, Pad Factor 4.208.
+DynamicBatchSampler: Bucket 54 with boundary 36041.0-38379.5 and batch_size 3: Num Examples 5.0, Num Full Batches 1.000, Pad Factor 5.479.
+DynamicBatchSampler: Bucket 55 with boundary 38379.5-41046.5 and batch_size 2: Num Examples 4.0, Num Full Batches 1.000, Pad Factor 1.490.
+DynamicBatchSampler: Bucket 56 with boundary 41046.5-44132.2 and batch_size 2: Num Examples 3.0, Num Full Batches 1.000, Pad Factor 6.070.
+DynamicBatchSampler: Bucket 57 with boundary 44132.2-47767.3 and batch_size 2: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 58 with boundary 47767.3-52150.0 and batch_size 2: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 59 with boundary 52150.0-57600.1 and batch_size 2: Num Examples 1.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 60 with boundary 57600.1-64678.8 and batch_size 1: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 61 with boundary 64678.8-74499.7 and batch_size 1: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 62 with boundary 74499.7-89752.3 and batch_size 1: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+DynamicBatchSampler: Bucket 63 with boundary 89752.3-120000.0 and batch_size 1: Num Examples 0.0, Num Full Batches 0.000, Pad Factor 0.000.
+Dictionary error for the word 'PÂTÉ' in the phrase: There were a couple of brace of cold woodcock, a pheasant, a _pâté de foie gras_ pie, with a group of ancient and cobwebby bottles.
+Dictionary error for the word 'OUTRÉ' in the phrase: Too little, if he could not invent a cause of quarrel which would give him the sympathy of the jury; too much, if he evolved from his own inner consciousness anything so _outré_ as a dying reference to a rat, and the incident of the vanishing cloth.
+Dictionary error for the word 'MCCARTHYS' in the phrase: “The two McCarthys were seen after the time when William Crowder, the game-keeper, lost sight of them.
+Dictionary error for the word 'RUCASTLES' in the phrase: And the Rucastles go out to-night?”
+Dictionary error for the word 'RUCASTLES' in the phrase: The Rucastles will be gone by that time, and Toller will, we hope, be incapable.
+Dictionary error for the word "BECHER'S" in the phrase: Becher’s.”
+Dictionary error for the word 'MCCARTHYS' in the phrase: She was so frightened by their violence that she ran away, and told her mother when she reached home that she had left the two McCarthys quarrelling near Boscombe Pool, and that she was afraid that they were going to fight.
+Missing target!
+Dictionary error for the word "'SEVENTY" in the phrase: You will find parallel cases, if you consult my index, in Andover in ’77, and there was something of the sort at The Hague last year.
+Dictionary error for the word 'MÉTIER' in the phrase: Therein lies my _métier_, and it is just possible that it may be of some service in the investigation which lies before us.
+Dictionary error for the word 'MCCARTHYS' in the phrase: They appear to have avoided the society of the neighboring English families, and to have led retired lives, though both the McCarthys were fond of sport, and were frequently seen at the race-meetings of the neighborhood.
+Dictionary error for the word 'RUCASTLES' in the phrase: I returned the strange hair to the drawer, and I said nothing of the matter to the Rucastles, as I felt that I had put myself in the wrong by opening a drawer which they had locked.
