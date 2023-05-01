@@ -223,7 +223,6 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
 
         # NOTE: the following lines do not cover that there is only one example in the dataset
         # warp frames (duration) distribution of train data
-        logging.info("Batch quantisation in latent space")
         # linspace set-up
         num_boundaries = num_quantiles + 1
         # create latent linearly equal spaced buckets
@@ -266,7 +265,6 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
             raise NotImplementedError
 
     def _generate_batches(self):
-        logging.info("DynamicBatchSampler: Generating dynamic batches")
         if self._shuffle_ex:
             # deterministically shuffle based on epoch and seed
             g = torch.Generator()

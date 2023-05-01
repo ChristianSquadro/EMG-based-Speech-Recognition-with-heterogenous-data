@@ -241,7 +241,7 @@ def read_phonemes(sentence):
             new_sentence += unit     
             
     #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’s": r"'s",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
+    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’s": r"'s",r"'seventy": r"seventy",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
     
     #Transform the words into sequences of phones
     phones = []
@@ -250,7 +250,8 @@ def read_phonemes(sentence):
             p = pron_dct[n]
             phones.append(p)
         except KeyError as e:
-            logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
+            #logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
+            logging.warning(e)
     return [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token but the start token is manually injected during beam search
 
 class TextTransform(object):

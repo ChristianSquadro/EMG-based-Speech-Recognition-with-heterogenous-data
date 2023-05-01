@@ -1,16 +1,8 @@
 train / dev split: 8055 200
-Batch quantisation in latent space
-DynamicBatchSampler: Generating dynamic batches
-Batch quantisation in latent space
-DynamicBatchSampler: Generating dynamic batches
-Dictionary error for the word 'RUCASTLES' in the phrase: The Rucastles will be gone by that time, and Toller will, we hope, be incapable.
-Dictionary error for the word 'CŒUR' in the phrase: “Oscillation upon the pavement always means an _affaire de cœur_.
-Dictionary error for the word 'ZENITHWARD' in the phrase: It was starlight and I explained the Signs of the Zodiac to her, and pointed out Mars, a bright dot of light creeping zenithward, towards which so many telescopes were pointed.
-Dictionary error for the word 'PÂTÉ' in the phrase: There were a couple of brace of cold woodcock, a pheasant, a _pâté de foie gras_ pie, with a group of ancient and cobwebby bottles.
-Dictionary error for the word 'RÉPERTOIRE' in the phrase: Again I changed my dress, again I sat in the window, and again I laughed very heartily at the funny stories of which my employer had an immense _répertoire_, and which he told inimitably.
-Dictionary error for the word 'MCCARTHYS' in the phrase: They appear to have avoided the society of the neighboring English families, and to have led retired lives, though both the McCarthys were fond of sport, and were frequently seen at the race-meetings of the neighborhood.
-Dictionary error for the word "'SEVENTY" in the phrase: You will find parallel cases, if you consult my index, in Andover in ’77, and there was something of the sort at The Hague last year.
-Dictionary error for the word 'RUCASTLES' in the phrase: “But it is impossible,” said Miss Hunter; “the ladder was not there when the Rucastles went away.”
-Dictionary error for the word 'OUTRÉ' in the phrase: If we could fly out of that window hand in hand, hover over this great city, gently remove the roofs, and peep in at the queer things which are going on, the strange coincidences, the plannings, the cross-purposes, the wonderful chains of events, working through generations, and leading to the most _outré_ results, it would make all fiction with its conventionalities and foreseen conclusions most stale and unprofitable.”
-Dictionary error for the word 'ZENITHWARD' in the phrase: It was starlight and I explained the Signs of the Zodiac to her, and pointed out Mars, a bright dot of light creeping zenithward, towards which so many telescopes were pointed.
-Dictionary error for the word 'ZENITHWARD' in the phrase: It was starlight and I explained the Signs of the Zodiac to her, and pointed out Mars, a bright dot of light creeping zenithward, towards which so many telescopes were pointed.
+"RUCASTLE'S"
+"RUCASTLE'S"
+'DETOUR'
+'DETOUR'
+'MCCARTHYS'
+"RUCASTLE'S"
+'CŒUR'

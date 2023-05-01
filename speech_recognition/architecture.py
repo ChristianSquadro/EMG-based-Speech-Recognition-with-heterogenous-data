@@ -8,7 +8,8 @@ from transformer import TransformerEncoderLayer, TransformerDecoderLayer, Positi
 from data_utils import decollate_tensor
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('model_size', 112, 'number of hidden dimensions')
+flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
+flags.DEFINE_integer('emg_features_size', 112, 'number of emg features')
 flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
 flags.DEFINE_integer('pad', 42, 'Padding value according to the position on phoneme inventory')
@@ -53,6 +54,7 @@ class Model(nn.Module):
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
         '''
+        self.emg_projection = nn.Linear(FLAGS.emg_features_size, FLAGS.model_size)
         
         self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of <S> and <PAD> without predicting them
         self.pos_encoder = PositionalEncoding(FLAGS.model_size)
@@ -115,13 +117,16 @@ class Model(nn.Module):
         self.memory_key_padding_mask = self.src_key_padding_mask
         self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
+        #Projection of emg input to excpected number of hidden dimension
+        x=self.emg_projection(x_raw)
+
         #Embedding and positional encoding of tgt
         tgt=self.embedding_tgt(y)
         tgt=self.pos_encoder(tgt)
         
-        x_raw = x_raw.transpose(0,1) # put time first
+        x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x_raw, src_key_padding_mask= self.src_key_padding_mask)
+        x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
         x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
