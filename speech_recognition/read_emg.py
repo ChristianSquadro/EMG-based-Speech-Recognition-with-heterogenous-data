@@ -72,8 +72,8 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0]:x.shape[0]-raw_emg_after.shape[0],:]
-    emg_orig = apply_to_all(subsample, x, 600.00, 1000)
-    x = apply_to_all(subsample, x, 450.00, 1000)
+    emg_orig = apply_to_all(subsample, x, 689.06, 1000)
+    x = apply_to_all(subsample, x, 516.79, 1000)
     emg = x
 
     for c in FLAGS.remove_channels:
@@ -168,13 +168,6 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
                 info = json.load(f)
             self.lengths_list.append(sum([emg_len for emg_len, _, _ in info['chunks']]))
 
-        # We do not put a default on num_buckets to encourage users to play with this parameter
-        if num_buckets is None and len(bucket_boundaries) == 0:
-            raise RuntimeError(
-                "Please specify either num_buckets or bucket boundaries."
-                "Check the docs, and/or the tutorial !"
-            )
-
         if self.lengths_list is not None:
             # take length of examples from this argument and bypass length_key
             for indx in range(len(self.lengths_list)):
@@ -241,18 +234,7 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
         quantiles = lognorm.ppf(latent_boundaries, 1)
         # scale up to to max_batch_length
         bucket_boundaries = quantiles * max_batch_length / quantiles[-1]
-        # compute resulting bucket length multipliers
-        length_multipliers = [
-            bucket_boundaries[x + 1] / bucket_boundaries[x]
-            for x in range(num_quantiles - 1)
-        ]
-        # logging
-        logging.info(
-            "Latent bucket boundary - buckets: {} - length multipliers: {}".format(
-                list(map("{:.2f}".format, bucket_boundaries)),
-                list(map("{:.2f}".format, length_multipliers)),
-            )
-        )
+        
         return list(sorted(bucket_boundaries))
 
     def _permute_batches(self):
@@ -341,77 +323,6 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
                     self._batches.append(batch)
 
         self._permute_batches()  # possibly reorder batches
-
-        if self._epoch == 0:  # only log at first epoch
-            # frames per batch & their padding remaining
-            boundaries = [0] + self._bucket_boundaries.tolist()
-
-            for bucket_indx in range(len(self._bucket_boundaries)):
-                try:
-                    num_batches = stats_tracker[bucket_indx]["tot"] // (
-                        self._max_batch_length
-                    )
-                    pad_factor = (
-                        stats_tracker[bucket_indx]["max"]
-                        - stats_tracker[bucket_indx]["min"]
-                    ) / (
-                        stats_tracker[bucket_indx]["tot"]
-                        / stats_tracker[bucket_indx]["n_ex"]
-                    )
-                except ZeroDivisionError:
-                    num_batches = 0
-                    pad_factor = 0
-
-                logging.info(
-                    (
-                        "DynamicBatchSampler: Bucket {} with boundary {:.1f}-{:.1f} and "
-                        + "batch_size {}: Num Examples {:.1f}, Num Full Batches {:.3f}, Pad Factor {:.3f}."
-                    ).format(
-                        bucket_indx,
-                        boundaries[bucket_indx],
-                        boundaries[bucket_indx + 1],
-                        self._bucket_lens[bucket_indx],
-                        stats_tracker[bucket_indx]["n_ex"],
-                        num_batches,
-                        pad_factor * 100,
-                    )
-                )
-
-            if self.verbose:
-                batch_stats = {
-                    "tot_frames": [],
-                    "tot_pad_frames": [],
-                    "pad_%": [],
-                }
-                for batch in self._batches:
-                    tot_frames = sum(
-                        [self._ex_lengths[str(idx)] for idx in batch]
-                    )
-                    batch_stats["tot_frames"].append(tot_frames)
-                    max_frames = max(
-                        [self._ex_lengths[str(idx)] for idx in batch]
-                    )
-                    tot_pad = sum(
-                        [
-                            max_frames - self._ex_lengths[str(idx)]
-                            for idx in batch
-                        ]
-                    )
-                    batch_stats["tot_pad_frames"].append(tot_pad)
-                    batch_stats["pad_%"].append(tot_pad / tot_frames * 100)
-
-                padding_details = "Batch {} with {:.1f} frames with {} files - {:.1f} padding, {:.2f} (%) of total."
-                padding_details = "DynamicBatchSampler: " + padding_details
-                for i in range(len(self._batches)):
-                    logging.info(
-                        padding_details.format(
-                            i,
-                            batch_stats["tot_frames"][i],
-                            len(self._batches[i]),
-                            batch_stats["tot_pad_frames"][i],
-                            batch_stats["pad_%"][i],
-                        )
-                    )
 
     def __iter__(self):
         for batch in self._batches:

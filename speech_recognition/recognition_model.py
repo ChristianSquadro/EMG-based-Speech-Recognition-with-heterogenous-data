@@ -21,12 +21,12 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-10, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
+flags.DEFINE_integer('learning_rate_warmup', 1, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0, 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.8, 'parameter alpha for the two losses')
+flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
 flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
@@ -64,8 +64,8 @@ def test(model, testset, device, tree, language_model):
 
 def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=5):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 120000, 64, shuffle=True, batch_ordering='random'))
-    dataloader_evaluation = torch.utils.data.DataLoader(devset, shuffle= True,collate_fn=EMGDataset.collate_raw, batch_size=1)
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 128000, 64, shuffle=True, batch_ordering='random'))
+    dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 64, shuffle=True, batch_ordering='random'))
 
     #Define model and loss function
     n_phones = len(devset.phone_transform.phoneme_inventory) - 2 #we should remove from prediction the <S> and <PAD>
@@ -105,7 +105,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
-            X_raw=nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X_raw=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True,  padding_value= FLAGS.pad).to(device)
 
             #Shifting target for input decoder and loss
@@ -131,7 +131,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
 
             #Gradient Update
             loss.backward()
-            if (batch_idx+1) % 2 == 0:
+            if (batch_idx+1) % 3 == 0:
                 optim.step()
                 optim.zero_grad()
 
@@ -152,37 +152,31 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
                 
                 with torch.no_grad():
                     for idx, example in enumerate(dataloader_evaluation):
-                        #Prediction without the 197-th batch because of missing label
-                        if example['text_int_lengths'][0] != 0:  
-                            
-                            #Collect the data
-                            X_raw=nn.utils.rnn.pad_sequence(example['raw_emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-                            y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True, padding_value=FLAGS.pad).to(device)
+                        #Collect the data
+                        X_raw=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+                        y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True, padding_value=FLAGS.pad).to(device)
+                    
+                        #Shifting target for input decoder and loss
+                        tgt= y[:,:-1]
+                        target= y[:,1:]
                         
-                            #Shifting target for input decoder and loss
-                            tgt= y[:,:-1]
-                            target= y[:,1:]
-                            
-                            #Forward Model
-                            out_enc, out_dec = model(x_raw=X_raw, y=tgt)
+                        #Forward Model
+                        out_enc, out_dec = model(x_raw=X_raw, y=tgt)
 
-                            #Decoder Loss
-                            out_dec=out_dec.permute(0,2,1)
-                            loss = loss_fn(out_dec, target)
-                            loss_dec = loss_fn(out_dec, target)
+                        #Decoder Loss
+                        out_dec=out_dec.permute(0,2,1)
+                        loss = loss_fn(out_dec, target)
+                        loss_dec = loss_fn(out_dec, target)
 
-                            #Encoder Loss
-                            out_enc = F.log_softmax(out_enc, 2)
-                            out_enc = out_enc.transpose(1,0)
-                            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_lengths'], blank = len(devset.phone_transform.phoneme_inventory)-2) 
+                        #Encoder Loss
+                        out_enc = F.log_softmax(out_enc, 2)
+                        out_enc = out_enc.transpose(1,0)
+                        loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_lengths'], blank = len(devset.phone_transform.phoneme_inventory)-2) 
 
-                            #Combination the two losses
-                            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
-                            eval_loss += loss.item()
-                            run_steps += 1
-                            
-                        else:
-                            logging.warning('Missing target!')
+                        #Combination the two losses
+                        loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                        eval_loss += loss.item()
+                        run_steps += 1
                         
                         #just to block processing all validation batches
                         if idx == 3:
