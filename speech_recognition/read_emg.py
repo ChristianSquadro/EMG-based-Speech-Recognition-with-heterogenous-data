@@ -1,8 +1,9 @@
 import re
 import os
 import numpy as np
-from typing import List
+import matplotlib.pyplot as plt
 import random
+from collections import defaultdict
 import scipy
 import json
 import copy
@@ -10,7 +11,6 @@ import sys
 import pickle
 import string
 import logging
-from scipy.stats import lognorm
 from functools import lru_cache
 from copy import copy
 
@@ -19,7 +19,7 @@ import soundfile as sf
 
 import torch
 
-from data_utils import load_audio, get_emg_features, FeatureNormalizer, phoneme_inventory, read_phonemes, TextTransform, PhoneTransform
+from data_utils import load_audio, get_emg_features, FeatureNormalizer, phoneme_inventory, read_phonemes, TextTransform
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -54,7 +54,7 @@ def apply_to_all(function, signal_array, *args, **kwargs):
         results.append(function(signal_array[:,i], *args, **kwargs))
     return np.stack(results, 1)
 
-def load_utterance(base_dir, index, limit_length=False, debug=False):
+def load_utterance(base_dir, index, limit_length=False, debug=False, text_align_directory=None):
     index = int(index)
     raw_emg = np.load(os.path.join(base_dir, f'{index}_emg.npy'))
     before = os.path.join(base_dir, f'{index-1}_emg.npy')
@@ -72,8 +72,8 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0]:x.shape[0]-raw_emg_after.shape[0],:]
-    emg_orig = apply_to_all(subsample, x, 600.00, 1000)
-    x = apply_to_all(subsample, x, 450.00, 1000)
+    emg_orig = apply_to_all(subsample, x, 689.06, 1000)
+    x = apply_to_all(subsample, x, 516.79, 1000)
     emg = x
 
     for c in FLAGS.remove_channels:
@@ -96,9 +96,12 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
         info = json.load(f)
 
     sess = os.path.basename(base_dir)
-    
-    phonemes=read_phonemes(info['text'])
-    
+    tg_fname = f'{text_align_directory}/{sess}/{sess}_{index}_audio.TextGrid'
+    if os.path.exists(tg_fname):
+        phonemes = read_phonemes(tg_fname, mfccs.shape[0])
+    else:
+        phonemes = np.zeros(mfccs.shape[0], dtype=np.int64)+phoneme_inventory.index('sil')
+
     return mfccs, emg_features, info['text'], (info['book'],info['sentence_index']), phonemes, emg_orig.astype(np.float32)
 
 class EMGDirectory(object):
@@ -140,207 +143,6 @@ class SizeAwareSampler(torch.utils.data.Sampler):
             batch.append(idx)
             batch_length += length
         # dropping last incomplete batch
-
-class DynamicBatchSampler(torch.utils.data.Sampler):
-    def __init__(
-        self,
-        dataset,
-        max_batch_length: int,
-        num_buckets: int = None,
-        shuffle: bool = True,
-        batch_ordering: str = "random",
-        max_batch_ex: int = None,
-        bucket_boundaries: List[int] = [],
-        seed: int = 42,
-        epoch: int = 0,
-        drop_last: bool = False,
-        verbose: bool = False,
-    ):
-        self._dataset = dataset
-        self._ex_lengths = {}
-        self.verbose = verbose
-        self.lengths_list=[]
-        
-        indices = list(range(len(dataset)))
-        for idx in indices:
-            directory_info, file_idx = dataset.example_indices[idx]
-            with open(os.path.join(directory_info.directory, f'{file_idx}_info.json')) as f:
-                info = json.load(f)
-            self.lengths_list.append(sum([emg_len for emg_len, _, _ in info['chunks']]))
-
-        if self.lengths_list is not None:
-            # take length of examples from this argument and bypass length_key
-            for indx in range(len(self.lengths_list)):
-                self._ex_lengths[str(indx)] = self.lengths_list[indx]
-
-        if len(bucket_boundaries) > 0:
-            if not all([x >= 0 for x in bucket_boundaries]):
-                raise ValueError(
-                    "All elements in bucket boundaries should be non-negative (>= 0)."
-                )
-            if not len(set(bucket_boundaries)) == len(bucket_boundaries):
-                raise ValueError(
-                    "Bucket_boundaries should not contain duplicates."
-                )
-            np.testing.assert_array_equal(
-                np.array(bucket_boundaries),
-                np.array(sorted(bucket_boundaries)),
-                err_msg="The arg bucket_boundaries should be an ascending sorted list of non negative values values!",
-            )
-            self._bucket_boundaries = np.array(sorted(bucket_boundaries))
-        else:
-            # use num_buckets
-            self._bucket_boundaries = np.array(
-                self._get_boundaries_through_warping(
-                    max_batch_length=max_batch_length,
-                    num_quantiles=num_buckets,
-                )
-            )
-
-        self._max_batch_length = max_batch_length
-        self._shuffle_ex = shuffle
-        self._batch_ordering = batch_ordering
-        self._seed = seed
-        self._drop_last = drop_last
-        if max_batch_ex is None:
-            max_batch_ex = np.inf
-        self._max_batch_ex = max_batch_ex
-        # Calculate bucket lengths - how often does one bucket boundary fit into max_batch_length?
-        self._bucket_lens = [
-            max(1, int(max_batch_length / self._bucket_boundaries[i]))
-            for i in range(len(self._bucket_boundaries))
-        ] + [1]
-        self._epoch = epoch
-        self._generate_batches()
-
-    def get_durations(self, batch):
-        """Gets durations of the elements in the batch."""
-        return [self._ex_lengths[str(idx)] for idx in batch]
-
-    def _get_boundaries_through_warping(
-        self, max_batch_length: int, num_quantiles: int,
-    ) -> List[int]:
-
-        # NOTE: the following lines do not cover that there is only one example in the dataset
-        # warp frames (duration) distribution of train data
-        # linspace set-up
-        num_boundaries = num_quantiles + 1
-        # create latent linearly equal spaced buckets
-        latent_boundaries = np.linspace(
-            1 / num_boundaries, num_quantiles / num_boundaries, num_quantiles,
-        )
-        # get quantiles using lognormal distribution
-        quantiles = lognorm.ppf(latent_boundaries, 1)
-        # scale up to to max_batch_length
-        bucket_boundaries = quantiles * max_batch_length / quantiles[-1]
-        
-        return list(sorted(bucket_boundaries))
-
-    def _permute_batches(self):
-
-        if self._batch_ordering == "random":
-            # deterministically shuffle based on epoch and seed
-            g = torch.Generator()
-            g.manual_seed(self._seed + self._epoch)
-            sampler = torch.randperm(
-                len(self._batches), generator=g
-            ).tolist()  # type: ignore
-            tmp = []
-            for idx in sampler:
-                tmp.append(self._batches[idx])
-            self._batches = tmp
-
-        elif self._batch_ordering == "ascending":
-            self._batches = sorted(
-                self._batches,
-                key=lambda x: max([self._ex_lengths[str(idx)] for idx in x]),
-            )
-        elif self._batch_ordering == "descending":
-            self._batches = sorted(
-                self._batches,
-                key=lambda x: max([self._ex_lengths[str(idx)] for idx in x]),
-                reverse=True,
-            )
-        else:
-            raise NotImplementedError
-
-    def _generate_batches(self):
-        if self._shuffle_ex:
-            # deterministically shuffle based on epoch and seed
-            g = torch.Generator()
-            g.manual_seed(self._seed + self._epoch)
-            sampler = torch.randperm(len(self._dataset), generator=g).tolist()  # type: ignore
-        else:
-            # take examples as they are: e.g. they have been sorted
-            sampler = range(len(self._dataset))  # type: ignore
-
-        self._batches = []
-        bucket_batches = [[] for i in self._bucket_lens]
-
-        stats_tracker = [
-            {"min": np.inf, "max": -np.inf, "tot": 0, "n_ex": 0}
-            for i in self._bucket_lens
-        ]
-
-        for idx in sampler:
-            directory_info, file_idx = self._dataset.example_indices[idx]
-            with open(os.path.join(directory_info.directory, f'{file_idx}_info.json')) as f:
-                info = json.load(f)
-            if not np.any([l in string.ascii_letters for l in info['text']]):
-                continue
-            # length of pre-sampled audio
-            item_len = self._ex_lengths[str(idx)]
-            # bucket to fill up most padding
-            bucket_id = np.searchsorted(self._bucket_boundaries, item_len)
-            # fill audio's duration into that bucket
-            bucket_batches[bucket_id].append(idx)
-
-            stats_tracker[bucket_id]["min"] = min(
-                stats_tracker[bucket_id]["min"], item_len
-            )
-            stats_tracker[bucket_id]["max"] = max(
-                stats_tracker[bucket_id]["max"], item_len
-            )
-            stats_tracker[bucket_id]["tot"] += item_len
-            stats_tracker[bucket_id]["n_ex"] += 1
-            # track #samples - why not duration/#frames; rounded up?
-            # keep track of durations, if necessary
-
-            if (
-                len(bucket_batches[bucket_id]) >= self._bucket_lens[bucket_id]
-                or len(bucket_batches[bucket_id]) >= self._max_batch_ex
-            ):
-                self._batches.append(bucket_batches[bucket_id])
-                bucket_batches[bucket_id] = []
-                # keep track of durations
-
-        # Dump remaining batches
-        if not self._drop_last:
-            for batch in bucket_batches:
-                if batch:
-                    self._batches.append(batch)
-
-        self._permute_batches()  # possibly reorder batches
-
-    def __iter__(self):
-        for batch in self._batches:
-            yield batch
-        if self._shuffle_ex:  # re-generate examples if ex_ordering == "random"
-            self._generate_batches()
-        if self._batch_ordering == "random":
-            # we randomly permute the batches only --> faster
-            self._permute_batches()
-
-    def set_epoch(self, epoch):
-        """
-        You can also just access self.epoch, but we maintain this interface
-        to mirror torch.utils.data.distributed.DistributedSampler
-        """
-        self._epoch = epoch
-        self._generate_batches()
-
-    def __len__(self):
-        return len(self._batches)
 
 class EMGDataset(torch.utils.data.Dataset):
     def __init__(self, base_dir=None, limit_length=False, dev=False, test=False, no_testset=False, no_normalizers=False):
@@ -405,7 +207,6 @@ class EMGDataset(torch.utils.data.Dataset):
         self.num_sessions = len(directories)
 
         self.text_transform = TextTransform()
-        self.phone_transform = PhoneTransform()
 
     def silent_subset(self):
         result = copy(self)
@@ -427,7 +228,7 @@ class EMGDataset(torch.utils.data.Dataset):
     @lru_cache(maxsize=None)
     def __getitem__(self, i):
         directory_info, idx = self.example_indices[i]
-        mfccs, emg, text, book_location, phonemes, raw_emg = load_utterance(directory_info.directory, idx, self.limit_length)
+        mfccs, emg, text, book_location, phonemes, raw_emg = load_utterance(directory_info.directory, idx, self.limit_length, text_align_directory=self.text_align_directory)
         raw_emg = raw_emg / 20
         raw_emg = 50*np.tanh(raw_emg/50.)
 
@@ -439,16 +240,13 @@ class EMGDataset(torch.utils.data.Dataset):
         session_ids = np.full(emg.shape[0], directory_info.session_index, dtype=np.int64)
         audio_file = f'{directory_info.directory}/{idx}_audio_clean.flac'
 
-        #self.text_transform.add_new_words(text)
-        words= [word for word in text]
         text_int = np.array(self.text_transform.text_to_int(text), dtype=np.int64)
 
-
-        result = {'audio_features':torch.from_numpy(mfccs).pin_memory(), 'emg':torch.from_numpy(emg).pin_memory(), 'text':text, 'words': words,'text_int': torch.from_numpy(text_int).pin_memory(), 'file_label':idx, 'session_ids':torch.from_numpy(session_ids).pin_memory(), 'book_location':book_location, 'silent':directory_info.silent, 'raw_emg':torch.from_numpy(raw_emg).pin_memory()}
+        result = {'audio_features':torch.from_numpy(mfccs).pin_memory(), 'emg':torch.from_numpy(emg).pin_memory(), 'text':text, 'text_int': torch.from_numpy(text_int).pin_memory(), 'file_label':idx, 'session_ids':torch.from_numpy(session_ids).pin_memory(), 'book_location':book_location, 'silent':directory_info.silent, 'raw_emg':torch.from_numpy(raw_emg).pin_memory()}
 
         if directory_info.silent:
             voiced_directory, voiced_idx = self.voiced_data_locations[book_location]
-            voiced_mfccs, voiced_emg, _, _, phonemes, _ = load_utterance(voiced_directory.directory, voiced_idx, False)
+            voiced_mfccs, voiced_emg, _, _, phonemes, _ = load_utterance(voiced_directory.directory, voiced_idx, False, text_align_directory=self.text_align_directory)
 
             if not self.no_normalizers:
                 voiced_mfccs = self.mfcc_norm.normalize(voiced_mfccs)
@@ -459,8 +257,7 @@ class EMGDataset(torch.utils.data.Dataset):
             result['parallel_voiced_emg'] = torch.from_numpy(voiced_emg).pin_memory()
 
             audio_file = f'{voiced_directory.directory}/{voiced_idx}_audio_clean.flac'
-        
-        phonemes=np.array(self.phone_transform.phone_to_int(phonemes), dtype=np.int64)
+
         result['phonemes'] = torch.from_numpy(phonemes).pin_memory() # either from this example if vocalized or aligned example if silent
         result['audio_file'] = audio_file
 
@@ -482,7 +279,6 @@ class EMGDataset(torch.utils.data.Dataset):
                 audio_feature_lengths.append(ex['audio_features'].shape[0])
                 parallel_emg.append(np.zeros(1))
         phonemes = [ex['phonemes'] for ex in batch]
-        phonemes_lengths = [ex['phonemes'].shape[0] for ex in batch]
         emg = [ex['emg'] for ex in batch]
         raw_emg = [ex['raw_emg'] for ex in batch]
         session_ids = [ex['session_ids'] for ex in batch]
@@ -497,7 +293,6 @@ class EMGDataset(torch.utils.data.Dataset):
                   'raw_emg':raw_emg,
                   'parallel_voiced_emg':parallel_emg,
                   'phonemes':phonemes,
-                  'phonemes_lengths': phonemes_lengths,
                   'session_ids':session_ids,
                   'lengths':lengths,
                   'silent':silent,

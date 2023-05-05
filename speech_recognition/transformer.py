@@ -1,4 +1,3 @@
-import math
 from typing import Optional
 
 import torch
@@ -52,84 +51,13 @@ class TransformerEncoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        src2 = self.self_attn(src, src, src, src_key_padding_mask=src_key_padding_mask)
+        src2 = self.self_attn(src)
         src = src + self.dropout1(src2)
         src = self.norm1(src)
         src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
         src = src + self.dropout2(src2)
         src = self.norm2(src)
         return src
-
-class TransformerDecoderLayer(nn.Module):
-    r"""TransformerDecoderLayer is made up of self-attn, multi-head-attn and feedforward network.
-    This standard decoder layer is based on the paper "Attention Is All You Need".
-    Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez,
-    Lukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Advances in
-    Neural Information Processing Systems, pages 6000-6010. Users may modify or implement
-    in a different way during application.
-
-    Args:
-        d_model: the number of expected features in the input (required).
-        nhead: the number of heads in the multiheadattention models (required).
-        dim_feedforward: the dimension of the feedforward network model (default=2048).
-        dropout: the dropout value (default=0.1).
-        activation: the activation function of the intermediate layer, can be a string
-            ("relu" or "gelu") or a unary callable. Default: relu
-        layer_norm_eps: the eps value in layer normalization components (default=1e-5).
-        batch_first: If ``True``, then the input and output tensors are provided
-            as (batch, seq, feature). Default: ``False`` (seq, batch, feature).
-        norm_first: if ``True``, layer norm is done prior to self attention, multihead
-            attention and feedforward operations, respectively. Otherwise it's done after.
-            Default: ``False`` (after).
-        """
-    # Adapted from pytorch source
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
-        super(TransformerDecoderLayer, self).__init__()
-        #Attention Mechanism
-        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
-        self.multihead_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
-        # Implementation of Feedforward model
-        self.linear1 = nn.Linear(d_model, dim_feedforward)
-        self.dropout = nn.Dropout(dropout)
-        self.linear2 = nn.Linear(dim_feedforward, d_model)
-        #Normalization Layer and Dropout Layer
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
-        self.norm3 = nn.LayerNorm(d_model)
-        self.dropout1 = nn.Dropout(dropout)
-        self.dropout2 = nn.Dropout(dropout)
-        self.dropout3 = nn.Dropout(dropout)
-        #Activation Function
-        self.activation = nn.ReLU()
-    
-    def forward(self, tgt: torch.Tensor, memory: torch.Tensor, tgt_mask: Optional[torch.Tensor] = None, memory_mask: Optional[torch.Tensor] = None,
-                tgt_key_padding_mask: Optional[torch.Tensor] = None, memory_key_padding_mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        r"""Pass the input through the encoder layer.
-
-        Args:
-            tgt: the sequence to the decoder layer (required).
-            memory: the sequence from the last layer of the encoder (required).
-            tgt_mask: the mask for the tgt sequence (optional).
-            memory_mask: the mask for the memory sequence (optional).
-            tgt_key_padding_mask: the mask for the tgt keys per batch (optional).
-            memory_key_padding_mask: the mask for the memory keys per batch (optional).
-
-        Shape:
-            see the docs in Transformer class.
-        """
-        tgt2 = self.self_attn(tgt, tgt, tgt,tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
-        tgt = tgt + self.dropout1(tgt2)
-        tgt = self.norm1(tgt)
-
-        tgt2=self.multihead_attn(tgt, memory, memory, memory_key_padding_mask=memory_key_padding_mask)
-        tgt = tgt + self.dropout1(tgt2)
-        tgt = self.norm1(tgt)
-
-        tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
-        tgt = tgt + self.dropout2(tgt2)
-        tgt = self.norm2(tgt)
-        return tgt
-    
 
 class MultiHeadAttention(nn.Module):
   def __init__(self, d_model=256, n_head=4, dropout=0.1, relative_positional=True, relative_positional_distance=100):
@@ -156,7 +84,7 @@ class MultiHeadAttention(nn.Module):
     else:
         self.relative_positional = None
 
-  def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, tgt_key_padding_mask: Optional[torch.Tensor] = None, tgt_mask: Optional[torch.Tensor] = None, src_key_padding_mask: Optional[torch.Tensor] = None, memory_key_padding_mask: Optional[torch.Tensor] = None):
+  def forward(self, x):
     """Runs the multi-head self-attention layer.
 
     Args:
@@ -165,32 +93,11 @@ class MultiHeadAttention(nn.Module):
       A single tensor containing the output from this layer
     """
 
-    #Computes projections
-    q = torch.einsum('tbf,hfa->bhta', query, self.w_q)
-    k = torch.einsum('tbf,hfa->bhta', key, self.w_k)
-    v = torch.einsum('tbf,hfa->bhta', value, self.w_v)
-     
-    # Compute scaled dot-product attention
+    q = torch.einsum('tbf,hfa->bhta', x, self.w_q)
+    k = torch.einsum('tbf,hfa->bhta', x, self.w_k)
+    v = torch.einsum('tbf,hfa->bhta', x, self.w_v)
     logits = torch.einsum('bhqa,bhka->bhqk', q, k) / (self.d_qkv ** 0.5)
 
-    # Apply att_mask to the attention weights if provided
-    if tgt_mask is not None:
-        logits = logits.masked_fill(tgt_mask == float('-inf'), -1e8)
-    
-    
-    #Apply padding_mask to the attention weights if provided
-    if tgt_key_padding_mask is not None:
-       logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
-
-    #Apply padding_mask to the attention weights if provided
-    if src_key_padding_mask is not None:
-       logits = logits.masked_fill(src_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
-
-    #Apply padding_mask to the attention weights if provided
-    if memory_key_padding_mask is not None:
-       logits = logits.masked_fill(memory_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8)
-    
-    
     if self.relative_positional is not None:
         q_pos = q.permute(2,0,1,3) #bhqd->qbhd
         l,b,h,d = q_pos.size()
@@ -396,39 +303,3 @@ class LearnedRelativePositionalEmbedding(nn.Module):
             x = x.transpose(0, 1)
             x = x.contiguous().view(bsz_heads, length+1, length)
             return x[:, 1:, :]
-        
-
-########
-# Taken from:
-# https://pytorch.org/tutorials/beginner/transformer_tutorial.html
-# or also here:
-# https://github.com/pytorch/examples/blob/master/word_language_model/model.py
-class PositionalEncoding(nn.Module):
-
-    def __init__(self, d_model, dropout=0.0, max_len=5000):
-        super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(p=dropout)
-        self.max_len = max_len
-
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float()
-                             * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze(0).transpose(0, 1)  # shape (max_len, 1, dim)
-        self.register_buffer('pe', pe)  # Will not be trained.
-
-    def forward(self, x):
-        """Inputs of forward function
-        Args:
-            x: the sequence fed to the positional encoder model (required).
-        Shape:
-            x: [sequence length, batch size, embed dim]
-            output: [sequence length, batch size, embed dim]
-        """
-        assert x.size(0) < self.max_len, (
-            f"Too long sequence length: increase `max_len` of pos encoding")
-        # shape of x (len, B, dim)
-        x = x + self.pe[:x.size(0), :]
-        return self.dropout(x)

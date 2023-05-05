@@ -4,15 +4,13 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from transformer import TransformerEncoderLayer, TransformerDecoderLayer, PositionalEncoding
-from data_utils import decollate_tensor
+from transformer import TransformerEncoderLayer
+
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
-flags.DEFINE_integer('emg_features_size', 112, 'number of emg features')
 flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
-flags.DEFINE_integer('pad', 0, 'Padding value according to the position on phoneme inventory')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
@@ -43,133 +41,46 @@ class ResBlock(nn.Module):
         return F.relu(x + res)
 
 class Model(nn.Module):
-    def __init__(self, num_features, num_outs_enc, num_outs_dec, device):
+    def __init__(self, num_features, num_outs, num_aux_outs=None):
         super().__init__()
 
-        '''
         self.conv_blocks = nn.Sequential(
             ResBlock(8, FLAGS.model_size, 2),
             ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
             ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
         )
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
-        '''
-        self.emg_projection = nn.Linear(FLAGS.emg_features_size, FLAGS.model_size)
-        
-        self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of <S> and <PAD> without predicting them
-        self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
-        self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
-        self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
-        self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
-        
-        self.device=device
-        
-        self.tgt_key_padding_mask=None
-        self.src_key_padding_mask=None
-        self.memory_key_padding_mask=None
-        self.tgt_mask=None
+        self.transformer = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
+        self.w_out = nn.Linear(FLAGS.model_size, num_outs)
 
-    def create_tgt_padding_mask(self, tgt):
-        # input tgt of shape ()
-        tgt_padding_mask = tgt == FLAGS.pad
-        return tgt_padding_mask
-    
-    def create_src_padding_mask(self, src):
-        # input tgt of shape ()
-        src_padding_mask = src == FLAGS.pad
-        return src_padding_mask
-    
-    def forward(self, x_raw= None, y= None, mode = 'default', part = None, memory=None):
+        self.has_aux_out = num_aux_outs is not None
+        if self.has_aux_out:
+            self.w_aux = nn.Linear(FLAGS.model_size, num_aux_outs)
+
+    def forward(self, x_feat, x_raw, session_ids):
         # x shape is (batch, time, electrode)
-        # y shape is (batch, sequence_length)
-        if mode == "default":
-            return self.forward_training(x_raw=x_raw, y=y)
-        elif mode == "beam_search":
-            if part == 'encoder':
-                return self.forward_beam_search(part=part, x_raw=x_raw)
-            elif part == 'decoder':
-                return self.forward_beam_search(part=part, y=y, memory=memory)
-      
-    def forward_training (self, x_raw= None, y= None) :
-        '''
+
         if self.training:
             r = random.randrange(8)
             if r > 0:
-                x_raw_clone = x_raw.clone()
-                x_raw_clone[:,:-r,:] = x_raw[:,r:,:] # shift left r
-                x_raw_clone[:,-r:,:] = 0 #TODO should i change it with padding value???
-                x_raw = x_raw_clone
+                x_raw[:,:-r,:] = x_raw[:,r:,:] # shift left r
+                x_raw[:,-r:,:] = 0
 
         x_raw = x_raw.transpose(1,2) # put channel before time for conv
         x_raw = self.conv_blocks(x_raw)
         x_raw = x_raw.transpose(1,2)
         x_raw = self.w_raw_in(x_raw)
+
         x = x_raw
-        '''
-        
-        #Padding Target Mask and attention mask
-        self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-        self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
-        self.memory_key_padding_mask = self.src_key_padding_mask
-        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
 
-        #Projection from emg input to the expected number of hidden dimension
-        x=self.emg_projection(x_raw)
-
-        #Embedding and positional encoding of tgt
-        tgt=self.embedding_tgt(y)
-        tgt=self.pos_decoder(tgt)
-        
         x = x.transpose(0,1) # put time first
-        tgt = tgt.transpose(0,1) # put sequence_length first
-        x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
-        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+        x = self.transformer(x)
+        x = x.transpose(0,1)
 
-        x_encoder = x_encoder.transpose(0,1)
-        x_decoder = x_decoder.transpose(0,1)
-
-        
-        return self.w_aux(x_encoder), self.w_out(x_decoder)
-        
-    def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
-        # x shape is (batch, time, electrode)
-        # y shape is (batch, sequence_length)
-
-        if part == 'encoder':
-            if self.training:
-                r = random.randrange(8)
-                if r > 0:
-                    x_raw_clone = x_raw.clone()
-                    x_raw_clone[:,:-r,:] = x_raw[:,r:,:] # shift left r
-                    x_raw_clone[:,-r:,:] = 0
-                    x_raw = x_raw_clone
-
-            x_raw = x_raw.transpose(1,2) # put channel before time for conv
-            x_raw = self.conv_blocks(x_raw)
-            x_raw = x_raw.transpose(1,2)
-            x_raw = self.w_raw_in(x_raw)
-            x = x_raw
-
-            
-            x = x.transpose(0,1) # put time first
-            x_encoder = self.transformerEncoder(x)
-            x_encoder = x_encoder.transpose(0,1)
-            
-            return x_encoder
-            
-        elif part == 'decoder':
-            #Embedding and positional encoding of tgt
-            tgt=self.embedding_tgt(y)
-            tgt=self.pos_decoder(tgt)
-            
-            tgt = tgt.transpose(0,1) # put sequence_length first
-            memory = memory.transpose(0,1) # put sequence_length first
-            x_decoder = self.transformerDecoder(tgt, memory)
-            x_decoder = x_decoder.transpose(0,1)
-            
-            return self.w_out(x_decoder)
+        if self.has_aux_out:
+            return self.w_out(x), self.w_aux(x)
+        else:
+            return self.w_out(x)
 

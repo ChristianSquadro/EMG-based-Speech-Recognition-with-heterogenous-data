@@ -1,12 +1,10 @@
-import math
 import string
-import logging
 
 import numpy as np
 import librosa
 import soundfile as sf
+from textgrids import TextGrid
 import jiwer
-from num2words import num2words
 from unidecode import unidecode
 
 import torch
@@ -16,8 +14,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
-phoneme_inventory = ['AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH','</S>','<S>','<PAD>']
-pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
+phoneme_inventory = ['aa','ae','ah','ao','aw','ax','axr','ay','b','ch','d','dh','dx','eh','el','em','en','er','ey','f','g','hh','hv','ih','iy','jh','k','l','m','n','nx','ng','ow','oy','p','r','s','sh','t','th','uh','uw','v','w','y','z','zh','sil']
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)
@@ -47,7 +44,7 @@ def mel_spectrogram(y, n_fft, num_mels, sampling_rate, hop_size, win_size, fmin,
 
     global mel_basis, hann_window
     if fmax not in mel_basis:
-        mel = librosa.filters.mel(sr=sampling_rate,n_fft=n_fft,n_mels=num_mels, fmin=fmin, fmax=fmax)
+        mel = librosa.filters.mel(sampling_rate, n_fft, num_mels, fmin, fmax)
         mel_basis[str(fmax)+'_'+str(y.device)] = torch.from_numpy(mel).float().to(y.device)
         hann_window[str(y.device)] = torch.hann_window(win_size).to(y.device)
 
@@ -84,6 +81,7 @@ def load_audio(filename, start=None, end=None, max_frames=None, renormalize_volu
     if max_frames is not None and mspec.shape[0] > max_frames:
         mspec = mspec[:max_frames,:]
     return mspec
+
 
 def double_average(x):
     assert len(x.shape) == 1
@@ -163,7 +161,7 @@ def combine_fixed_length(tensor_list, length):
     if total_length % length != 0:
         pad_length = length - (total_length % length)
         tensor_list = list(tensor_list) # copy
-        tensor_list.append(torch.full((pad_length,*tensor_list[0].size()[1:]),FLAGS.pad, dtype=tensor_list[0].dtype, device=tensor_list[0].device))
+        tensor_list.append(torch.zeros(pad_length,*tensor_list[0].size()[1:], dtype=tensor_list[0].dtype, device=tensor_list[0].device))
         total_length += pad_length
     tensor = torch.cat(tensor_list, 0)
     n = total_length // length
@@ -223,42 +221,30 @@ def print_confusion(confusion_mat, n=10):
         p2s = phoneme_inventory[p2]
         print(f'{p1s} {p2s} {v*100:.1f} {(confusion_mat[p1,p1]+confusion_mat[p2,p2])/(target_counts[p1]+target_counts[p2])*100:.1f}')
 
-def read_phonemes(sentence):
-    
-    #Premanipulation to avoid issues with num2words
-    pre_sentence=jiwer.SubstituteRegexes({r"_": r" ", r"£": r"pound "})(sentence)
-    
-    #Transform digits into words
-    digits=[]
-    new_sentence=""
-    for unit in pre_sentence:
-        if unit.isdigit():
-            digits.append(unit)
-        elif digits:
-            new_sentence += num2words(int(''.join(digits))) + ' ' + unit
-            digits=[]  
-        else:
-            new_sentence += unit     
-            
-    #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’s": r"'s",r"'seventy": r"seventy",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
-    
-    #Transform the words into sequences of phones
-    phones = []
-    for n in new_sentence:
-        try:
-            p = pron_dct[n]
-            phones.append(p)
-        except KeyError as e:
-            #logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
-            logging.warning(e)
-    return [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token but the start token is manually injected during beam search
+def read_phonemes(textgrid_fname, max_len=None):
+    tg = TextGrid(textgrid_fname)
+    phone_ids = np.zeros(int(tg['phones'][-1].xmax*86.133)+1, dtype=np.int64)
+    phone_ids[:] = -1
+    phone_ids[-1] = phoneme_inventory.index('sil') # make sure list is long enough to cover full length of original sequence
+    for interval in tg['phones']:
+        phone = interval.text.lower()
+        if phone in ['', 'sp', 'spn']:
+            phone = 'sil'
+        if phone[-1] in string.digits:
+            phone = phone[:-1]
+        ph_id = phoneme_inventory.index(phone)
+        phone_ids[int(interval.xmin*86.133):int(interval.xmax*86.133)] = ph_id
+    assert (phone_ids >= 0).all(), 'missing aligned phones'
+
+    if max_len is not None:
+        phone_ids = phone_ids[:max_len]
+        assert phone_ids.shape[0] == max_len
+    return phone_ids
 
 class TextTransform(object):
     def __init__(self):
         self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
-        self.chars = "*" + string.ascii_lowercase+string.digits+ ' ' #TODO remove *
-        self.vocabulary_size=len(self.chars)
+        self.chars = string.ascii_lowercase+string.digits+' '
 
     def clean_text(self, text):
         text = unidecode(text)
@@ -271,16 +257,3 @@ class TextTransform(object):
 
     def int_to_text(self, ints):
         return ''.join(self.chars[i] for i in ints)
-    
-class PhoneTransform(object):
-    def __init__(self):
-        self.phoneme_inventory = phoneme_inventory
-        self.vocabulary_size=len(self.phoneme_inventory)
-
-    def phone_to_int(self, phone):
-        phone= phone
-        return [self.phoneme_inventory.index(c) for c in phone]
-
-    def int_to_phone(self, ints):
-        return ''.join(self.phoneme_inventory[i] for i in ints)
-    
