@@ -1,8 +1,2 @@
 train / dev split: 8055 200
 "RUCASTLE'S"
-"RUCASTLE'S"
-'DETOUR'
-'DETOUR'
-'MCCARTHYS'
-"RUCASTLE'S"
-'CŒUR'

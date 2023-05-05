@@ -13,7 +13,6 @@ import torch.nn.functional as F
 
 from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
-from data_utils import combine_fixed_length
 from BeamSearch import run_single_bs
 
 from absl import flags
@@ -25,7 +24,7 @@ flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
-flags.DEFINE_float('l2', 0, 'weight decay')
+flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
 flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
@@ -64,7 +63,7 @@ def test(model, testset, device, tree, language_model):
 
 def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=5):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 80000, 64, shuffle=True, batch_ordering='random'))
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 10000, 64, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 64, shuffle=True, batch_ordering='random'))
 
     #Define model and loss function
@@ -122,6 +121,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
+            y = nn.utils.rnn.pad_sequence(example['phonemes'], batch_first=True).to(device)
             loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_lengths'], blank = len(devset.phone_transform.phoneme_inventory)-2) 
 
             #Combination the two losses
