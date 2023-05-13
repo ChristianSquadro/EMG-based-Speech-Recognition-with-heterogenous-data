@@ -1,3 +1,4 @@
+import datetime
 import os
 import sys
 import numpy as np
@@ -14,6 +15,7 @@ from read_emg import EMGDataset, SizeAwareSampler
 from architecture import Model
 from data_utils import combine_fixed_length, decollate_tensor
 from transformer import TransformerEncoderLayer
+from torch.utils.tensorboard import SummaryWriter
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -31,7 +33,7 @@ def test(model, testset, device):
    return
 
 
-def train_model(trainset, devset, device, n_epochs=200):
+def train_model(trainset, devset, device, writer,n_epochs=200, report_every=5):
     dataloader = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0, collate_fn=EMGDataset.collate_raw, batch_sampler=SizeAwareSampler(trainset, 128000))
 
 
@@ -57,6 +59,8 @@ def train_model(trainset, devset, device, n_epochs=200):
 
     batch_idx = 0
     optim.zero_grad()
+    run_steps=0
+    train_loss=0
     for epoch_idx in range(n_epochs):
         losses = []
         for example in dataloader:
@@ -75,6 +79,18 @@ def train_model(trainset, devset, device, n_epochs=200):
             losses.append(loss.item())
 
             loss.backward()
+            train_loss += loss.item()
+            run_steps += 1
+            
+            if batch_idx % report_every == 0:     
+                #Evaluation
+                model.eval()
+                
+                #Print training loss
+                writer.add_scalar('Loss/Training', round(train_loss / run_steps,3), batch_idx)
+                train_loss = 0
+                run_steps = 0
+                
             if (batch_idx+1) % 2 == 0:
                 optim.step()
                 optim.zero_grad()
@@ -116,7 +132,9 @@ def main():
 
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
 
-    model = train_model(trainset, devset, device)
+    log_dir="logs/run/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    writer = SummaryWriter(log_dir=log_dir)
+    model = train_model(trainset, devset, device, writer)
 
 if __name__ == '__main__':
     FLAGS(sys.argv)
