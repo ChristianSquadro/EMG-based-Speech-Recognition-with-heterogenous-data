@@ -25,7 +25,7 @@ flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
+flags.DEFINE_float('alpha_loss', 0.4, 'parameter alpha for the two losses')
 flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved', None, 'run evaluation on given model file')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
@@ -69,7 +69,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
     #Define model and loss function
     n_phones = len(devset.phone_transform.phoneme_inventory) - 2 #we should remove from prediction the <S> and <PAD>
     model = Model(devset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
-    model=nn.DataParallel(model, device_ids=[0,1]).to(device)
+    model=nn.DataParallel(model, device_ids=[0,1,2,3]).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
 
     if FLAGS.start_training_from is not None:

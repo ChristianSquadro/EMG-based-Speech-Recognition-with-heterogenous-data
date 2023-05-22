@@ -12,7 +12,7 @@ flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
 flags.DEFINE_integer('emg_features_size', 112, 'number of emg features')
 flags.DEFINE_integer('num_layers', 6, 'number of layers')
 flags.DEFINE_float('dropout', .2, 'dropout')
-flags.DEFINE_integer('pad', 0, 'Padding value according to the position on phoneme inventory')
+flags.DEFINE_integer('pad', 42, 'Padding value according to the position on phoneme inventory')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
