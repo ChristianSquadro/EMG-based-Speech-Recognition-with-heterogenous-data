@@ -38,7 +38,8 @@ def train_model(trainset, devset, device, writer,n_epochs=200, report_every=5):
 
 
     n_chars = len(devset.text_transform.chars)
-    model = Model(devset.num_features, n_chars+1).to(device)
+    model = Model(devset.num_features, n_chars+1)
+    model= nn.DataParallel(model, device_ids=[0,1]).to(device)
 
     if FLAGS.start_training_from is not None:
         state_dict = torch.load(FLAGS.start_training_from)
@@ -99,7 +100,7 @@ def train_model(trainset, devset, device, writer,n_epochs=200, report_every=5):
         train_loss = np.mean(losses)
         val = test(model, devset, device)
         lr_sched.step()
-        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f} validation WER: {val*100:.2f}')
+        logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f}')
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
 
     model.load_state_dict(torch.load(os.path.join(FLAGS.output_directory,'model.pt'))) # re-load best parameters
