@@ -1,3 +1,19 @@
 train / dev split: 8055 200
+'MCCARTHYS'
+"RUCASTLE'S"
+'MCCARTHYS'
+"RUCASTLE'S"
+'MCCARTHYS'
+'DETOUR'
 "RUCASTLE'S"
 "RUCASTLE'S"
+'DETOUR'
+'DETOUR'
+finished epoch 1 - training loss: 3.1477
+finished epoch 2 - training loss: 2.9035
+finished epoch 3 - training loss: 2.7453
+finished epoch 4 - training loss: 2.6199
+finished epoch 5 - training loss: 2.5282
+finished epoch 6 - training loss: 2.4494
+finished epoch 7 - training loss: 2.3754
+finished epoch 8 - training loss: 2.3116

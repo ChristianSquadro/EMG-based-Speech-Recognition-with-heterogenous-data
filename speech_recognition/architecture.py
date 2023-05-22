@@ -59,8 +59,8 @@ class Model(nn.Module):
         self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of <S> and <PAD> without predicting them
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
-        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=8, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
+        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
+        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)

@@ -20,8 +20,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_integer('batch_size', 32, 'training batch size')
-flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_float('learning_rate', 3e-5, 'learning rate')
+flags.DEFINE_integer('learning_rate_warmup', 1, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 flags.DEFINE_float('l2', 0., 'weight decay')
@@ -63,7 +63,7 @@ def test(model, testset, device, tree, language_model):
 
 def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=5):
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 10000, 64, shuffle=True, batch_ordering='random'))
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 100000, 128, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 64, shuffle=True, batch_ordering='random'))
 
     #Define model and loss function
