@@ -61,7 +61,7 @@ def test(model, testset, device, tree, language_model):
     #references = [references[i] for i in range(len(references)) if len(references[i]) > 0]
     return jiwer.wer(references, predictions)
 
-def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=200, report_every=5):
+def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=80, report_every=5):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 100000, 128, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 64, shuffle=True, batch_ordering='random'))
