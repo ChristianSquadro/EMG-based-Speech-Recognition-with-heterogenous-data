@@ -12,10 +12,10 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 400, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
-flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
+flags.DEFINE_float('LMPenalty', 0.6, 'penalty to penalize short words insertion')
     
 # Helpers
 def replicate(l,t):
@@ -85,7 +85,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
 
     ### MAIN PART
     dct = tree._dictionary
-    pr = False # print outputs?
     pr2 = False
    
     # forward pass, attention is applied to data_encoded as trained
@@ -132,7 +131,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             full_probs = step_probs + torch.sum(hypos.probs,1,keepdim=True)
         
         if FLAGS.Constrained:
-             # this step sets all possible combinations of hypo and new phone to zero which do NOT correspond to valid words
+             # this step sets all possible combinations of hypo and new phone to -inf which do NOT correspond to valid words
             full_probs = PrefixTree.filter_valid_cont(hypos.nodes, full_probs,device) 
            
         # Compute the best hypos (requires some shape juggling), make sure that hypos with probability -inf are never taken
@@ -209,7 +208,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model):
     sentence= ' '.join([item.name for item in words])
-    logprob=language_model.score(sentence + '</S>',bos = False, eos = True)
+    logprob=language_model.score('<S>'+ sentence + '</S>',bos = False, eos = True)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 

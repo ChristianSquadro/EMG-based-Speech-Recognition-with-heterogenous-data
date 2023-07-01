@@ -56,7 +56,7 @@ class Model(nn.Module):
         '''
         self.emg_projection = nn.Linear(FLAGS.emg_features_size, FLAGS.model_size)
         
-        self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of <S> and <PAD> without predicting them
+        self.embedding_tgt = nn.Embedding(num_outs_dec + 2 , FLAGS.model_size, padding_idx=FLAGS.pad) # We need to take in consideration the embedding of </S> and <PAD> without predicting them
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
         encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
@@ -93,6 +93,11 @@ class Model(nn.Module):
                 return self.forward_beam_search(part=part, x_raw=x_raw)
             elif part == 'decoder':
                 return self.forward_beam_search(part=part, y=y, memory=memory)
+        elif mode == "greedy_search":
+            if part == 'encoder':
+                return self.forward_greedy_search(part=part, x_raw=x_raw)
+            elif part == 'decoder':
+                return self.forward_greedy_search(part=part, y=y, memory=memory)
       
     def forward_training (self, x_raw= None, y= None) :
         '''
@@ -115,7 +120,7 @@ class Model(nn.Module):
         self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
         self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
         self.memory_key_padding_mask = self.src_key_padding_mask
-        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
 
         #Projection from emg input to the expected number of hidden dimension
         x=self.emg_projection(x_raw)
@@ -137,24 +142,11 @@ class Model(nn.Module):
         
     def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
         # x shape is (batch, time, electrode)
-        # y shape is (batch, sequence_length)
+        # y shape is (batch, sequence_length)      
 
         if part == 'encoder':
-            if self.training:
-                r = random.randrange(8)
-                if r > 0:
-                    x_raw_clone = x_raw.clone()
-                    x_raw_clone[:,:-r,:] = x_raw[:,r:,:] # shift left r
-                    x_raw_clone[:,-r:,:] = 0
-                    x_raw = x_raw_clone
-
-            x_raw = x_raw.transpose(1,2) # put channel before time for conv
-            x_raw = self.conv_blocks(x_raw)
-            x_raw = x_raw.transpose(1,2)
-            x_raw = self.w_raw_in(x_raw)
-            x = x_raw
-
-            
+            #Projection from emg input to the expected number of hidden dimension
+            x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first
             x_encoder = self.transformerEncoder(x)
             x_encoder = x_encoder.transpose(0,1)
@@ -169,6 +161,33 @@ class Model(nn.Module):
             tgt = tgt.transpose(0,1) # put sequence_length first
             memory = memory.transpose(0,1) # put sequence_length first
             x_decoder = self.transformerDecoder(tgt, memory)
+            x_decoder = x_decoder.transpose(0,1)
+            
+            return self.w_out(x_decoder)
+        
+    def forward_greedy_search(self, part , x_raw=None, y=None, memory=None):
+        # x shape is (batch, time, electrode)
+        # y shape is (batch, sequence_length)      
+
+        if part == 'encoder':
+            #Projection from emg input to the expected number of hidden dimension
+            self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
+            x=self.emg_projection(x_raw)
+            x = x.transpose(0,1) # put time first
+            x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
+            x_encoder = x_encoder.transpose(0,1)
+            
+            return x_encoder
+            
+        elif part == 'decoder':
+            self.memory_key_padding_mask = self.src_key_padding_mask
+            #Embedding and positional encoding of tgt
+            tgt=self.embedding_tgt(y)
+            tgt=self.pos_decoder(tgt)
+            
+            tgt = tgt.transpose(0,1) # put sequence_length first
+            memory = memory.transpose(0,1) # put sequence_length first
+            x_decoder = self.transformerDecoder(tgt, memory, memory_key_padding_mask= self.memory_key_padding_mask)
             x_decoder = x_decoder.transpose(0,1)
             
             return self.w_out(x_decoder)
