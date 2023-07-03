@@ -91,8 +91,8 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     memory = model(mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
-    start_tok = vocab_size - 2
-    end_tok = vocab_size - 3
+    start_tok = vocab_size - 3
+    end_tok = vocab_size - 2
     max_len = torch.sum(target != end_tok) + 20
     
     # initialize
