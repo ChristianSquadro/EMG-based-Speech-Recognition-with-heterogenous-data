@@ -25,9 +25,9 @@ flags.DEFINE_float('learning_rate', 3e-5, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
-flags.DEFINE_float('l2', 0.4, 'weight decay')
+flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.4, 'parameter alpha for the two losses')
-flags.DEFINE_float('report_every', 10, "Reporting parameter of the loss plot")
+flags.DEFINE_float('report_every', 5, "Reporting parameter of the loss plot")
 flags.DEFINE_string('evaluate_saved_beam_search', None, 'run evaluation on given model file')
 flags.DEFINE_string('evaluate_saved_greedy_search', None, 'run evaluation on given model file')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
@@ -64,7 +64,7 @@ def test_beam_search(model, testset, device, tree, language_model, n_pred=None):
     return jiwer.wer(references, predictions), references, predictions
 
 
-def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=120, report_every=5):
+def train_model(trainset, devset, device, writer, tree, language_model, n_epochs=120):
     #Define Dataloader
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 128000, 32, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 32, shuffle=True, batch_ordering='random'))
@@ -143,11 +143,10 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             train_loss += loss.item()
             train_dec_loss += loss_dec.item()
             train_enc_loss += loss_enc.item()
-            
 
             #Gradient Update
             loss.backward()
-            if (batch_idx+1) % 2 == 0:
+            if (batch_idx+1) % 3 == 0:
                 optim.step()
                 optim.zero_grad()
 
@@ -155,7 +154,16 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
             batch_idx += 1
             run_steps += 1
 
-            if batch_idx % report_every == 0:     
+            #Training WER
+            torch.cuda.empty_cache()
+            model.eval()
+            _, _, phones_seq = run_greedy(model, X_raw[:2], y[:2], n_phones, device)
+            predictions += phones_seq
+            references += example['phonemes'][:2]
+            model.train()
+            torch.cuda.empty_cache()
+
+            if batch_idx % FLAGS.report_every == 0:     
                 #Evaluation
                 model.eval()
                 
@@ -163,7 +171,7 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
                 writer.add_scalar('Loss/Training', round(train_loss / run_steps,3), batch_idx)
                 writer.add_scalar('Loss_Decoder/Training', round(train_dec_loss / run_steps,3), batch_idx)
                 writer.add_scalar('Loss_Encoder/Training', round(train_enc_loss / run_steps,3), batch_idx)
-                #writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references, predictions), batch_idx)
+                writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references, predictions), batch_idx)
                 writer.flush()
                 
                 #Reset variables
@@ -204,9 +212,6 @@ def train_model(trainset, devset, device, writer, tree, language_model, n_epochs
                         predictions += phones_seq
                         references += example['phonemes']
                         
-                        #just to block processing all validation batches
-                        if idx == 3:
-                            break
                             
                 #Writing on tensorboard
                 writer.add_scalar('Loss/Evaluation', round (eval_loss / run_steps, 3), batch_idx)

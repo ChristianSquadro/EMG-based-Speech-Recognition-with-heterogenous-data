@@ -117,17 +117,17 @@ class TransformerDecoderLayer(nn.Module):
         Shape:
             see the docs in Transformer class.
         """
-        tgt2 = self.self_attn(tgt, tgt, tgt,tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
+        tgt2 = self.self_attn(tgt, tgt, tgt, tgt_key_padding_mask=tgt_key_padding_mask, tgt_mask=tgt_mask)
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
         tgt2=self.multihead_attn(tgt, memory, memory, memory_key_padding_mask=memory_key_padding_mask)
-        tgt = tgt + self.dropout1(tgt2)
-        tgt = self.norm1(tgt)
-
-        tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
         tgt = tgt + self.dropout2(tgt2)
         tgt = self.norm2(tgt)
+
+        tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
+        tgt = tgt + self.dropout3(tgt2)
+        tgt = self.norm3(tgt)
         return tgt
     
 
