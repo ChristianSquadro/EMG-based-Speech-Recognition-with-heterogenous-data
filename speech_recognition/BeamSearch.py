@@ -85,15 +85,14 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
 
     ### MAIN PART
     dct = tree._dictionary
-    pr = False # print outputs?
     pr2 = False
    
     # forward pass, attention is applied to data_encoded as trained
     memory = model(mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
-    start_tok = vocab_size - 2
-    end_tok = vocab_size - 3
+    start_tok = vocab_size - 3
+    end_tok = vocab_size - 2
     max_len = torch.sum(target != end_tok) + 20
     
     # initialize
@@ -119,7 +118,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         memory_stub= memory.repeat(last_frame_hypo.shape[0], 1, 1) 
         
         # decode_step treats the different hypos as though they were different elements of a batch
-        step_logits = model(mode='beam_search', part='decoder',y=last_frame_hypo,memory=memory_stub)
+        step_logits = model(mode='beam_search', part='decoder',y=last_frame_hypo,memory=memory_stub) [:,:,:-2]
 
         # step_logits and step_probs have the shape (hypos * tokens)
         step_probs = torch.nn.functional.log_softmax(step_logits,2)
@@ -132,7 +131,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             full_probs = step_probs + torch.sum(hypos.probs,1,keepdim=True)
         
         if FLAGS.Constrained:
-             # this step sets all possible combinations of hypo and new phone to zero which do NOT correspond to valid words
+             # this step sets all possible combinations of hypo and new phone to -inf which do NOT correspond to valid words
             full_probs = PrefixTree.filter_valid_cont(hypos.nodes, full_probs,device) 
            
         # Compute the best hypos (requires some shape juggling), make sure that hypos with probability -inf are never taken
@@ -209,7 +208,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model):
     sentence= ' '.join([item.name for item in words])
-    logprob=language_model.score(sentence + '</S>',bos = False, eos = True)
+    logprob=language_model.score('<S>'+ sentence + '</S>',bos = False, eos = True)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 

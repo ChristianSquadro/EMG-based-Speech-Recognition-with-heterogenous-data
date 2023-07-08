@@ -72,8 +72,8 @@ def load_utterance(base_dir, index, limit_length=False, debug=False):
     x = apply_to_all(notch_harmonics, x, 60, 1000)
     x = apply_to_all(remove_drift, x, 1000)
     x = x[raw_emg_before.shape[0]:x.shape[0]-raw_emg_after.shape[0],:]
-    emg_orig = apply_to_all(subsample, x, 600.00, 1000)
-    x = apply_to_all(subsample, x, 450.00, 1000)
+    emg_orig = apply_to_all(subsample, x, 689.06, 1000)
+    x = apply_to_all(subsample, x, 516.79, 1000)
     emg = x
 
     for c in FLAGS.remove_channels:
@@ -460,8 +460,9 @@ class EMGDataset(torch.utils.data.Dataset):
 
             audio_file = f'{voiced_directory.directory}/{voiced_idx}_audio_clean.flac'
         
+        result['phonemes'] = ' '.join(phonemes)
         phonemes=np.array(self.phone_transform.phone_to_int(phonemes), dtype=np.int64)
-        result['phonemes'] = torch.from_numpy(phonemes).pin_memory() # either from this example if vocalized or aligned example if silent
+        result['phonemes_int'] = torch.from_numpy(phonemes).pin_memory() # either from this example if vocalized or aligned example if silent
         result['audio_file'] = audio_file
 
         return result
@@ -482,7 +483,8 @@ class EMGDataset(torch.utils.data.Dataset):
                 audio_feature_lengths.append(ex['audio_features'].shape[0])
                 parallel_emg.append(np.zeros(1))
         phonemes = [ex['phonemes'] for ex in batch]
-        phonemes_lengths = [ex['phonemes'].shape[0] for ex in batch]
+        phonemes_int = [ex['phonemes_int'] for ex in batch]
+        phonemes_lengths = [ex['phonemes_int'].shape[0] for ex in batch]
         emg = [ex['emg'] for ex in batch]
         raw_emg = [ex['raw_emg'] for ex in batch]
         session_ids = [ex['session_ids'] for ex in batch]
@@ -497,7 +499,8 @@ class EMGDataset(torch.utils.data.Dataset):
                   'raw_emg':raw_emg,
                   'parallel_voiced_emg':parallel_emg,
                   'phonemes':phonemes,
-                  'phonemes_lengths': phonemes_lengths,
+                  'phonemes_int':phonemes_int,
+                  'phonemes_int_lengths': phonemes_lengths,
                   'session_ids':session_ids,
                   'lengths':lengths,
                   'silent':silent,

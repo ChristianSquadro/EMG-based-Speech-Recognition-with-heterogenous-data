@@ -8,5 +8,5 @@ deepspeech-0.7.0-models.pbmm
 models/recognition_model/model.pt
 hifi_gan
 logs/run
-models/recognition_model/log.txt
+models/recognition_model
 text_alignments
