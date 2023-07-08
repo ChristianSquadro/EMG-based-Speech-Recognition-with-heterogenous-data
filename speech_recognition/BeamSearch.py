@@ -117,7 +117,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         last_frame_hypo = hypos.histories[:,-1].unsqueeze(1) # hypos is always the MOST RECENT hypo in the history
         memory_stub= memory.repeat(last_frame_hypo.shape[0], 1, 1) 
         
-        # decode_step treats the different hypos as though they were different elements of a batch
+        # decode_step treats the different hypos as though they were different elements of a batch apart from the last two token predicted which are <S> and <PAD>
         step_logits = model(mode='beam_search', part='decoder',y=last_frame_hypo,memory=memory_stub) [:,:,:-2]
 
         # step_logits and step_probs have the shape (hypos * tokens)
