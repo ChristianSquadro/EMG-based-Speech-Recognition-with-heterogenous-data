@@ -53,7 +53,9 @@ class Model(nn.Module):
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
         '''
         self.emg_projection = nn.Linear(num_features, FLAGS.model_size)
+        self.emg_projection = nn.Linear(num_features, FLAGS.model_size)
         
+        self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
@@ -61,6 +63,7 @@ class Model(nn.Module):
         decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
+        self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
         self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
         
@@ -96,6 +99,11 @@ class Model(nn.Module):
                 return self.forward_greedy_search(part=part, x_raw=x_raw)
             elif part == 'decoder':
                 return self.forward_greedy_search(part=part, y=y, memory=memory)
+        elif mode == "greedy_search":
+            if part == 'encoder':
+                return self.forward_greedy_search(part=part, x_raw=x_raw)
+            elif part == 'decoder':
+                return self.forward_greedy_search(part=part, y=y, memory=memory)
       
     def forward_training (self, x_raw= None, y= None) :
         '''
@@ -118,7 +126,7 @@ class Model(nn.Module):
         self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
         self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
         self.memory_key_padding_mask = self.src_key_padding_mask
-        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
 
         #Projection from emg input to the expected number of hidden dimension
         x=self.emg_projection(x_raw)
@@ -141,8 +149,11 @@ class Model(nn.Module):
     def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)      
+        # y shape is (batch, sequence_length)      
 
         if part == 'encoder':
+            #Projection from emg input to the expected number of hidden dimension
+            x=self.emg_projection(x_raw)
             #Projection from emg input to the expected number of hidden dimension
             x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first

@@ -15,6 +15,7 @@ from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
+from greedy_search import run_greedy
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -47,6 +48,8 @@ flags.DEFINE_float('n_epochs', 120, 'number of epochs')
 
 def train_model(trainset, devset, device, writer):    
     #Define Dataloader
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 128000, 32, shuffle=True, batch_ordering='random'))
+    dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 32, shuffle=True, batch_ordering='random'))
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 128000, 32, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 32, shuffle=True, batch_ordering='random'))
 
@@ -89,6 +92,7 @@ def train_model(trainset, devset, device, writer):
             #Preprosessing of the input and target for the model
             X_raw=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
 
             #Shifting target for input decoder and loss
             tgt= y[:,:-1]
@@ -96,6 +100,13 @@ def train_model(trainset, devset, device, writer):
 
             #Prediction
             out_enc, out_dec = model(x_raw=X_raw, y=tgt)
+
+            #Encoder Loss
+            out_enc = F.log_softmax(out_enc, 2)
+            out_enc = out_enc.transpose(1,0)
+            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True).to(device)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+            
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
@@ -211,6 +222,9 @@ def train_model(trainset, devset, device, writer):
         lr_sched.step()
         #Mean of the main loss and logging
         train_loss = np.mean(losses)
+        
+        '''
+        _, references, prediction= test_beam_search(model, devset, device, tree, language_model , 3)
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f}')
         #Save Model
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
@@ -294,6 +308,10 @@ def main():
 
 if __name__ == '__main__':
     FLAGS(sys.argv)
+    if FLAGS.evaluate_saved_beam_search is not None:
+        evaluate_saved_beam_search()
+    elif FLAGS.evaluate_saved_greedy_search is not None:
+        evaluate_saved_greedy_search()
     if FLAGS.evaluate_saved_beam_search is not None:
         evaluate_saved_beam_search()
     elif FLAGS.evaluate_saved_greedy_search is not None:
