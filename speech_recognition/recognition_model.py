@@ -42,9 +42,9 @@ flags.DEFINE_integer('batch_size', 32, 'training batch size')
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_integer('learning_rate_patience', 5, 'learning rate decay patience')
-flags.DEFINE_float('l2', 0.1, 'weight decay')
+flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
-flags.DEFINE_integer('n_epochs', 60, 'number of epochs')
+flags.DEFINE_integer('n_epochs', 80, 'number of epochs')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
@@ -204,7 +204,7 @@ def train_model(trainset, devset, device, writer):
     batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []
 
     #Define Dataloader
-    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 128000, 32, shuffle=True, batch_ordering='random'))
+    dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(trainset, 120000, 32, shuffle=True, batch_ordering='random'))
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= DynamicBatchSampler(devset, 128000, 32, shuffle=True, batch_ordering='random'))
     
     #Define model and loss function
@@ -239,6 +239,9 @@ def train_model(trainset, devset, device, writer):
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {train_loss:.4f}')
         #Save Model
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
+        #Training loss to convergence
+        if round(train_loss, 1) == 0.0:
+            break
 
     return model
 
@@ -253,7 +256,6 @@ def evaluate_saved_beam_search():
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
     dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
-    vocab_size = len(testset.phone_transform.phoneme_inventory)
     references = []
     predictions = []
      
@@ -262,7 +264,8 @@ def evaluate_saved_beam_search():
             X_raw=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             tgt = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
-            pred=run_single_bs(model,X_raw,tgt,vocab_size,tree,language_model,device)
+            target= tgt[:,1:]
+            pred=run_single_bs(model,X_raw,target,n_phones,tree,language_model,device)
  
             pred_text = testset.text_transform.clean_text(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
@@ -271,11 +274,11 @@ def evaluate_saved_beam_search():
             
             logging.info(f'{pred_text} -> {target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
-    return jiwer.wer(references, predictions), references, predictions
+    print('WER:', jiwer.wer(references, predictions))
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    testset = EMGDataset(dev=False,test=False)
+    testset = EMGDataset(test=True)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
@@ -291,7 +294,8 @@ def evaluate_saved_greedy_search():
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model
-            phones_seq = run_greedy(model, X_raw, y, n_phones, device)
+            target= y[:,1:]
+            phones_seq = run_greedy(model, X_raw, target, n_phones, device)
 
             #Append lists to calculate the CER
             predictions += phones_seq

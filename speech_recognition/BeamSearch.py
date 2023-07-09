@@ -12,10 +12,10 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 400, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 200, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
-flags.DEFINE_float('LMPenalty', 0.6, 'penalty to penalize short words insertion')
+flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
     
 # Helpers
 def replicate(l,t):
@@ -91,9 +91,9 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     memory = model(mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
-    start_tok = vocab_size - 3
-    end_tok = vocab_size - 2
-    max_len = torch.sum(target != end_tok) + 20
+    end_tok = vocab_size - 3
+    start_tok = vocab_size - 2
+    max_len = torch.sum(target != end_tok) + 40
     
     # initialize
 
@@ -208,7 +208,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model):
     sentence= ' '.join([item.name for item in words])
-    logprob=language_model.score('<S>'+ sentence + '</S>',bos = False, eos = True)
+    logprob=language_model.score(sentence,bos = True, eos = True)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 
