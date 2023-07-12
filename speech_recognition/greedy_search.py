@@ -18,7 +18,6 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
 
   with torch.no_grad():
     while True:
-      torch.cuda.empty_cache()
       #Decoder
       step_logits = model(mode='greedy_search', part='decoder', y=dec_input, memory=memory)
       probs = torch.nn.functional.softmax(step_logits, dim=2)

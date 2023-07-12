@@ -240,11 +240,10 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
 
         if self._batch_ordering == "random":
             # deterministically shuffle based on epoch and seed
-            g = torch.Generator()
-            g.manual_seed(self._seed + self._epoch)
+            #g = torch.Generator()
+            #g.manual_seed(self._seed + self._epoch)
             sampler = torch.randperm(
-                len(self._batches), generator=g
-            ).tolist()  # type: ignore
+                len(self._batches)).tolist()  # type: ignore
             tmp = []
             for idx in sampler:
                 tmp.append(self._batches[idx])
@@ -267,9 +266,9 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
     def _generate_batches(self):
         if self._shuffle_ex:
             # deterministically shuffle based on epoch and seed
-            g = torch.Generator()
-            g.manual_seed(self._seed + self._epoch)
-            sampler = torch.randperm(len(self._dataset), generator=g).tolist()  # type: ignore
+            #g = torch.Generator()
+            #g.manual_seed(self._seed + self._epoch)
+            sampler = torch.randperm(len(self._dataset)).tolist()  # type: ignore
         else:
             # take examples as they are: e.g. they have been sorted
             sampler = range(len(self._dataset))  # type: ignore
@@ -324,12 +323,9 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
 
     def __iter__(self):
         for batch in self._batches:
+            if self._shuffle_ex:  # re-generate examples if ex_ordering == "random"
+                self._generate_batches()
             yield batch
-        if self._shuffle_ex:  # re-generate examples if ex_ordering == "random"
-            self._generate_batches()
-        if self._batch_ordering == "random":
-            # we randomly permute the batches only --> faster
-            self._permute_batches()
 
     def set_epoch(self, epoch):
         """
@@ -337,7 +333,6 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
         to mirror torch.utils.data.distributed.DistributedSampler
         """
         self._epoch = epoch
-        self._generate_batches()
 
     def __len__(self):
         return len(self._batches)
