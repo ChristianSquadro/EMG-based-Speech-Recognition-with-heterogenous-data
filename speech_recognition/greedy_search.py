@@ -6,7 +6,6 @@ FLAGS = flags.FLAGS
 
 def run_greedy(model, X_raw, tgt, vocab_size, device):
   batch_len=tgt.shape[0]
-  #total_logits= torch.zeros(batch_len,0,vocab_size,dtype=torch.float32)
   phones_seq = [['<S>'] for _ in range(batch_len)]
   start_tok = vocab_size - 3
   max_seq_length= tgt.shape[1]  
@@ -33,7 +32,6 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
       #Concatenate the decoder input sequence
       predicted_idx=predicted_idx.reshape(batch_len, 1)
       dec_input=torch.cat((dec_input, predicted_idx), dim=1)
-      #total_logits=torch.cat((total_logits, step_logits[:,-1:,:].to('cpu')), dim=1)
 
       #Stopping Criteria
       if all([any(phone == '</S>' for phone in item ) for item in phones_seq]) or dec_input.shape[1] == max_seq_length:

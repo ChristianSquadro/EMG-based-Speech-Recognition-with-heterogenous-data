@@ -9,7 +9,11 @@ from data_utils import decollate_tensor
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
-flags.DEFINE_integer('num_layers', 6, 'number of layers')
+flags.DEFINE_integer('feed_forward_layer_size', 3072, 'feed-forward dimensions')
+flags.DEFINE_integer('num_layers_encoder', 6, 'number of layers')
+flags.DEFINE_integer('num_layers_decoder', 4, 'number of layers')
+flags.DEFINE_integer('n_heads', 4, 'number of heads')
+flags.DEFINE_integer('relative_distance', 100, 'relative positional distance')
 flags.DEFINE_float('dropout', .2, 'dropout')
 
 class ResBlock(nn.Module):
@@ -53,17 +57,14 @@ class Model(nn.Module):
         self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
         '''
         self.emg_projection = nn.Linear(num_features, FLAGS.model_size)
-        self.emg_projection = nn.Linear(num_features, FLAGS.model_size)
         
-        self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
-        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=True, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=4, relative_positional=False, relative_positional_distance=100, dim_feedforward=3072, dropout=FLAGS.dropout)
-        self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers)
-        self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers)
-        self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
+        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads, relative_positional=True, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
+        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads, relative_positional=False, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
+        self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers_encoder)
+        self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers_decoder)
         self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
         self.w_out = nn.Linear(FLAGS.model_size, num_outs_dec)
         
@@ -152,8 +153,6 @@ class Model(nn.Module):
         # y shape is (batch, sequence_length)      
 
         if part == 'encoder':
-            #Projection from emg input to the expected number of hidden dimension
-            x=self.emg_projection(x_raw)
             #Projection from emg input to the expected number of hidden dimension
             x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first

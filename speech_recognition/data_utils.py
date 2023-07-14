@@ -252,7 +252,7 @@ def read_phonemes(sentence):
         except KeyError as e:
             #logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
             logging.warning(e)
-    return ['<S>'] + [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token but the start token is manually injected during beam search
+    return ['<S>'] + [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token and start token
 
 class TextTransform(object):
     def __init__(self):
