@@ -11,7 +11,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
 flags.DEFINE_integer('feed_forward_layer_size', 3072, 'feed-forward dimensions')
 flags.DEFINE_integer('num_layers_encoder', 6, 'number of layers')
-flags.DEFINE_integer('num_layers_decoder', 4, 'number of layers')
+flags.DEFINE_integer('num_layers_decoder', 8, 'number of layers')
 flags.DEFINE_integer('n_heads', 4, 'number of heads')
 flags.DEFINE_integer('relative_distance', 100, 'relative positional distance')
 flags.DEFINE_float('dropout', .2, 'dropout')

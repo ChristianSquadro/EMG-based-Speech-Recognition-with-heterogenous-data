@@ -43,7 +43,6 @@ flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
-flags.DEFINE_float('gradient_clipping', 1.0, 'parameter for tuning clipping')
 flags.DEFINE_integer('steps_grad', 3, 'steps of gradient accumulation')
 flags.DEFINE_integer('n_epochs', 100, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
@@ -63,9 +62,10 @@ def train_model(trainset, devset, device, writer):
                 set_lr(iteration*target_lr/FLAGS.learning_rate_warmup)
         
         #Training loop 
-        model.train()   
         optim.zero_grad()    
         for step,example in enumerate(dataloader_training):
+            #Set the model in train mode
+            model.train()   
             
             #Schedule_lr to change learning rate during the warmup phase
             schedule_lr(batch_idx)
@@ -105,8 +105,6 @@ def train_model(trainset, devset, device, writer):
 
             #Gradient Update
             loss.backward()
-            #Gradient Clipping
-            torch.nn.utils.clip_grad_norm_(model.parameters(), FLAGS.gradient_clipping)
             if (step + 1) % FLAGS.steps_grad == 0:
                 optim.step()
                 optim.zero_grad()
@@ -114,11 +112,15 @@ def train_model(trainset, devset, device, writer):
             #Increment counter batch and counter for steps of losses   
             batch_idx += 1
             run_train_steps += 1
-        
-            if batch_idx % FLAGS.report_loss == 0:  
+            
+            #Run the model on evaluation set and report the loss
+            if (step + 1) % FLAGS.report_loss == 0:  
                 evaluation_loop() 
                 report_loss()
-            
+        
+        #To report the remained loss history
+        evaluation_loop() 
+        report_loss()
   
     def evaluation_loop():
         nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
@@ -237,8 +239,8 @@ def train_model(trainset, devset, device, writer):
     batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []
 
     #Define Dataloader
-    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
-    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 128000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 128000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchTrainingSampler)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
@@ -255,7 +257,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    #lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[5,10,15], gamma=.5)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[5,10,15], gamma=.5)
     
     ##MODEL TRAINING##
     
@@ -264,6 +266,10 @@ def train_model(trainset, devset, device, writer):
         losses = []
         torch.cuda.empty_cache()
         training_loop()  
+        #Random shift batches
+        dynamicBatchTrainingSampler.set_epoch(epoch_idx + 1)
+        dynamicBatchEvaluationSampler.set_epoch(epoch_idx + 1)
+        #PER
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
          
@@ -273,9 +279,6 @@ def train_model(trainset, devset, device, writer):
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
         #Save Model
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
-        #Random shift batches
-        dynamicBatchTrainingSampler.set_epoch(epoch_idx + 1)
-        dynamicBatchEvaluationSampler.set_epoch(epoch_idx + 1)
         #Stop if Training loss reaches convergence
         if round(np.mean(losses), 1) == 0.0:
             break
@@ -316,8 +319,8 @@ def evaluate_saved_beam_search():
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    testset = EMGDataset(test=True)
-    #testset = EMGDataset(dev=False,test=False)
+    #testset = EMGDataset(test=True)
+    testset = EMGDataset(dev=True)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)

@@ -34,7 +34,7 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
       dec_input=torch.cat((dec_input, predicted_idx), dim=1)
 
       #Stopping Criteria
-      if all([any(phone == '</S>' for phone in item ) for item in phones_seq]) or dec_input.shape[1] == max_seq_length:
+      if all([any(phone == '</S>' for phone in item ) for item in phones_seq]) or dec_input.shape[1] >= max_seq_length:
         break
     
     #Formatting phones
