@@ -1,1 +1,201 @@
 train / dev split: 8055 200
+Prediction: <S> AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 0.9354838709677419)
+finished epoch 1 - training loss: 4.6406
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 2 - training loss: 2.9681
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 3 - training loss: 2.9106
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 4 - training loss: 2.8083
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 5 - training loss: 2.6675
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 6 - training loss: 2.5277
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 7 - training loss: 2.4010
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 8 - training loss: 2.2972
+Prediction: <S> M IY N D DH AH M AE N T ER </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 0.7692307692307693)
+finished epoch 9 - training loss: 2.1821
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 10 - training loss: 2.0607
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 11 - training loss: 1.9370
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 12 - training loss: 1.8097
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 13 - training loss: 1.6665
+Prediction: <S> T </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 3.0)
+finished epoch 14 - training loss: 1.5775
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 15 - training loss: 1.4356
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 16 - training loss: 1.3389
+Prediction: <S> IH K AH IH IH IH K AH IH IH IH IH K AH IH IH IH IH IH K AH IH IH IH IH IH K AH IH IH ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 0.9354838709677419)
+finished epoch 17 - training loss: 1.2340
+Prediction: <S> M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 0.9354838709677419)
+finished epoch 18 - training loss: 1.1563
+Prediction: <S> M M M </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 1.8)
+finished epoch 19 - training loss: 1.0426
+Prediction: <S> M </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 3.0)
+finished epoch 20 - training loss: 1.0313
+Prediction: <S> M </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 3.0)
+finished epoch 21 - training loss: 0.8276
+Prediction: <S> M </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 3.0)
+finished epoch 22 - training loss: 0.7803
+Prediction: <S> M </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 3.0)
+finished epoch 23 - training loss: 0.7596
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 24 - training loss: 0.7431
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 25 - training loss: 0.7288
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 26 - training loss: 0.7159
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 27 - training loss: 0.7038
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 28 - training loss: 0.6914
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 29 - training loss: 0.6824
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 30 - training loss: 0.6709
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 31 - training loss: 0.6609
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 32 - training loss: 0.6510
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 33 - training loss: 0.6402
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 34 - training loss: 0.6297
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 35 - training loss: 0.6231
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 36 - training loss: 0.6131
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 37 - training loss: 0.6030
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 38 - training loss: 0.5957
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 39 - training loss: 0.5854
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 40 - training loss: 0.5776
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 41 - training loss: 0.5687
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 42 - training loss: 0.5592
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 43 - training loss: 0.5514
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 44 - training loss: 0.5440
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 45 - training loss: 0.5359
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 46 - training loss: 0.5268
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 47 - training loss: 0.5197
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 48 - training loss: 0.5114
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 49 - training loss: 0.5031
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 50 - training loss: 0.4966
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 51 - training loss: 0.4897
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 52 - training loss: 0.4830
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 53 - training loss: 0.4763
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 54 - training loss: 0.4686
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 55 - training loss: 0.4619
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 56 - training loss: 0.4549
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 57 - training loss: 0.4480
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 58 - training loss: 0.4422
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 59 - training loss: 0.4346
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 60 - training loss: 0.4302
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 61 - training loss: 0.4238
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 62 - training loss: 0.4180
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 63 - training loss: 0.4122
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 64 - training loss: 0.4050
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 65 - training loss: 0.4000
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 66 - training loss: 0.3949
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 67 - training loss: 0.3893
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 68 - training loss: 0.3841
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 69 - training loss: 0.3792
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 70 - training loss: 0.3735
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 71 - training loss: 0.3704
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 72 - training loss: 0.3640
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 73 - training loss: 0.3597
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 74 - training loss: 0.3541
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 75 - training loss: 0.3499
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 76 - training loss: 0.3446
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 77 - training loss: 0.3391
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 78 - training loss: 0.3352
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 79 - training loss: 0.3303
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 80 - training loss: 0.3265
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 81 - training loss: 0.3224
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 82 - training loss: 0.3183
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 83 - training loss: 0.3144
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 84 - training loss: 0.3107
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 85 - training loss: 0.3088
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 86 - training loss: 0.3049
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 87 - training loss: 0.3007
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 88 - training loss: 0.2959
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 89 - training loss: 0.2930
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 90 - training loss: 0.2907
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 91 - training loss: 0.2879
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 92 - training loss: 0.2844
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 93 - training loss: 0.2791
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 94 - training loss: 0.2758
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 95 - training loss: 0.2742
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 96 - training loss: 0.2715
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 97 - training loss: 0.2701
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 98 - training loss: 0.2682
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 99 - training loss: 0.2628
+Prediction: <S> </S> ---> Reference: <S> L AY K B ER N T M IY T </S>  (PER: 5.0)
+finished epoch 100 - training loss: 0.2596
