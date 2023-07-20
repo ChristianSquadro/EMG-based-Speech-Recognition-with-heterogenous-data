@@ -180,10 +180,12 @@ class MultiHeadAttention(nn.Module):
     
     #Apply padding_mask to the attention weights if provided
     if tgt_key_padding_mask is not None:
+       logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8)
        logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
 
     #Apply padding_mask to the attention weights if provided
     if src_key_padding_mask is not None:
+       logits = logits.masked_fill(src_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8)
        logits = logits.masked_fill(src_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
 
     #Apply padding_mask to the attention weights if provided

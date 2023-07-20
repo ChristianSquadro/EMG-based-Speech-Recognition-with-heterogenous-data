@@ -34,7 +34,7 @@ flags.DEFINE_string('dict', "descriptions/dgaddy-lexicon.txt", 'the pronunciatio
 flags.DEFINE_string('lang_model', "descriptions/lm.binary", 'the language model')
 
 #Parameters
-flags.DEFINE_integer('pad', 42, 'Padding value according to the position on phoneme inventory')
+flags.DEFINE_integer('pad', 39, 'Padding value according to the position on phoneme inventory')
 flags.DEFINE_integer('report_PER', 1, "How many epochs to report PER")
 flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
@@ -73,7 +73,7 @@ def train_model(trainset, devset, device, writer):
             
             #Preprosessing of the input and target for the model
             X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
             print(len(X))
@@ -90,7 +90,7 @@ def train_model(trainset, devset, device, writer):
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones) 
             
             
             #Decoder Loss
@@ -111,7 +111,6 @@ def train_model(trainset, devset, device, writer):
                 optim.zero_grad()
                 sum_batch_size=0
 
-
             #Increment counter batch and counter for steps of losses   
             batch_idx += 1
             run_train_steps += 1
@@ -120,6 +119,7 @@ def train_model(trainset, devset, device, writer):
             if (step + 1) % FLAGS.report_loss == 0:  
                 evaluation_loop() 
                 report_loss()
+                
         
         #To report the remained loss history
         evaluation_loop() 
@@ -135,7 +135,7 @@ def train_model(trainset, devset, device, writer):
                 torch.cuda.empty_cache()
                 #Collect the data
                 X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-                y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+                y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             
                 #Forward Model using Greedy Approach not teacher forcing
                 tgt= y[:,:-1]
@@ -145,7 +145,7 @@ def train_model(trainset, devset, device, writer):
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
                 out_enc = out_enc.transpose(1,0)
-                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones) 
                     
                 #Decoder Loss
                 out_dec=out_dec.permute(0,2,1)
@@ -199,11 +199,11 @@ def train_model(trainset, devset, device, writer):
         for step,example in enumerate(dataloader_training):
             torch.cuda.empty_cache()
             X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             target= y[:,1:]
             phones_seq = run_greedy(model, X, target, n_phones, device)
             predictions_train += phones_seq
-            references_train += example['phonemes']
+            references_train += example['text']
             #Pick up just 10 batches
             if step + 1 == 10:
                 break
@@ -213,7 +213,7 @@ def train_model(trainset, devset, device, writer):
             torch.cuda.empty_cache()
             #Collect the data
             X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model using Greedy Approach not teacher forcing
             target= y[:,1:]
@@ -221,12 +221,12 @@ def train_model(trainset, devset, device, writer):
             
             #Append lists to calculate the PER
             predictions_eval += phones_seq
-            references_eval += example['phonemes']
+            references_eval += example['text']
 
         #Reporting PER
-        logging.info(f'Prediction: {predictions_eval[0]} ---> Reference: {references_eval[0]}  (PER: {jiwer.wer(predictions_eval[0], references_eval[0])})')
-        writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references_train, predictions_train), batch_idx)
-        writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.wer(references_eval, predictions_eval), batch_idx)
+        logging.info(f'Prediction: {predictions_eval[0]} ---> Reference: {references_eval[0]}  (PER: {jiwer.cer(predictions_eval[0], references_eval[0])})')
+        writer.add_scalar('PhonemeErrorRate/Training', jiwer.cer(references_train, predictions_train), batch_idx)
+        writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.cer(references_eval, predictions_eval), batch_idx)
         writer.flush()
         predictions_train=[]
         references_train=[]
@@ -248,7 +248,7 @@ def train_model(trainset, devset, device, writer):
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
     #Define model and loss function
-    n_phones = len(devset.phone_transform.phoneme_inventory)
+    n_phones = len(devset.text_transform.chars)
     model = Model(devset.num_features, n_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)

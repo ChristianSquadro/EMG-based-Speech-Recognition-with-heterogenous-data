@@ -257,7 +257,7 @@ def read_phonemes(sentence):
 class TextTransform(object):
     def __init__(self):
         self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
-        self.chars = "*" + string.ascii_lowercase+string.digits+ ' ' #TODO remove *
+        self.chars = string.ascii_lowercase+string.digits + ' ' + '=' + '+' + '-' #the = is <\S>, + is <S> and - is <PAD>
         self.vocabulary_size=len(self.chars)
 
     def clean_text(self, text):
