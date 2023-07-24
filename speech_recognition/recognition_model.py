@@ -41,8 +41,8 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
-flags.DEFINE_float('grad_clipping', 1.0, 'parameter for gradient clipping')
+flags.DEFINE_float('alpha_loss', 0.4, 'parameter alpha for the two losses')
+flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
@@ -138,7 +138,7 @@ def train_model(trainset, devset, device, writer):
                 X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
                 y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             
-                #Forward Model using Greedy Approach not teacher forcing
+                #Forward Model 
                 tgt= y[:,:-1]
                 target= y[:,1:]
                 out_enc, out_dec = model(x_raw=X, y=tgt)
