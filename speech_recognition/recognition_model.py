@@ -15,7 +15,6 @@ from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
-from greedy_search import run_greedy
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -43,8 +42,9 @@ flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
+flags.DEFINE_float('grad_clipping', 1.0, 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
-flags.DEFINE_integer('n_epochs', 100, 'number of epochs')
+flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
 
 def train_model(trainset, devset, device, writer):    
@@ -106,6 +106,7 @@ def train_model(trainset, devset, device, writer):
 
             #Alternative Gradient Update
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), FLAGS.grad_clipping)
             if sum_batch_size >= FLAGS.batch_size_grad:
                 optim.step()
                 optim.zero_grad()
@@ -242,8 +243,8 @@ def train_model(trainset, devset, device, writer):
     batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []
 
     #Define Dataloader
-    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
-    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 120000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 120000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchTrainingSampler)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
@@ -260,7 +261,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[20], gamma=.1)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[60], gamma=.1)
     
     ##MODEL TRAINING##
     
@@ -276,13 +277,13 @@ def train_model(trainset, devset, device, writer):
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
         #Change learning rate
-        lr_sched.step()
+        #lr_sched.step()
         #Mean of the main loss and logging
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
         #Save Model
         torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
         #Stop if Training loss reaches convergence
-        if round(np.mean(losses), 1) == 0.0:
+        if round(np.mean(losses), 1) == 0.00:
             break
 
     return model
