@@ -43,7 +43,7 @@ flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.4, 'parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
-flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
+flags.DEFINE_integer('batch_size_grad', 50, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
 
@@ -261,7 +261,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[60], gamma=.1)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[15], gamma=.1)
     
     ##MODEL TRAINING##
     
@@ -277,7 +277,7 @@ def train_model(trainset, devset, device, writer):
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
         #Change learning rate
-        #lr_sched.step()
+        lr_sched.step()
         #Mean of the main loss and logging
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
         #Save Model
