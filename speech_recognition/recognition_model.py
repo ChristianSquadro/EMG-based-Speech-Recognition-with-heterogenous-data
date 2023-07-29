@@ -29,7 +29,7 @@ flags.DEFINE_string('start_training_from', None, 'start training from this model
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
 flags.DEFINE_string('vocabulary', "descriptions/vocabulary", 'the set of all words in the lexicon')
-flags.DEFINE_string('dict', "descriptions/dgaddy-lexicon.txt", 'the pronunciation dictionary')
+flags.DEFINE_string('dict', "descriptions/new_dgaddy-lexicon.txt", 'the pronunciation dictionary')
 flags.DEFINE_string('lang_model', "descriptions/lm.binary", 'the language model')
 
 #Parameters
@@ -41,9 +41,9 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.4, 'parameter alpha for the two losses')
+flags.DEFINE_float('alpha_loss', 0.8, 'parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
-flags.DEFINE_integer('batch_size_grad', 50, 'batch size for gradient accumulation')
+flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
 
@@ -68,6 +68,7 @@ def train_model(trainset, devset, device, writer):
             #Set the model in train mode
             model.train()   
             
+            '''
             #Schedule_lr to change learning rate during the warmup phase
             schedule_lr(batch_idx)
             
@@ -125,7 +126,7 @@ def train_model(trainset, devset, device, writer):
         #To report the remained loss history
         evaluation_loop() 
         report_loss()
-  
+        '''
     def evaluation_loop():
         nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
 
@@ -192,7 +193,7 @@ def train_model(trainset, devset, device, writer):
         run_eval_steps=0
 
     def report_PER():
-        nonlocal predictions_train,references_train,predictions_eval,references_eval
+        nonlocal predictions_train,references_train,predictions_eval,references_eval,curr_eval_PER
 
         #Calculation PER
         model.eval()
@@ -228,6 +229,7 @@ def train_model(trainset, devset, device, writer):
         logging.info(f'Prediction: {predictions_eval[0]} ---> Reference: {references_eval[0]}  (PER: {jiwer.wer(predictions_eval[0], references_eval[0])})')
         writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references_train, predictions_train), batch_idx)
         writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.wer(references_eval, predictions_eval), batch_idx)
+        curr_eval_PER=jiwer.wer(references_eval, predictions_eval)
         writer.flush()
         predictions_train=[]
         references_train=[]
@@ -240,11 +242,11 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; best_eval_PER=10; curr_eval_PER=0;
 
     #Define Dataloader
-    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 120000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
-    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 120000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 80000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 80000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchTrainingSampler)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
@@ -277,11 +279,13 @@ def train_model(trainset, devset, device, writer):
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
         #Change learning rate
-        lr_sched.step()
+        #lr_sched.step()
         #Mean of the main loss and logging
         logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
-        #Save Model
-        torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
+        #Save the Best Model
+        if curr_eval_PER < best_eval_PER:
+            torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
+            best_eval_PER= curr_eval_PER
         #Stop if Training loss reaches convergence
         if round(np.mean(losses), 1) == 0.00:
             break

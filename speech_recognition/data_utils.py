@@ -17,7 +17,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
 phoneme_inventory = ['AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH','</S>','<S>','<PAD>']
-pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
+pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/new_dgaddy-lexicon.txt') if line.split() != [] }
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)
@@ -234,6 +234,8 @@ def read_phonemes(sentence):
     for unit in pre_sentence:
         if unit.isdigit():
             digits.append(unit)
+        elif unit == ',':
+            pass
         elif digits:
             new_sentence += num2words(int(''.join(digits))) + ' ' + unit
             digits=[]  
@@ -241,7 +243,7 @@ def read_phonemes(sentence):
             new_sentence += unit     
             
     #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’s": r"'s",r"'seventy": r"seventy",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
+    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’(\w+)": r"'\1",r"'seventy": r"seventy",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
     
     #Transform the words into sequences of phones
     phones = []
@@ -250,8 +252,8 @@ def read_phonemes(sentence):
             p = pron_dct[n]
             phones.append(p)
         except KeyError as e:
-            #logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
-            logging.warning(e)
+            logging.warning('Dictionary error for the word %s in the phrase: %s', e, sentence)
+            #logging.warning(e)
     return ['<S>'] + [phone for word_phone in phones for phone in word_phone] + ['</S>'] #The model should learn the end token and start token
 
 class TextTransform(object):
