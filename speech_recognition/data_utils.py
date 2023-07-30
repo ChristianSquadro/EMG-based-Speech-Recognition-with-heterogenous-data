@@ -17,7 +17,11 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('normalizers_file', 'normalizers.pkl', 'file with pickled feature normalizers')
 
 phoneme_inventory = ['AA', 'AE', 'AH', 'AO','AW', 'AY', 'B', 'CH', 'D', 'DH', 'EH', 'ER', 'EY', 'F', 'G', 'HH', 'IH', 'IX','IY', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OY', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UW', 'V', 'W', 'Y', 'Z', 'ZH','</S>','<S>','<PAD>']
-pron_dct= { line.split()[0] : line.split()[1:] for line in open('descriptions/new_dgaddy-lexicon.txt') if line.split() != [] }
+pron_dct={}
+
+def load_dictionary():
+    global pron_dct
+    pron_dct= { line.split()[0] : line.split()[1:] for line in open(FLAGS.dict) if line.split() != [] }
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)

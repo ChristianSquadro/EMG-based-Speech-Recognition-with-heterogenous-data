@@ -15,6 +15,7 @@ from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
+from data_utils import load_dictionary
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -298,7 +299,7 @@ def evaluate_saved_beam_search():
     testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
-    model=nn.DataParallel(model).to(device)
+    model=nn.DataParallel(model, device_ids=[0,1,2,3]).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
@@ -314,7 +315,7 @@ def evaluate_saved_beam_search():
             target= tgt[:,1:]
             pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
  
-            pred_text = testset.text_transform.clean_text(' '.join(pred[2]))
+            pred_text = ' '.join(pred[2])
             target_text = testset.text_transform.clean_text(example['text'][0])
             references.append(target_text)
             predictions.append(pred_text)
@@ -331,7 +332,7 @@ def evaluate_saved_greedy_search():
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=True , batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, shuffle=True, batch_size=1)
     references = []
     predictions = []
 
@@ -370,6 +371,7 @@ def main():
 
 if __name__ == '__main__':
     FLAGS(sys.argv)
+    load_dictionary()
     if FLAGS.evaluate_saved_beam_search is not None:
         evaluate_saved_beam_search()
     elif FLAGS.evaluate_saved_greedy_search is not None:
