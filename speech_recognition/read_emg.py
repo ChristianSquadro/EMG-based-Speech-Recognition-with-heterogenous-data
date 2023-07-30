@@ -485,6 +485,7 @@ class EMGDataset(torch.utils.data.Dataset):
         session_ids = [ex['session_ids'] for ex in batch]
         lengths = [ex['emg'].shape[0] for ex in batch]
         silent = [ex['silent'] for ex in batch]
+        text= [ex['text'] for ex in batch]
         text_ints = [ex['text_int'] for ex in batch]
         text_lengths = [ex['text_int'].shape[0] for ex in batch]
 
@@ -499,6 +500,7 @@ class EMGDataset(torch.utils.data.Dataset):
                   'session_ids':session_ids,
                   'lengths':lengths,
                   'silent':silent,
+                  'text':text,
                   'text_int':text_ints,
                   'text_int_lengths':text_lengths}
         return result

@@ -243,7 +243,7 @@ def read_phonemes(sentence):
             new_sentence += unit     
             
     #String manipulation before being proccesed by the dictionary     
-    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’(\w+)": r"'\1",r"'seventy": r"seventy",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
+    new_sentence=jiwer.Compose([jiwer.SubstituteRegexes({r"—": r" ", r"-": r" ",r"’(\w+)": r"'\1",r"[.!?,\“\”;:‘’\[\]\(\)\/]": r""}), jiwer.ToUpperCase()])(new_sentence).split()
     
     #Transform the words into sequences of phones
     phones = []

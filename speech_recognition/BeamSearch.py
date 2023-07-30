@@ -12,7 +12,7 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 200, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
 flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
@@ -93,7 +93,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     # prepare some constants
     end_tok = vocab_size - 3
     start_tok = vocab_size - 2
-    max_len = torch.sum(target != end_tok) + 40
+    max_len = torch.sum(target != end_tok) + 20
     
     # initialize
 
