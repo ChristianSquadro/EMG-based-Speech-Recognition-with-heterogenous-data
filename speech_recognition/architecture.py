@@ -10,8 +10,8 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
 flags.DEFINE_integer('feed_forward_layer_size', 3072, 'feed-forward dimensions')
-flags.DEFINE_integer('num_layers_encoder', 7, 'number of encoder layers')
-flags.DEFINE_integer('num_layers_decoder', 7, 'number of decoder layers')
+flags.DEFINE_integer('num_layers_encoder', 6, 'number of encoder layers')
+flags.DEFINE_integer('num_layers_decoder', 6, 'number of decoder layers')
 flags.DEFINE_integer('n_heads_encoder', 8, 'number of heads encoder')
 flags.DEFINE_integer('n_heads_decoder', 8, 'number of heads decoder')
 flags.DEFINE_integer('relative_distance', 100, 'relative positional distance')

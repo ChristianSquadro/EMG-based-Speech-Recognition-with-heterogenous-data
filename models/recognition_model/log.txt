@@ -1,321 +1,145 @@
 train / dev split: 8055 200
-Prediction: <S> S T UW S T UW N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.8347107438016529) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 1 - training loss: 6.4338
-Prediction: <S> AH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D IH N D ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.8429752066115702) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 2 - training loss: 3.2487
-Prediction: <S> AH N D DH AH S AH N D AH N D AH N D DH AH S T R AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH N D HH AE D HH IH Z HH AE D HH IH Z HH IH Z HH IH Z HH AE D HH IH Z HH IH Z HH IH Z HH IH Z HH IH Z HH IH Z HH IH Z HH AE D HH IH Z HH IH Z HH IH Z HH IH Z HH IH Z HH IH Z ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.8512396694214877) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 3 - training loss: 3.0474
-Prediction: <S> DH AH S AH N AH N AH N D DH AH S AH N AH N AH N AH N AH N AH N AH V DH AH S AH N AH N AH N AH N AH N AH N AH N AH N AH N AH V DH AH N AH N AH V DH AH S AH N AH N AH N AH N AH N AH N AH N AH N AH N AH V DH AH N AH N AH N AH V DH AH N AH N AH N AH V DH AH N AH N AH N AH V DH AH S AH N AH N AH N AH N AH N ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7933884297520661) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 4 - training loss: 2.5512
-Prediction: <S> R IY Z DH AH S EH N S T AH N D DH AH S T R IY M AH N D DH AH N D DH AH S T R IY M AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH S T R IH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N D DH AH N ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.768595041322314) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 5 - training loss: 2.1851
-Prediction: <S> F AO R DH AH S T R EY T AH N D S T R EY M AH N D S OW K AH N D AH N D S T R EY S T AH N D AH N D AH N S T R AH N D AH N D AH N D AH N D AH N D S T UW S T R AH N D AH N D AH N D AH N D AH N D AH N S T R EH S T AH N D AH N D AH N D AH N S T R AH N D AH N D AH N D AH N D AH N D ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.743801652892562) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 6 - training loss: 1.9272
-Prediction: <S> N AY S AO DH AH W ER D IH N T UW DH AH W ER D IH N T UW DH AH W AO R N IH NG AH V DH AH W IH N D IH N D IH S T R EY M D AH N D DH AH W AO R AH N D AH V DH AH W IH L AH N D IH N D AH V DH AH W IH N D IH N D IH N D IH N D IH N D AH V DH AH W EY W ER D IH N D IH N D IH N D IH N D IH N D IH N D IH ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.768595041322314) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 7 - training loss: 1.7374
-Prediction: <S> S OW L IY HH AE D S OW L IY AH P IH N DH AH S T EY B AH L K R IH V IY P AH L T UW DH AH W AO R D Z S T IY P AH Z IH T S IY V DH AH W AO R D Z S T UW DH AH W AO R D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 1.0289855072463767) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 8 - training loss: 1.5604
-Prediction: <S> S T R AO L IH NG B IY IH N W AH N S T R AH M AH N D W AA Z S K R IH P S AH L AH N D S T R AH B AH L IY V IH NG F AO R DH AH W AO R N IH NG AH V DH AH W AO R N IH NG AH V DH AH W AO R N AH V DH AH S T R EY N JH AH N D S T EH P S AH Z AH N D W AA Z S T R IH M AH S T IH L AH N D W AA Z S T ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7851239669421488) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 9 - training loss: 1.4200
-Prediction: <S> IH NG S P IH T AH N D ER IH NG Z P IY P AH L IY IH N T UW S K EY P IH NG W OW K IH NG S T EH R Z AH N D S T EH R AH N D S T EH L AH N D S T AE P AH Z AH N D S T EH L AH N D S T AE P AH Z AH N D S T EH L AH N D W OW N L IY AH V DH AH OW N L IY AH N D S T EH N T AH N D S T EH L AH N D S ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7355371900826446) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 10 - training loss: 1.2838
-Prediction: <S> K M EY D IH S K R AH M P EY N D SH AW T IH D W OW K IH NG AE T DH AH S EH L F T DH AH OW L D AH V DH AH OW L N IH NG W OW K IH NG W OW K IH NG W OW K IH NG AE T IH NG W OW K IH NG W OW K IH NG AW T IH NG DH AH SH EH L P AH N IY P AH N D W OW K IH NG W OW K IH NG W OW K IH NG W OW K IH NG IH NG W OW K IH NG ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.768595041322314) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 11 - training loss: 1.1662
-Prediction: <S> M AE N AH N D SH AA P AH Z IH T S CH AA B AH T DH AH CH EH R IH NG HH AE P AH N D SH EH L ER AH V DH AH W OW K IH NG HH AE P AH N D SH EH L ER AH V DH AH W ER IY D IY Z K R IH M AH L AW D AH V DH AH W OW N L EY T ER </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7558139534883721) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 12 - training loss: 1.0573
-Prediction: <S> T UW S P IY T AH N T S T AA P AH L IY F IH NG G Y AH S K R IY M AH S T UW R AY IH NG DH AH S EH L AH N D W OW K IH NG DH AH S EH N D IH N W OW K IH NG DH AH T EH L AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.9) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 13 - training loss: 0.9615
-Prediction: <S> P AE N S OW L IY IH N DH AH CH R AY IH NG HH AE P AH L IY V N IH NG W AH NG IH NG AY P AH L IY V N IH NG M IY W AH N S T AE N D IH N DH AH D R AY IH NG DH AH N D AH N D DH AH L AY T AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.84) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 14 - training loss: 0.8777
-Prediction: <S> IH NG B AE D AY SH AE L B AH S T AH N D W AO K IH NG HH AE P AH N D SH AE L B IH N IY V IH NG M AY V IH NG W AA K IH NG HH AE P AH N D AW N AH V DH AH HH AO R AH N D ER AY K Y UW S K R IY M AH L AW T AH V DH AH OW N AY T AH D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7032967032967034) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 15 - training loss: 0.8001
-Prediction: <S> S AO IH NG IH K S K R IH P AH L IY V IH NG W AH N S T AE N D IH NG AY P AH N IY V IH NG M AH N IY V IH NG W AH N S S T AE N D IH NG AY B IH N IY V IH NG W AH N S S T AE N D IH NG DH AH S IH L AH JH ER W OW K IH NG AY B IH K IY V IH NG W AA K IH NG AY B IH T IY V IH NG W AA K IH NG AY B IH T IY V IY AH W ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.7024793388429752) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 16 - training loss: 0.7374
-Prediction: <S> S AA P AH Z D IH D SH AA R P AH S T UW W OW K IH NG AY B IH L IY V IH NG P AA S AH N D IH N W OW K IH NG AY P AH L IY V IH NG W AA Z S T EH R IH NG Y UW S K R IH M AH L AW D AH V DH AH HH OW L AY K AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5903614457831325) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 17 - training loss: 0.6885
-Prediction: <S> JH AA P AH Z T UW D R AY IH NG Y UW S K R IH P L AW T AH V DH AH OW N L IY AH </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 2.0303030303030303) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 18 - training loss: 0.6347
-Prediction: <S> AH N T S AO L IH NG S T AE N D IH NG DH AH S EH L AH N D AH L ER AH N D F R AY IH NG Y UW S K R IH P L IY V IH NG W AH S S T AE N D IH NG DH AH S EH L AH N D AH N L ER AH N D V G R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L AY AH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 19 - training loss: 0.5931
-Prediction: <S> S AA P AH S IH T AH N D IH SH AA P AH L IY F Y UW M IH S T AE N D IH NG DH AH S IH L AH N D ER AH N D T UW Y AO R AH N D T UW Y AO R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.620253164556962) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 20 - training loss: 0.5559
-Prediction: <S> P AE Z IH T W OW K IH NG HH AE P AH N D IH T W OW K IH NG HH AE P AH N D IH T W OW K IH NG HH AY P EH N IY F IY W AH N Z S T AE N D IH NG DH AH S EH L AH N L ER AH N D V AY P EH N IY V N IY W AH N Z S T AE N D IH NG DH AH S EH L AH N D ER AH N D F R AH N IH NG Y UW S K R IH P AH L AW T AH V DH AH ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6446280991735537) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 21 - training loss: 0.5120
-Prediction: <S> AE N AA T SH AA P AH S T IH D N W OW K IH NG AY B EH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH JH ER AH N D F R AH N IH NG DH AH S IH L AH JH ER AH N D T UW R AY IH NG AY B EH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH JH ER AH V DH AH OW L IY AH </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6226415094339622) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 22 - training loss: 0.4746
-Prediction: <S> AA P IH T AH N T CH AA P S T IH D W OW K IH NG AY B IH L IY V IY P AH S T AE N S IH NG DH AH S IH L AH N CH ER AH N D DH AH W OW K IH NG AY B IH L IY V IY P AH S S T AE N D IH NG DH AH S IH L AH N CH ER AH N D F R AY IH NG Y UW S K R IH P AH L AW T AH V DH AH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 23 - training loss: 0.4431
-Prediction: <S> S T AE P AH S T IH D W OW K IH NG HH AE P AH N D SH AA P AH S T IH D W OW K IH NG HH AY P AH L IY V IH NG W AH N S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D UW T R AY IH NG HH AE P IY P AH N S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D DH AH S IH L AH N D ER AH N D T UW R AY IH NG Y UW ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5702479338842975) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 24 - training loss: 0.4076
-Prediction: <S> P AE N AH N D ER S T AA P AH S T N IH N W AO K IH NG AY P L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D T UW R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L AY G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.3625) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 25 - training loss: 0.3833
-Prediction: <S> JH P AH S T AH D W OW K AY P AH L IY F Y UW W AA CH T AE N D IH NG DH AH CH IH L AH N D ER AH N D F Y UW M AH S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D F R AY IH NG Y UW S K R IH P AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5268817204301075) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 26 - training loss: 0.3593
-Prediction: <S> M JH AA B AH S T IH L AH N D HH UW R AY IH NG T UW S K R IH M AH L AW T AH V DH AH OW N L AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.9354838709677419) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 27 - training loss: 0.3299
-Prediction: <S> P IH T AA P AH Z IH T IH D W OW K IH NG AY B IH N IY V N IY P AH Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D T UW T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4473684210526316) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 28 - training loss: 0.3072
-Prediction: <S> S AA R IH NG S P IH R Z JH AA P AH Z AH N D IH N W OW K IH NG AY B IH L IY V IH NG W AH N S T AE N D IH NG DH AH S IH L AH N D ER AH N D S T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L IY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.37349397590361444) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 29 - training loss: 0.2879
-Prediction: <S> S AO L IH NG T UW M AE N CH AA B HH AH Z AH N D IH D W OW K IH NG AY B IH IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG Y UW S K R IH P L AW T AH V DH AH OW L AH G EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.32926829268292684) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 30 - training loss: 0.2676
-Prediction: <S> AA P AH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D UW T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.711864406779661) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 31 - training loss: 0.2491
-Prediction: <S> Z P EY D CH AA B AH S AH N D IH NG DH AH S IH L AH N D ER AH N D HH UW T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.8909090909090909) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 32 - training loss: 0.2415
-Prediction: <S> M AE N JH AA B AH S T IH N W OW K IH NG AY B IH L IY V IH NG W AA S T AE N D IH NG DH AH S IH L AH N D ER AH N D F R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L AH G EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.3424657534246575) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 33 - training loss: 0.2314
-Prediction: <S> EY N D SH AA P AH S T IH L W AO K IH NG AY B IH G IY V IY W AH S T AE N D IH NG DH AH S IH L AH N D R AY IH NG AY B IH N IY V N IH NG AY B IH L IY V N T R AY IH NG AY B IH L IY V IY W AA N S T AE N D IH NG DH AH S IH L AH N D S T R AY IH NG DH AH S IH L AH N D DH AH TH R AY K AH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6782608695652174) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 34 - training loss: 0.2103
-Prediction: <S> B D AH N CH AA P AH Z D IH D ER AH N D T UW DH AH T R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L AH JH ER AH N D T UW DH AH T R AY IH NG Y UW S K R IH P AH L AW T AH V DH AH OW N L AH G EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.65) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 35 - training loss: 0.1965
-Prediction: <S> P S T AA P AH S T IH L W OW K IH NG AY B IH L IY V IH NG P AA S S T AE N D IH NG DH AH S IH L AH N D ER AH N D T UW T R AY IH NG Y UW S K R IY M AH L AW T AH V DH AH OW N L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.44) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 36 - training loss: 0.1867
-Prediction: <S> AA P AH Z D IH N W OW K IH NG AY B IH L IY V IY W AH S T AE N D IH NG DH AH S IH L AH N D ER AH N D F R AY IH NG AY P L IY V IY W AA S T AE N D IH NG DH AH S IH L AH N D ER AH N D S IH L AH N D ER AH N D S IH L AH N D ER AH N D S IH L AH N D ER AE N D UW T R AY IH NG S K R IH M AH L AW T AH V DH ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6776859504132231) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 37 - training loss: 0.1748
-Prediction: <S> AH Z AA P AH Z IH T AH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D S T AE N D IH NG DH AH S IH L AH N D ER AE N S OW D R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AH N D ER AE N S OW D R AY IH NG IH N HH AY B IH L IY V HH IY W AA S T AE N D IH ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6033057851239669) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 38 - training loss: 0.1704
-Prediction: <S> P IH T S AO IH NG AY B IH L IY V IH NG P AH S T IH D AH N T W OW K IH NG AY B IH L IY V IH NG P AH S T S T AE N D IH NG DH AH S IH L AH N D ER AH N D V AY IH NG Y UW S K R IH M AH L AW T AH V DH AH W IH DH EH G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4090909090909091) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 39 - training loss: 0.1575
-Prediction: <S> M IH N JH AA P AH S T IH N W OW K IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N JH ER AH N D T UW R AY IH NG T UW S K R IH M AH L AW T AH V DH AH OW N L EY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.3783783783783784) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 40 - training loss: 0.1528
-Prediction: <S> S IH NG JH AA P AH S IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D HH UW T R AY IH NG AY D B IH L IY V HH IY W AH S T IH NG DH AH S IH L AH N D ER AH N D HH UW T R AY IH NG HH AY B IH L IY V HH IY W AH S S T IH N D IH NG DH AH S IH L AH N D ER AH N D HH UW R ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6363636363636364) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 41 - training loss: 0.1451
-Prediction: <S> P AE N W OW IH NG AY B IH N W OW S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG AY B IH N IY V IY AH S S T AE N D IH NG DH AH S IH L AH N D ER AH N D DH AH T R AY IH NG S K R IH M AH L AW T AH V DH AH OW L EY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4835164835164835) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 42 - training loss: 0.1370
-Prediction: <S> P EY N AA P AH S T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AE N S T R AY IH NG T UW S K R IH M AH N AW T AH V DH AH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.3611111111111111) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 43 - training loss: 0.1323
-Prediction: <S> P AH S T IH N W OW K IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S EH L AH N ER AH N D T R AY IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S EH L AH N D ER AH N D T UW D R AY IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S EH L AH N D ER AH N D HH UW D R AY IH NG N ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.6115702479338843) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 44 - training loss: 0.1265
-Prediction: <S> M AY S AO IH NG T UW M EH N D AH N D SH AA P AH Z IH N W OW K IH NG AY B IH L IY V IH T W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG Y UW S K R M AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.34523809523809523) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 45 - training loss: 0.1207
-Prediction: <S> AA P EH D SH AA P AH S T IH D W OW K IH NG AE B IH L IY V IY W AA CH T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R IH M AH L AW T AH V DH AH OW L AY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4084507042253521) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 46 - training loss: 0.1163
-Prediction: <S> P S AA P AH S D IH N W OW K IH NG AW B AH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D F AO R AY IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D W OW K IH NG HH AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D F AO ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5785123966942148) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 47 - training loss: 0.1122
-Prediction: <S> S AO K AY B IH L IY V IY W AA Z S T AE N D R AY IH NG HH AY P AH L IY V IY W AA Z S T AE N D IH NG DH AH S IH L AH N ER AH N D T R AY IH NG S K R IH M AH L AW T AH V DH AH OW L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.47368421052631576) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 48 - training loss: 0.1089
-Prediction: <S> IH NG AY B IH AA N S CH AA B AH S AH N D W OW K IH NG AY B IH L IY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG S K R IH M AH L AW T AH V DH AH OW L EY N AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.38961038961038963) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 49 - training loss: 0.1026
-Prediction: <S> AH N S T R AY IH NG S K R IH M P AH L IY V HH IY W AA Z S T AE N T IH NG DH AH S IH L AH N D ER AH N D T UW D R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L IH NG AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5277777777777778) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 50 - training loss: 0.1034
-Prediction: <S> P AH S T IH N W OW K IH NG HH AE P AH N D W OW K IH NG HH AE P IH N IY V IY W AA T S T AE N D IH NG DH AH S IH L AH N D ER AH N D T UW R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L IY EH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4444444444444444) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 51 - training loss: 0.0968
-Prediction: <S> P IH N CH AA P AH S T AE N D AH N D R AY IH NG AY B IH L IY V IH T W AA S T AE N D IH NG DH AH S IH L AH N D R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L AY AH G EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4722222222222222) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 52 - training loss: 0.0943
-Prediction: <S> S T S T IH NG AY B IH L IY V HH IY W AA S S T AE N D IH NG DH AH S IH L AH JH ER AE N OW K IH NG AY B IH L IY V HH IY W AA S T AE N D IH NG DH AH S IH L AH JH ER AH N D DH AH N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW L AY K AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4631578947368421) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 53 - training loss: 0.0880
-Prediction: <S> EY SH AA P AH S D IH N D R AY IH NG AE B IH N AA P AH S T AE N D IY DH AH S EH L AH N D R AY IH NG AY B IH HH IY W AA Z S T AE N D HH IY DH AH S IH L AH N D ER AH N D F R AY IH NG S K R IH M AH L AW T AH V DH AH OW L AY T AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4891304347826087) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 54 - training loss: 0.0889
-Prediction: <S> AA S T AE N D R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH HH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 1.878787878787879) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 55 - training loss: 0.0900
-Prediction: <S> M IH N SH AA P AH S T EH N D W OW K IH NG HH AY B IH L IY V HH IY W AA T S T AE N D IH NG DH AH S IH L AH N D R AY IH NG S K R IH M B AH L AW T AH V DH AH OW L IY AH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.45714285714285713) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 56 - training loss: 0.0919
-Prediction: <S> S DH AH S EH N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG IH AY B IH L EY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N D ER AH N D S T R AY B AH L AW T AH V DH AH OW L EY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5194805194805194) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 57 - training loss: 0.0841
-Prediction: <S> S IH NG AH L ER AH N D R AY IH NG HH AE P AH L AW T AH V DH AH HH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 1.96875) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 58 - training loss: 0.0788
-Prediction: <S> JH P AH S T IH D W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH N W OW K IH NG AY B IH L IY V IY P AH S S T AE N D IH NG DH AH S EH L AH N D ER AH N D T R AY IH NG Y UW S K R IH B AH L AW T AH V DH AH OW L AY EH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.40217391304347827) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 59 - training loss: 0.0752
-Prediction: <S> AY IH NG AA P AH Z IH N W OW K IH NG AE P AH N IY V IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG IY S K R IH M AH L AW T AH V DH AH OW L AY AE N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4225352112676056) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 60 - training loss: 0.0779
-Prediction: <S> N JH R AY IH NG L AH N D T R AY IH NG Y UW S K R IH M AH N S T IH N W OW K IH NG HH AE P AH L IY V HH IY P AH S S T AE N D IH NG DH AH S IH L AH JH ER AH N D T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L EY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4444444444444444) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 61 - training loss: 0.0716
-Prediction: <S> JH AA P AH S T IH L W OW K IH NG AY B IH L IY V IY W AA Z S T EH N D IH N DH AH S IH L AH N D ER AH N D T UW T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4507042253521127) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 62 - training loss: 0.0727
-Prediction: <S> AY P EY D IH N W OW K IH NG AY B IH N T T W OW K IH NG AY B IH N EY T IH N W OW K IH NG AY B IH G EY V IH NG W AA Z S T AE N D IH NG DH AH S IH L AH N JH ER AH N D F R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L AY AH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.44565217391304346) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 63 - training loss: 0.0717
-Prediction: <S> D R AY IH NG AY B IH N CH AA B AH S T IH L AH N D R AY IH NG S K R IH M AH L AH N D ER AH N D F R AY IH NG Z K R IH M B AH L AW T AH V DH AH OW L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.796875) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 64 - training loss: 0.0705
-Prediction: <S> AE P AH S T AO P AH S T IH N W OW K IH NG AY B IH N IY V AH S T AE N D IH NG DH AH S IH L AH N ER AH N D T R AY IH NG S K R IH M AH L AW T AH V DH AH OW L AY G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.47058823529411764) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 65 - training loss: 0.0657
-Prediction: <S> AE Z D R AY IH NG AY B IH N IY V IY P AH S T AE N D IH N W OW K IH NG AY B IH N IY P AH S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG AY B IH N IY V N AH M AH S S T AE N D IH NG DH AH S IH L AH N D ER AH N D S T R IH NG Y UW S K R IH M AH L AW T AH V DH AH OW L IY G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5213675213675214) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 66 - training loss: 0.0626
-Prediction: <S> K R IH L AH N D R AY IH NG AY B IH N IY V IY P AA S T AE N D IH L AH N D ER AH N D T R AY IH NG AE B IH N IY V IY P AA S S T AE N D IH NG DH AH S IH L AH N D ER AH N D F R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 67 - training loss: 0.0643
-Prediction: <S> T W IH NG AY B IH N IY V IY W AA Z S T EH N D AH N D R AY IH NG AY B IH L IY V DH IY P AA S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG AY B IH G IY V N IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.4628099173553719) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 68 - training loss: 0.0620
-Prediction: <S> AA P IY P AA S T AE N D IH NG AY B IH N IY V IY AH P AA S T AE N D IH NG DH AH S IH L AH JH ER AH N D T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY K AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5652173913043478) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 69 - training loss: 0.0614
-Prediction: <S> JH AA P AH S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG Y UW S K R IH M AH L AW T AH V DH AH OW N L AY G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.8846153846153846) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 70 - training loss: 0.0604
-Prediction: <S> AH S K R IH B AH L AW T AH V DH AH OW L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 3.4285714285714284) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 71 - training loss: 0.0617
-Prediction: <S> L AY K M AH L AH N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW L IH NG AH P IH N IY V N IY P AA S T AE N D IH D ER W OW K IH NG AY B IH N IY V N IY P AA S T AE N D IH N T R AY IH NG Y UW S K R IH M B AH L AW T AH V DH AH OW L AY EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5612244897959183) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 72 - training loss: 0.0603
-Prediction: <S> N D W AH S T IH N W OW K IH NG T AY B IH L IY V DH IY W AA S T S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY IH NG Y UW S K R IH B AH L AW T AH V DH AH OW L AY G EH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.3972602739726027) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 73 - training loss: 0.0579
-Prediction: <S> M IH N W IH NG AY B IH N T UW W OW K IH NG AY B IH L IY V HH IY W AA S S T AE N D IH NG DH AH S IH L AH N JH ER AH N D T R AY IH NG S K R IH M AH L AW T AH V DH AH OW L EH G AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.410958904109589) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 74 - training loss: 0.0555
-Prediction: <S> B AH S T AE N D W OW K IH NG AY B IH N IY V N AY B IH N IY V IY P AH S T AE N D IH NG DH AH S IH L AH N D ER AH N D T R AY K Y UW S K R IH B AH L AW T AH V DH AH OW L AY EH N D </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.527027027027027) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 75 - training loss: 0.0574
-Prediction: <S> D AA D EY D AA P AH S IY IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG DH AH S IH L AH N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L EY </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.5151515151515151) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 76 - training loss: 0.0542
-Prediction: <S> D R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 2.6923076923076925) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 77 - training loss: 0.0558
-Prediction: <S> N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW N L AY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 2.5555555555555554) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 78 - training loss: 0.0543
-Prediction: <S> JH AA P S AY S AO HH IY AH S IH L AH N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW L IY AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 1.425) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 79 - training loss: 0.0559
-Prediction: <S> D R AY S K R IH M IH D AH N T SH AA P AH Z D IH N W OW K IH NG AE B IH L IY V N Y UW M AH S T AE N D IH NG DH AH S IH L AH N JH ER AH N D R AY IH NG S K R IH M AH L AW T AH V DH AH OW L EY K AH N </S> ---> 
- Reference: <S> AY S AO EY Y AH NG M AE N EY SH AA P AH S IH S T AH N T IH N W OW K IH NG AY B IH L IY V HH IY W AA Z S T AE N D IH NG AA N DH AH S IH L AH N D ER AH N D T R AY IH NG T UW S K R AE M B AH L AW T AH V DH AH HH OW L AH G EH N </S>  (PER: 0.43209876543209874) 
- Reference Text: I saw a young man, a shop assistant in Woking I believe he was, standing on the cylinder and trying to scramble out of the hole again.
-finished epoch 80 - training loss: 0.0519
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7922077922077922) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N ---> 
+ Training Reference: <S> M EH N L AY K S K AY AH P AH R EH L IY W AA CH T DH AH R EH D P L AE N AH T IH T IH Z AA D B AY DH AH B AY DH AE T F AO R K AW N T L AH S S EH N CH ER IY Z M AA R Z HH AE Z B IH N DH AH S T AA R AH V W AO R B AH T F EY L D T UW IH N T ER P R AH T DH AH F L AH K CH AH W EY T IH NG AH P IH R AH N S AH Z AH V DH AH M AA R K IH NG Z DH EY M AE P T S OW W EH L </S>  (Training PER: 0.9455782312925171) 
+ Training Reference Text: Men like Schiaparelli watched the red planet—it is odd, by-the-bye, that for countless centuries Mars has been the star of war—but failed to interpret the fluctuating appearances of the markings they mapped so well.
+-----finished epoch 1 - training loss: 5.3967------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8051948051948052) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG K AH N D IH NG ---> 
+ Training Reference: <S> SH IY S T EY T S DH AE T W AY L SH IY W AA Z DH EH R SH IY S AO AE T DH AH B AO R D ER AH V DH AH W UH D AH N D K L OW S B AY DH AH L EY K M IH S T ER M AH K AA R TH IY AH N D HH IH Z S AH N AH N D DH AE T DH EY AH P IH R D T UW B IY HH AE V IH NG EY V AY AH L AH N T K W AO R AH L </S>  (Training PER: 1.0263157894736843) 
+ Training Reference Text: She states that while she was there she saw, at the border of the wood and close by the lake, Mr. McCarthy and his son, and that they appeared to be having a violent quarrel.
+-----finished epoch 2 - training loss: 3.0917------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH N D DH AH W AA Z AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7922077922077922) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AH N D DH AH W AA Z W IH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH ---> 
+ Training Reference: <S> IH N DH AH L AE T ER AE Z M EY B IY R IH M EH M B ER D SH ER L AA K HH OW M Z W AA Z EY B AH L B AY W AY N D IH NG AH P DH AH D EH D M AE N Z W AA CH T UW P R UW V DH AE T IH T HH AE D B IH N W AW N D AH P T UW AW ER Z B IH F AO R AH N D DH AE T DH EH R F AO R DH AH D IH S IY S T HH AE D G AO N T UW B EH D W IH DH IH N DH AE T T AY M EY D IH D AH K SH AH N W IH CH W AA Z AH V DH AH G R EY T AH S T IH M P AO R T AH N S IH N K L IH R IH NG AH P DH AH K EY S </S>  (Training PER: 0.9037433155080213) 
+ Training Reference Text: In the latter, as may be remembered, Sherlock Holmes was able, by winding up the dead man’s watch, to prove that it had been wound up two hours before, and that therefore the deceased had gone to bed within that time—a deduction which was of the greatest importance in clearing up the case.
+-----finished epoch 3 - training loss: 2.8120------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH N D AH V DH AH S AH V DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8181818181818182) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH S AH N D DH AH S AH S AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH N D AH N D AH N D AH N D AH N D AH N D AH N D DH AH S AH S AH N D DH AH S ---> 
+ Training Reference: <S> EY M AA N S T R AH S T R AY P AA D HH AY ER DH AE N M EH N IY HH AW S AH Z S T R AY D IH NG OW V ER DH AH Y AH NG P AY N T R IY Z AH N D S M AE SH IH NG DH EH M AH S AY D IH N IH T S K ER IH R EY W AO K IH NG EH N JH AH N AH V G L IH T ER IH NG M EH T AH L S T R AY D IH NG N AW AH K R AO S DH AH HH EH DH ER AA R T IH K Y AH L EY T R OW P S AH V S T IY L D AE NG G AH L IH NG F R AH M IH T AH N D DH AH K L AE T ER IH NG T UW M AH L T AH V IH T S P AE S AH JH M IH NG G AH L IH NG W IH DH DH AH R AY AH T AH V DH AH TH AH N D ER </S>  (Training PER: 0.8113207547169812) 
+ Training Reference Text: A monstrous tripod, higher than many houses, striding over the young pine trees, and smashing them aside in its career; a walking engine of glittering metal, striding now across the heather; articulate ropes of steel dangling from it, and the clattering tumult of its passage mingling with the riot of the thunder.
+-----finished epoch 4 - training loss: 2.4839------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH V DH AH M AA R T AH V DH AH M AA R SH AH V DH AH V DH AH V DH AH S AH V DH AH V DH AH V DH AH V DH AH V DH AH M AY T AH V DH AH V DH AH S T AH V DH AH V DH AH V DH AH V DH AH V DH AH M AY T AH ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8311688311688312) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> K AH N D DH AH S EH N D AH N D AH N D AH N D AH N D AH N D DH AH S EH R AH V DH AH V DH AH S T R AY D AH N D ---> 
+ Training Reference: <S> DH AE T W IH L D UW S EH D HH IY AY K UH D N AA T AE S K F AO R EH N IY TH IH NG B EH T ER </S>  (Training PER: 1.0526315789473684) 
+ Training Reference Text: “‘That will do,’ said he; ‘I could not ask for anything better.
+-----finished epoch 5 - training loss: 2.2403------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> IH S T R AH N D IH NG AH N D IH N DH AH S T R UW M AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH V DH AH S T R AE N D AH N D AH N D AH N D AH N D AH N D AH N ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7792207792207793) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> K AH M P AA K T AH N D IH N T AH N D ER </S> ---> 
+ Training Reference: <S> DH EY AA R T AY P R IH T AH N AY R IH M AA R K T </S>  (Training PER: 0.7272727272727273) 
+ Training Reference Text: “They are type-written,” I remarked.
+-----finished epoch 6 - training loss: 2.0318------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> M AY B R AH DH ER Z M AY B R AH DH ER S T R EY N D M AY N D M AY N D M AY N D M AY N D M AY S T R EY N D M AY T AH V DH AH S M AO R SH AH N Z AH V DH AH S M AO R N IH NG AH V DH AH ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8441558441558441) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> R IY AH V DH AH K AO R N S AH V DH AH S IH R AH N D ER AH V DH AH S IH R IY AH N D ER AH V DH AH S T R IY AH N D ER AH N D ER AH V DH AH S T R IY AH N D AH N D ER AH V DH AH S T R IY AH N D AH N D ER AH N D ER AH V DH AH S T R IY AH N D AH N D ER AH N D ER AH V DH AH N D ER M AH N D ER AH N D ER AH N D ER AH N D ER AH N D ER AH N D ER AH V DH AH S T R IY R IY AH N D AH N D AH ---> 
+ Training Reference: <S> DH AH AO R D AH N EH R IY T R AE F IH K HH AE D B IH N S T AA P T AY B IH L IY V IH N AO R D ER T UW AH L AW AH V DH AH P AE S AH JH AH V T R UW P S AH N D G AH N Z T UW CH AH R T S IY AH N D AY HH AE V HH ER D S IH N S DH AE T EY S AE V AH JH S T R AH G AH L AH K ER D F AO R P L EY S AH Z IH N DH AH S P EH SH AH L T R EY N Z DH AE T W ER P UH T AA N AE T EY L EY T ER AW ER </S>  (Training PER: 0.8246753246753247) 
+ Training Reference Text: The ordinary traffic had been stopped, I believe, in order to allow of the passage of troops and guns to Chertsey, and I have heard since that a savage struggle occurred for places in the special trains that were put on at a later hour.
+-----finished epoch 7 - training loss: 1.8523------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> IH F Y UW S IY M AY B AE K IH NG IH F AO R DH AH F AY N D IH NG AH V DH AH D IH S T R EY SH AH N Z AH V DH AH D IH S T R EY N JH AH N D DH AH F AY N D IH NG AH V DH AH D IH S T R EY SH AH N ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8441558441558441) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> IH NG P IY P AH L IY P IY P AH L IH T AH V DH AH HH IY P IH N D IH T EH N T AH V DH AH F IY P AH L IY P IH N T AH V DH AH HH IY P IH N D IH N T UW DH AH ---> 
+ Training Reference: <S> L AH N D AH N IH N D EY N JH ER HH IY HH AE D T UW G IH V TH R IY P AH N S F AO R EY K AA P IY AH V DH AE T P EY P ER </S>  (Training PER: 1.0) 
+ Training Reference Text: London in Danger!” He had to give threepence for a copy of that paper.
+-----finished epoch 8 - training loss: 1.7004------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH V DH AH D IH S T R AY T IH NG AH V DH AH D IH S T R EY N JH AH V DH AH S M AE N T AH V DH AH V EH L AH V DH AH S T R EY N JH AH V DH AH V DH AH S M AE L Z F Y UW JH AH N Z AH V DH AH V ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8311688311688312) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> Y UW W ER K EY M AY L IH T S ER S AH V F AO R DH AH W ER K EY M Z </S> ---> 
+ Training Reference: <S> AY B EH G DH AE T Y UW W IH L S T EY T Y AO R B IH Z N AH S S ER S EH D AY M AY T AY M IH Z AH V V AE L Y UW HH EH V AH N F ER G IH V M IY F AO R DH AE T L AE S T S EH N T AH N S B AH T DH AH W ER D Z K EY M T UW M AY L IH P S </S>  (Training PER: 0.7708333333333334) 
+ Training Reference Text: “‘I beg that you will state your business, sir,’ said I; ‘my time is of value.’ Heaven forgive me for that last sentence, but the words came to my lips.
+-----finished epoch 9 - training loss: 1.5711------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH N D AH V DH AH T R EY T IH NG AH V DH AH T R IY T IH NG AH N D AH V DH AH T R IY M AH N T S AH N D AH V DH AH T EY L Z AH V DH AH M AA R SH AH N Z AH V DH AH T R IY M AH N T S AH N D ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7662337662337663) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AE T DH AH T EY B AH L T UW F AO R AY S EH D DH AH R OW D AH V DH AH R OW D AH N D DH AH R OW D AH N D DH AH R OW D AH N D DH AH R OW D AH N D DH AH R OW N D DH AH R OW N D ER S AH V DH AH W AO R S AH V DH AH W AO R S AH N AH N D DH AH S AH N D ---> 
+ Training Reference: <S> AY HH AE D AH N T B IH N AE T DH AH T EY B AH L T EH N M IH N AH T S B IH F AO R AY S AO F R AE NG K AW T AH V DH AH W IH N D OW AE T DH AH AH DH ER S AY D AH V DH AH R OW D </S>  (Training PER: 1.0704225352112675) 
+ Training Reference Text: I hadn’t been at the table ten minutes before I saw Frank out of the window at the other side of the road.
+-----finished epoch 10 - training loss: 1.4348------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> IH T W AA Z F AO R DH AH D EY P AH L AH V DH AH D EY L IH NG AH V DH AH D EY L IH NG AH N D AH V DH AH D EY L IH K AH M AA L AH T S </S> ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7142857142857143) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> </S> ---> 
+ Training Reference: <S> HH AW AY F EH L IH N W IH DH DH AH K Y UH R AH T </S>  (Training PER: 0.9047619047619048) 
+ Training Reference Text: HOW I FELL IN WITH THE CURATE.
+-----finished epoch 11 - training loss: 1.3184------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH V DH AH D EY B EH D IY AH V DH AH D EY B AA D IY AH L AH N D AH K AH M AW T AH N D AH V DH AH D EY B AH L T UW AH N D AH V DH AH D EY B AA D IY AH S AH Z AH N D AH V DH AH D EY B AH L T ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7792207792207793) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AH V S T R IH NG AH V W AY M AH N D AW N DH AH S T R IH NG AH V W EY B R AH JH F IH K Y ER Z F IH K Y ER Z F AO R DH AH K AA R Z AH V W EY B R AH JH </S> ---> 
+ Training Reference: <S> W AH N S HH AW EH V ER AY M EY D AW T EY S T R IH NG AH V B L AE K F IH G Y ER Z HH ER IY IH NG AH K R AO S DH AH M EH D OW Z F R AH M DH AH D ER EH K SH AH N AH V W EY B R AH JH </S>  (Training PER: 0.5753424657534246) 
+ Training Reference Text: Once, however, I made out a string of black figures hurrying across the meadows from the direction of Weybridge.
+-----finished epoch 12 - training loss: 1.2094------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z F UW JH IH SH T R AY T IH NG M IH S T R AY T IH NG AH V DH AH D EY B AH L IH S T R AY T IH NG M IH S T R AY T IH NG AH V DH AH D EY B AH L JH AH V DH AH D EY B AA D IY AH S </S> ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.8051948051948052) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> UW S T R UW P ER T R UW M ER T UW DH AH D AO R T UW S AE S T R UW M ER T UW S AE N D </S> ---> 
+ Training Reference: <S> L HH AA M S EH S T R AY AH N L OW AH UW V AH R S EH S T T AW T AE Z G UW S T AA V IY F L AW B ER T R OW T T UW JH AO R JH AH Z S AE N D </S>  (Training PER: 0.7068965517241379) 
+ Training Reference Text: “‘L’homme c’est rien—l’oeuvre c’est tout,’ as Gustave Flaubert wrote to Georges Sand.”
+-----finished epoch 13 - training loss: 1.1179------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AO R AH V DH OW Z IH N M AA D IY AH L IH NG AH M AH L T AH N D AH V DH AH D EY B AA D IY AH N D AH V DH AH D EY B AA D IY AH N D AH V DH AH D EY B AA D IY AH L IH NG AH M AA D IY AH L CH AH N ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7792207792207793) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> AO R S IY W AH N AH V DH AH M OW S T ER M AA R K AH B AH L T UW IH Z ER N D </S> ---> 
+ Training Reference: <S> Y AO R S T EY T M AH N T IH Z AY F AO R S IY W AH N AH V DH AH M OW S T R IH M AA R K AH B AH L T UW W IH CH AY HH AE V EH V ER L IH S AH N D </S>  (Training PER: 0.48333333333333334) 
+ Training Reference Text: “Your statement is, I foresee, one of the most remarkable to which I have ever listened.
+-----finished epoch 14 - training loss: 1.0370------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> ER M AY AH SH EY T EY T AH W AO R D Z F ER CH ER AH V DH AH S AH S T R EY N JH M AH CH AH N D AH V DH AH D EY B AY DH IY AH P AY IY AH S M AE CH AH G EH N S T DH AH M AE N AH JH AH N S T R EY ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.7012987012987013) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> W AA Z B IH L IY IH N DH AH T R IY M OW S T EH M P T EH M P T S EH L AH JH AH N S IH R UW AH L IY B ER S K R UW DH AE T HH AE Z M EY B AH T IH N EH S T R UW L IY B IH Z K R UW T AH N S IH N S T R IY Z DH EH R W AA Z B IY IH NG W AA CH AH B IY IH NG W AA CH AH L IY S K R UW T UW DH AE T HH AE Z M EH M EH N S K R UW L AH JH AH N S K R UW T S IH N S IH N S T R IY Z DH EH R W ER L AA Z K R IY Z DH EH N AY Z M EH N EH N S K R IY N S K R IY CH ER Z DH EH R IY Z AH N D IH N K R IY CH ER Z AH N D G R IY Z DH AE T HH AE Z M EY B IH L D IH N S K ER V DH AH D IH T S K S W AO R M P AH N S K R UW L AH B L AA N AH T DH AH V EH R IY Z K ER Z S ER N IH N IH N T EH R AH N S IH N S T R IY Z DH EH R W ER L D AH N AA ---> 
+ Training Reference: <S> N OW W AH N W UH D HH AE V B IH L IY V D IH N DH AH L AE S T Y IH R Z AH V DH AH N AY N T IY N TH S EH N CH ER IY DH AE T DH IH S W ER L D W AA Z B IY IH NG W AA CH T K IY N L IY AH N D K L OW S L IY B AY IH N T EH L AH JH AH N S IH Z G R EY T ER DH AE N M AE N Z AH N D Y EH T AE Z M AO R T AH L AE Z HH IH Z OW N DH AE T AE Z M EH N B IH Z IY D DH EH M S EH L V Z AH B AW T DH EH R V EH R IY AH S K AH N S ER N Z DH EY W ER S K R UW T AH N IY Z D AH N D S T AH D IY D P ER HH AE P S AO L M OW S T AE Z N EH R OW L IY AE Z EY M AE N W IH DH EY M AY K R AH S K OW P M AY T S K R UW T AH N AY Z DH AH T R AE N ZH AH N T K R IY CH ER Z DH AE T S W AO R M AH N D M AH L T AH P L AY IH N EY D R AA P AH V W AO T ER </S>  (Training PER: 0.8327645051194539) 
+ Training Reference Text: No one would have believed in the last years of the nineteenth century that this world was being watched keenly and closely by intelligences greater than man’s and yet as mortal as his own; that as men busied themselves about their various concerns they were scrutinised and studied, perhaps almost as narrowly as a man with a microscope might scrutinise the transient creatures that swarm and multiply in a drop of water.
+-----finished epoch 15 - training loss: 0.9638------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AH V DH OW Z F UH SH AH N D AH V DH AH D EY B AA D IY S M AE SH AY K EH N S DH AH F AE S </S> ---> 
+  Evaluation Reference: <S> M AY IH M AE JH AH N EY SH AH N W AA Z F UH L AH V DH OW Z S T R AY D IH NG M AH T AE L IH K M AA N S T ER Z AH N D AH V DH AH D EH D B AA D IY S M AE SH T AH G EH N S T DH AH F EH N S </S>  (Evaluation PER: 0.6103896103896104) 
+ Evaluation Reference Text: My imagination was full of those striding metallic monsters, and of the dead body smashed against the fence.
+----Prediction Training-----
+Training Prediction: <S> </S> ---> 
+ Training Reference: <S> AY W IH L T R AY </S>  (Training PER: 0.7777777777777778) 
+ Training Reference Text: “I will try.
+-----finished epoch 16 - training loss: 0.8889------
