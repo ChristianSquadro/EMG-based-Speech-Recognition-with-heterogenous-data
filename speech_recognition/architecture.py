@@ -145,19 +145,23 @@ class Model(nn.Module):
         
     def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
         # x shape is (batch, time, electrode)
-        # y shape is (batch, sequence_length)      
-        # y shape is (batch, sequence_length)      
+        # y shape is (batch, sequence_length)           
 
         if part == 'encoder':
             #Projection from emg input to the expected number of hidden dimension
+            self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
             x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first
-            x_encoder = self.transformerEncoder(x)
+            x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
             x_encoder = x_encoder.transpose(0,1)
             
             return x_encoder
             
         elif part == 'decoder':
+            self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+            self.memory_key_padding_mask = self.src_key_padding_mask
+
             #Embedding and positional encoding of tgt
             tgt=self.embedding_tgt(y)
             tgt=self.pos_decoder(tgt)
@@ -185,7 +189,7 @@ class Model(nn.Module):
             
         elif part == 'decoder':
             self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
             self.memory_key_padding_mask = self.src_key_padding_mask
 
             #Embedding and positional encoding of tgt

@@ -14,8 +14,8 @@ from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
-flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
-flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
+flags.DEFINE_float('LMWeight', 0.5 , 'importance for language model scoring')
+flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
     
 # Helpers
 def replicate(l,t):

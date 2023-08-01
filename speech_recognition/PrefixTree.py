@@ -269,7 +269,7 @@ def coverage_penalty():
 def check_language_model(lm, sentence):
     # tranform from list of word into a string (lm accepts only string)
     sentence= ' '.join(sentence)
-    logprob = lm.score(sentence, bos = False, eos = False)
+    logprob = lm.score(sentence, bos = True, eos = False)
     return logprob
 
 
@@ -285,7 +285,7 @@ def init_tree(phones, voc, words):
     t = set(test_words)
     test_words = list(t)
     
-    d= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
+    d= { line.split()[0] : line.split()[1:] for line in open(words) if line.split() != [] }
 
     test_dct = Dictionary.Dictionary()
     for p in phones:
@@ -353,7 +353,7 @@ def init_language_model(lmFile):
 
 
 def fill_probs(tree,node):
-    end_tok = tree._phone_count 
+    end_tok = tree._phone_count
     child_id = []
     tree._root.probs[end_tok] = 0
     
