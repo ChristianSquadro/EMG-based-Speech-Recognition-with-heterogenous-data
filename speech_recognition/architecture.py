@@ -159,7 +159,7 @@ class Model(nn.Module):
             
         elif part == 'decoder':
             self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
             self.memory_key_padding_mask = self.src_key_padding_mask
 
             #Embedding and positional encoding of tgt
@@ -189,7 +189,7 @@ class Model(nn.Module):
             
         elif part == 'decoder':
             self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(self, y.shape[1]).to(self.device)
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
             self.memory_key_padding_mask = self.src_key_padding_mask
 
             #Embedding and positional encoding of tgt

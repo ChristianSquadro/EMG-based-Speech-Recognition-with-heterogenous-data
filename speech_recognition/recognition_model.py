@@ -44,9 +44,9 @@ flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('alpha_loss', 0.70, 'parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
-flags.DEFINE_integer('batch_size_grad', 150, 'batch size for gradient accumulation')
+flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
-flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
+flags.DEFINE_integer('n_buckets', 8, 'number of buckets in the dataset')
 flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
