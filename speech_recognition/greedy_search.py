@@ -8,7 +8,7 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
   batch_len=tgt.shape[0]
   phones_seq = [['<S>'] for _ in range(batch_len)]
   start_tok = vocab_size - 3
-  max_seq_length= tgt.shape[1]  
+  max_seq_length= tgt.shape[1] + 1 #+1 for <S> removed   
   dec_input = torch.full([batch_len, 1], start_tok).to(device)
   phone_transform = PhoneTransform()
 
