@@ -7,8 +7,13 @@ import torch.nn.functional as F
 from transformer import TransformerEncoderLayer, TransformerDecoderLayer, PositionalEncoding
 from data_utils import decollate_tensor
 from absl import flags
+
+#---Try Conformer Encoder
+#from fairseq.modules import RelPositionalEncoding
+#from fairseq.modules.conformer_layer import ConformerEncoderLayer
+
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('model_size', 768, 'number of hidden dimensions')
+flags.DEFINE_integer('model_size',  768, 'number of hidden dimensions')
 flags.DEFINE_integer('feed_forward_layer_size', 3072, 'feed-forward dimensions')
 flags.DEFINE_integer('num_layers_encoder', 6, 'number of encoder layers')
 flags.DEFINE_integer('num_layers_decoder', 6, 'number of decoder layers')
@@ -62,8 +67,8 @@ class Model(nn.Module):
         self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
-        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_encoder, relative_positional=True, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
-        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_decoder, relative_positional=False, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
+        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_encoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
+        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_decoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers_encoder)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers_decoder)
         self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
@@ -76,6 +81,18 @@ class Model(nn.Module):
         self.memory_key_padding_mask=None
         self.tgt_mask=None
 
+        #---Try Conformer Model---
+        '''
+        self.embed_positions = RelPositionalEncoding(max_len=100, d_model=FLAGS.model_size)
+        self.conformer_layers = torch.nn.ModuleList([ConformerEncoderLayer(embed_dim=FLAGS.model_size, 
+                                                                           ffn_embed_dim=FLAGS.feed_forward_layer_size,
+                                                                           attention_heads=FLAGS.n_heads_encoder,
+                                                                           dropout=FLAGS.dropout,
+                                                                           depthwise_conv_kernel_size=15,
+                                                                           pos_enc_type='rel_pos',
+                                                                           attn_type='espnet',
+                                                                           use_fp16=True) for _ in range(FLAGS.num_layers_encoder)])
+        '''
     def create_tgt_padding_mask(self, tgt):
         # input tgt of shape ()
         tgt_padding_mask = tgt == FLAGS.pad
@@ -135,6 +152,11 @@ class Model(nn.Module):
         x = x.transpose(0,1) # put time first
         tgt = tgt.transpose(0,1) # put sequence_length first
         x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
+        '''
+        position = self.embed_positions(x)
+        for layer in self.conformer_layers:
+            x_encoder, (attn, layer_res) = layer(x=x, encoder_padding_mask=self.src_key_padding_mask, position_emb=position)
+        '''
         x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
@@ -183,6 +205,11 @@ class Model(nn.Module):
             x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first
             x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
+            '''
+            position = self.embed_positions(x)
+            for layer in self.conformer_layers:
+                x_encoder, (attn, layer_res) = layer(x=x, encoder_padding_mask=self.src_key_padding_mask, position_emb=position)
+            '''
             x_encoder = x_encoder.transpose(0,1)
             
             return x_encoder, self.w_aux(x_encoder)
@@ -199,6 +226,7 @@ class Model(nn.Module):
             tgt = tgt.transpose(0,1) # put sequence_length first
             memory = memory.transpose(0,1) # put sequence_length first
             x_decoder = self.transformerDecoder(tgt, memory, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+
             x_decoder = x_decoder.transpose(0,1)
             
             return self.w_out(x_decoder)

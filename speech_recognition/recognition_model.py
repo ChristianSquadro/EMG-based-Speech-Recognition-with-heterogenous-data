@@ -42,8 +42,8 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.70, 'parameter alpha for the two losses')
-flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
+flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
+flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 8, 'number of buckets in the dataset')
@@ -51,7 +51,7 @@ flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
-        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps
+        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss
 
         #Warmup phase methods
         def set_lr(new_lr):
@@ -62,8 +62,8 @@ def train_model(trainset, devset, device, writer):
             iteration = iteration + 1
             if iteration <= FLAGS.learning_rate_warmup:
                 set_lr(iteration*target_lr/FLAGS.learning_rate_warmup)
-        
-        #Training loop 
+
+        #Training loop
         optim.zero_grad()  
         sum_batch_size=0  
         for step,example in enumerate(dataloader_training):
@@ -78,7 +78,7 @@ def train_model(trainset, devset, device, writer):
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
-            print(len(X))
+            #print(len(X))
             sum_batch_size += len(X)
 
             
@@ -99,8 +99,9 @@ def train_model(trainset, devset, device, writer):
             out_dec=out_dec.permute(0,2,1)
             loss_dec = loss_fn(out_dec, target)
 
-            #Combination the two losses
-            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                
+            #Combination the two losses   
+            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
             train_dec_loss += loss_dec.item()
@@ -121,7 +122,14 @@ def train_model(trainset, devset, device, writer):
             
             #Run the model on evaluation set and report the loss
             if (step + 1) % FLAGS.report_loss == 0:  
-                evaluation_loop() 
+                evaluation_loop()
+                '''
+                #Adaptevly tune the weigth based on the distance loss
+                if abs(round(train_dec_loss / run_train_steps,3) - round(train_enc_loss / run_train_steps,3)) > FLAGS.threshold_alpha_loss and batch_idx >= 10000:
+                    alpha_loss += 0.05 if loss_dec < loss_enc else -0.05
+                    alpha_loss= np.clip(alpha_loss, 0.05, 0.95)
+                    print(alpha_loss)
+                '''
                 report_loss()
         
         #To report the remained loss history
@@ -129,7 +137,7 @@ def train_model(trainset, devset, device, writer):
         report_loss()
         
     def evaluation_loop():
-        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
+        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
 
         #Evaluation loop
         model.eval()
@@ -155,7 +163,7 @@ def train_model(trainset, devset, device, writer):
                 loss_dec = loss_fn(out_dec, target)
 
                 #Combination the two losses
-                loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
                 eval_loss += loss.item()
                 eval_dec_loss += loss_dec.item()
                 eval_enc_loss += loss_enc.item()
@@ -251,7 +259,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.7; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
