@@ -4,6 +4,7 @@ import kenlm
 import Words
 import Phones
 import Dictionary
+import jiwer
 
 class Node:
     _id = 0 
@@ -268,8 +269,8 @@ def coverage_penalty():
 
 def check_language_model(lm, sentence):
     # tranform from list of word into a string (lm accepts only string)
-    sentence= ' '.join(sentence)
-    logprob = lm.score(sentence, bos = True, eos = False)
+    sentence= jiwer.ToLowerCase()(' '.join(sentence))
+    logprob = lm.score(sentence, bos = True, eos = False) / np.log(((len(sentence))**0.8))
     return logprob
 
 

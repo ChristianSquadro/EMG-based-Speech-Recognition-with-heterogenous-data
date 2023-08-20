@@ -190,7 +190,7 @@ class Model(nn.Module):
             
             tgt = tgt.transpose(0,1) # put sequence_length first
             memory = memory.transpose(0,1) # put sequence_length first
-            x_decoder = self.transformerDecoder(tgt, memory)
+            x_decoder = self.transformerDecoder(tgt, memory, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
             x_decoder = x_decoder.transpose(0,1)
             
             return self.w_out(x_decoder)

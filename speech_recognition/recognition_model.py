@@ -315,11 +315,11 @@ def evaluate_saved_beam_search():
     testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
-    model=nn.DataParallel(model, device_ids=[0,1,2,3]).to(device)
+    model=nn.DataParallel(model).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
-    dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, shuffle=False ,batch_size=1)
     references = []
     predictions = []
      
@@ -331,24 +331,24 @@ def evaluate_saved_beam_search():
             target= tgt[:,1:]
             pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
  
-            pred_text = ' '.join(pred[2])
+            pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
             references.append(target_text)
             predictions.append(pred_text)
             
             logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
-    print('WER:', jiwer.wer(references, predictions))
+    print('Final WER:', jiwer.wer(references, predictions))
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=True, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, shuffle=False, batch_size=1)
     references = []
     predictions = []
 
@@ -366,7 +366,7 @@ def evaluate_saved_greedy_search():
             predictions += phones_seq
             references += example['phonemes']
 
-    print('WER:', jiwer.wer(references, predictions))
+    print('PER:', jiwer.wer(references, predictions))
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)
