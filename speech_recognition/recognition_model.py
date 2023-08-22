@@ -333,10 +333,10 @@ def evaluate_saved_beam_search():
  
             pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
-            references.append(target_text)
-            predictions.append(pred_text)
-            
-            logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
+            if len(target_text) is not 0:
+                references.append(target_text)
+                predictions.append(pred_text)  
+                logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
     print('Final WER:', jiwer.wer(references, predictions))
 
@@ -365,6 +365,7 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})')
 
     print('PER:', jiwer.wer(references, predictions))
 
@@ -389,8 +390,18 @@ if __name__ == '__main__':
     FLAGS(sys.argv)
     load_dictionary()
     if FLAGS.evaluate_saved_beam_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_beam_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_beam_search()
     elif FLAGS.evaluate_saved_greedy_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_greedy_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_greedy_search()
     else:
         main()
