@@ -311,8 +311,8 @@ def train_model(trainset, devset, device, writer):
 
 def evaluate_saved_beam_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
