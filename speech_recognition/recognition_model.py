@@ -332,7 +332,7 @@ def evaluate_saved_greedy_search():
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=True, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, shuffle=False, batch_size=1)
     references = []
     predictions = []
 
@@ -349,8 +349,7 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-
-    print('WER:', jiwer.wer(references, predictions))
+            print(f'Prediction: {phones_seq} Reference:{example["phonemes"]} WER:{jiwer.wer(phones_seq, example["phonemes"])}')
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)
