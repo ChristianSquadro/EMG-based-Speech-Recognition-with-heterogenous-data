@@ -26,9 +26,9 @@ class TransformerEncoderLayer(nn.Module):
         >>> out = encoder_layer(src)
     """
 
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
+    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional_distance=100):
         super(TransformerEncoderLayer, self).__init__()
-        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
+        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=True, relative_positional_distance=relative_positional_distance)
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)
@@ -83,11 +83,11 @@ class TransformerDecoderLayer(nn.Module):
             Default: ``False`` (after).
         """
     # Adapted from pytorch source
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
+    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional_distance=100):
         super(TransformerDecoderLayer, self).__init__()
         #Attention Mechanism
-        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
-        self.multihead_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
+        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional= False, relative_positional_distance=relative_positional_distance)
+        self.multihead_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional= False, relative_positional_distance=relative_positional_distance)
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)

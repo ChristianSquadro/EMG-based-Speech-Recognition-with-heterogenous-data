@@ -10,4 +10,5 @@ hifi_gan
 logs/run
 models/recognition_model
 text_alignments
-model_to_save/model.pt
+model_to_save
+environment.yml

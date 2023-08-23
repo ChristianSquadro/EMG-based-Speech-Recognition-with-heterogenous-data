@@ -42,15 +42,16 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.75, 'parameter alpha for the two losses')
-flags.DEFINE_float('grad_clipping', 5.0, 'parameter for gradient clipping')
-flags.DEFINE_integer('batch_size_grad', 150, 'batch size for gradient accumulation')
+flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
+flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
+flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
-flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
+flags.DEFINE_integer('n_buckets', 8, 'number of buckets in the dataset')
+flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
-        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps
+        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss
 
         #Warmup phase methods
         def set_lr(new_lr):
@@ -61,8 +62,8 @@ def train_model(trainset, devset, device, writer):
             iteration = iteration + 1
             if iteration <= FLAGS.learning_rate_warmup:
                 set_lr(iteration*target_lr/FLAGS.learning_rate_warmup)
-        
-        #Training loop 
+
+        #Training loop
         optim.zero_grad()  
         sum_batch_size=0  
         for step,example in enumerate(dataloader_training):
@@ -77,7 +78,7 @@ def train_model(trainset, devset, device, writer):
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
-            print(len(X))
+            #print(len(X))
             sum_batch_size += len(X)
 
             
@@ -98,8 +99,9 @@ def train_model(trainset, devset, device, writer):
             out_dec=out_dec.permute(0,2,1)
             loss_dec = loss_fn(out_dec, target)
 
-            #Combination the two losses
-            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                
+            #Combination the two losses   
+            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
             train_dec_loss += loss_dec.item()
@@ -120,7 +122,14 @@ def train_model(trainset, devset, device, writer):
             
             #Run the model on evaluation set and report the loss
             if (step + 1) % FLAGS.report_loss == 0:  
-                evaluation_loop() 
+                evaluation_loop()
+                '''
+                #Adaptevly tune the weigth based on the distance loss
+                if abs(round(train_dec_loss / run_train_steps,3) - round(train_enc_loss / run_train_steps,3)) > FLAGS.threshold_alpha_loss and batch_idx >= 10000:
+                    alpha_loss += 0.05 if loss_dec < loss_enc else -0.05
+                    alpha_loss= np.clip(alpha_loss, 0.05, 0.95)
+                    print(alpha_loss)
+                '''
                 report_loss()
         
         #To report the remained loss history
@@ -128,7 +137,7 @@ def train_model(trainset, devset, device, writer):
         report_loss()
         
     def evaluation_loop():
-        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
+        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
 
         #Evaluation loop
         model.eval()
@@ -154,7 +163,7 @@ def train_model(trainset, devset, device, writer):
                 loss_dec = loss_fn(out_dec, target)
 
                 #Combination the two losses
-                loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
                 eval_loss += loss.item()
                 eval_dec_loss += loss_dec.item()
                 eval_enc_loss += loss_enc.item()
@@ -193,7 +202,7 @@ def train_model(trainset, devset, device, writer):
         run_eval_steps=0
 
     def report_PER():
-        nonlocal predictions_train,references_train,predictions_eval,references_eval,curr_eval_PER, text_eval
+        nonlocal predictions_train,references_train,predictions_eval,references_eval,curr_eval_PER, text_eval, text_train
 
         #Calculation PER
         model.eval()
@@ -206,8 +215,9 @@ def train_model(trainset, devset, device, writer):
             phones_seq = run_greedy(model, X, target, n_phones, device)
             predictions_train += phones_seq
             references_train += example['phonemes']
-            #Pick up just 10 batches
-            if step + 1 == 10:
+            text_train += example['text']
+            #Pick up just 15 batches
+            if step + 1 == 15:
                 break
         
         #Greedy Search Evaluation Set
@@ -227,7 +237,10 @@ def train_model(trainset, devset, device, writer):
             text_eval += example['text']
 
         #Reporting PER
-        logging.info(f'Prediction: {predictions_eval[0]} ---> \n Reference: {references_eval[0]}  (PER: {jiwer.wer(predictions_eval[0], references_eval[0])}) \n Reference Text: {text_eval[0]}')
+        logging.info(f'----Prediction Evaluation-----')
+        logging.info(f'Evaluation Prediction: {predictions_eval[0]} ---> \n  Evaluation Reference: {references_eval[0]}  (Evaluation PER: {jiwer.wer(references_eval[0], predictions_eval[0])}) \n Evaluation Reference Text: {text_eval[0]}')
+        logging.info(f'----Prediction Training-----')
+        logging.info(f'Training Prediction: {predictions_train[0]} ---> \n Training Reference: {references_train[0]}  (Training PER: {jiwer.wer(references_train[0], predictions_train[0])}) \n Training Reference Text: {text_train[0]}')
         writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references_train, predictions_train), batch_idx)
         writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.wer(references_eval, predictions_eval), batch_idx)
         curr_eval_PER=jiwer.wer(references_eval, predictions_eval)
@@ -236,6 +249,9 @@ def train_model(trainset, devset, device, writer):
         references_train=[]
         predictions_eval=[]
         references_eval=[]
+        text_train=[]
+        text_eval=[]
+
 
 
     ################################################### TRAINING MODEL BELOW ########################################################################       
@@ -243,11 +259,11 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; best_eval_PER=10; curr_eval_PER=0; text_eval=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.7; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
-    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 80000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
-    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 80000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchTrainingSampler)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
@@ -264,7 +280,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[15], gamma=.1)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[18], gamma=.1)
     
     ##MODEL TRAINING##
     
@@ -281,7 +297,7 @@ def train_model(trainset, devset, device, writer):
         #Change learning rate
         #lr_sched.step()
         #Mean of the main loss and logging
-        logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
+        logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
         #Save the Best Model
         if curr_eval_PER < best_eval_PER:
             torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
@@ -299,11 +315,11 @@ def evaluate_saved_beam_search():
     testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
-    model=nn.DataParallel(model, device_ids=[0,1,2,3]).to(device)
+    model=nn.DataParallel(model).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
-    dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, shuffle=False ,batch_size=1)
     references = []
     predictions = []
      
@@ -315,19 +331,19 @@ def evaluate_saved_beam_search():
             target= tgt[:,1:]
             pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
  
-            pred_text = ' '.join(pred[2])
+            pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
-            references.append(target_text)
-            predictions.append(pred_text)
-            
-            logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
+            if len(target_text) is not 0:
+                references.append(target_text)
+                predictions.append(pred_text)  
+                logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
-    print('WER:', jiwer.wer(references, predictions))
+    print('Final WER:', jiwer.wer(references, predictions))
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
@@ -349,7 +365,9 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            print(f'Prediction: {phones_seq} Reference:{example["phonemes"]} WER:{jiwer.wer(phones_seq, example["phonemes"])}')
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})')
+
+    print('PER:', jiwer.wer(references, predictions))
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)
@@ -372,8 +390,18 @@ if __name__ == '__main__':
     FLAGS(sys.argv)
     load_dictionary()
     if FLAGS.evaluate_saved_beam_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_beam_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_beam_search()
     elif FLAGS.evaluate_saved_greedy_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_greedy_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_greedy_search()
     else:
         main()
