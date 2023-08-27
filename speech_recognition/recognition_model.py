@@ -41,12 +41,12 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
-flags.DEFINE_float('l2', 0., 'weight decay')
+flags.DEFINE_float('l2', 0.1, 'weight decay')
 flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
-flags.DEFINE_integer('n_buckets', 8, 'number of buckets in the dataset')
+flags.DEFINE_integer('n_buckets', 16, 'number of buckets in the dataset')
 flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
@@ -132,9 +132,6 @@ def train_model(trainset, devset, device, writer):
                 '''
                 report_loss()
         
-        #To report the remained loss history
-        evaluation_loop() 
-        report_loss()
         
     def evaluation_loop():
         nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
@@ -259,7 +256,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.7; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.3; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -311,8 +308,8 @@ def train_model(trainset, devset, device, writer):
 
 def evaluate_saved_beam_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
@@ -330,6 +327,7 @@ def evaluate_saved_beam_search():
 
             target= tgt[:,1:]
             pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
+            torch.cuda.empty_cache()
  
             pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])

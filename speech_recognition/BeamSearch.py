@@ -13,7 +13,7 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 50, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.2 , 'importance for language model scoring')
 flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
@@ -206,7 +206,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, max_len):
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model, max_len):
     sentence= jiwer.ToLowerCase()(' '.join([item.name for item in words]))
-    logprob=language_model.score(sentence,bos = True, eos = True) + ((len(sentence))**0.85)
+    logprob=language_model.score(sentence,bos = True, eos = True) / ((len(sentence) + 1)**0.9)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 

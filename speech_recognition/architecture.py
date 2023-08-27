@@ -19,8 +19,8 @@ flags.DEFINE_integer('num_layers_encoder', 6, 'number of encoder layers')
 flags.DEFINE_integer('num_layers_decoder', 6, 'number of decoder layers')
 flags.DEFINE_integer('n_heads_encoder', 8, 'number of heads encoder')
 flags.DEFINE_integer('n_heads_decoder', 8, 'number of heads decoder')
-flags.DEFINE_integer('relative_distance', 100, 'relative positional distance')
-flags.DEFINE_float('dropout', .1, 'dropout')
+flags.DEFINE_integer('relative_distance', 300, 'relative positional distance')
+flags.DEFINE_float('dropout', .3, 'dropout')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
