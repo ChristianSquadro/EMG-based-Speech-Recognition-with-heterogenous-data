@@ -1,3 +1,4 @@
+ *  AE S T ER IH S K
  A	EY											
  ABANDONED	AH B AE N D AH N D											
  ABANDONING	AH B AE N D AH N IH NG											
@@ -3683,7 +3684,8 @@
  HEARTED	HH AA R T AH D											
  HEARTILY	HH AA R T AH L IY											
  HEARTLESS	HH AA R T L AH S											
- HEART'S	HH AA R T S											
+ HEART'S	HH AA R T S		
+ HEARTS	HH AA R T S										
  HEARTY	HH AA R T IY											
  HEAT	HH IY T											
  HEATED	HH IY T AH D											
