@@ -401,13 +401,6 @@ class EMGDataset(torch.utils.data.Dataset):
 
         self.text_transform = TextTransform()
         self.phone_transform = PhoneTransform()
-        
-        #Try augmentation
-        '''
-        generator = torch.Generator().manual_seed(0)
-        self.pair_permutation = torch.randperm(len(self.example_indices), generator=generator)
-        self.silences = torch.randint(160, 4000, (len(self.example_indices),), generator=generator)
-        '''
 
     def silent_subset(self):
         result = copy(self)
@@ -444,17 +437,6 @@ class EMGDataset(torch.utils.data.Dataset):
         words= [word for word in text]
         text_int = np.array(self.text_transform.text_to_int(text), dtype=np.int64)
 
-        #try augmentation
-        '''
-        pair_index = self.pair_permutation[i]
-        directory_info, idx = self.example_indices[pair_index]
-        _, emg2, text2, _, phonemes2, _ = load_utterance(directory_info.directory, idx, self.limit_length)
-        silence = np.zeros((self.silences[i].item(), 112), dtype= np.float16)
-        emg = np.concatenate([emg, silence, emg2], axis=0)
-        text = f'{text} {text2}'
-        phonemes = phonemes + phonemes2
-        '''
-        
         result = {'audio_features':torch.from_numpy(mfccs).pin_memory(), 'emg':torch.from_numpy(emg).pin_memory(), 'text':text, 'words': words,'text_int': torch.from_numpy(text_int).pin_memory(), 'file_label':idx, 'session_ids':torch.from_numpy(session_ids).pin_memory(), 'book_location':book_location, 'silent':directory_info.silent, 'raw_emg':torch.from_numpy(raw_emg).pin_memory()}
 
         if directory_info.silent:

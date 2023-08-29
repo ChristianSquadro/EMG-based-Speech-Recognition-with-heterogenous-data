@@ -346,7 +346,9 @@ def evaluate_saved_greedy_search():
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=False, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
+    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
+    alpha_loss= 0.3
     references = []
     predictions = []
 
@@ -359,11 +361,25 @@ def evaluate_saved_greedy_search():
             #Forward Model
             target= y[:,1:]
             phones_seq = run_greedy(model, X, target, n_phones, device)
+            
+            #Forward Model 
+            tgt= y[:,:-1]
+            target= y[:,1:]
+            out_enc, out_dec = model(x_raw=X, y=tgt)
+            #Encoder Loss
+            out_enc = F.log_softmax(out_enc, 2)
+            out_enc = out_enc.transpose(1,0)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+                
+            #Decoder Loss
+            out_dec=out_dec.permute(0,2,1)
+            loss_dec = loss_fn(out_dec, target)
+            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
 
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})')
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
 
     print('PER:', jiwer.wer(references, predictions))
 

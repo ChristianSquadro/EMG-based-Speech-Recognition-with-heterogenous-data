@@ -270,7 +270,7 @@ def coverage_penalty():
 def check_language_model(lm, sentence):
     # tranform from list of word into a string (lm accepts only string)
     sentence= jiwer.ToLowerCase()(' '.join(sentence))
-    logprob = lm.score(sentence, bos = True, eos = False) + ((len(sentence) + 1)**0.9)
+    logprob = lm.score(sentence, bos = True, eos = False) + ((len(sentence) + 1)**0.85)
     return logprob
 
 
