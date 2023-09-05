@@ -15,7 +15,7 @@ from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
-from data_utils import load_dictionary
+from data_utils import load_dictionary,combine_fixed_length
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -41,7 +41,7 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
-flags.DEFINE_float('l2', 0.1, 'weight decay')
+flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
@@ -74,7 +74,8 @@ def train_model(trainset, devset, device, writer):
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
@@ -87,7 +88,7 @@ def train_model(trainset, devset, device, writer):
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(x_raw=X, y=tgt)
+            out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
@@ -123,13 +124,6 @@ def train_model(trainset, devset, device, writer):
             #Run the model on evaluation set and report the loss
             if (step + 1) % FLAGS.report_loss == 0:  
                 evaluation_loop()
-                '''
-                #Adaptevly tune the weigth based on the distance loss
-                if abs(round(train_dec_loss / run_train_steps,3) - round(train_enc_loss / run_train_steps,3)) > FLAGS.threshold_alpha_loss and batch_idx >= 10000:
-                    alpha_loss += 0.05 if loss_dec < loss_enc else -0.05
-                    alpha_loss= np.clip(alpha_loss, 0.05, 0.95)
-                    print(alpha_loss)
-                '''
                 report_loss()
         
         
@@ -142,13 +136,14 @@ def train_model(trainset, devset, device, writer):
             for step,example in enumerate(dataloader_evaluation):
                 torch.cuda.empty_cache()
                 #Collect the data
-                X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+                X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+                #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
                 y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             
                 #Forward Model 
                 tgt= y[:,:-1]
                 target= y[:,1:]
-                out_enc, out_dec = model(x_raw=X, y=tgt)
+                out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
 
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
@@ -206,10 +201,11 @@ def train_model(trainset, devset, device, writer):
         #Greedy Search Training Set Subset
         for step,example in enumerate(dataloader_training):
             torch.cuda.empty_cache()
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
             predictions_train += phones_seq
             references_train += example['phonemes']
             text_train += example['text']
@@ -220,13 +216,13 @@ def train_model(trainset, devset, device, writer):
         #Greedy Search Evaluation Set
         for step, example in enumerate(dataloader_evaluation):
             torch.cuda.empty_cache()
-            #Collect the data
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model using Greedy Approach not teacher forcing
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
             
             #Append lists to calculate the PER
             predictions_eval += phones_seq
@@ -316,17 +312,19 @@ def evaluate_saved_beam_search():
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=False ,batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset,  collate_fn=EMGDataset.collate_raw,shuffle=False ,batch_size=1)
     references = []
     predictions = []
      
+    model.eval() 
     with torch.no_grad():
         for example in dataloader:
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             tgt = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
             target= tgt[:,1:]
-            pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
+            pred=run_single_bs(model,X,target,n_phones,tree,language_model,device, example['lengths'])
             torch.cuda.empty_cache()
  
             pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
@@ -346,24 +344,42 @@ def evaluate_saved_greedy_search():
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=False, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
+    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
+    alpha_loss= 0.3
     references = []
     predictions = []
 
+    model.eval() 
     with torch.no_grad():
         for idx, example in enumerate(dataloader):
             #Collect the data
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq = run_greedy(model, example['lengths'], X, target, n_phones, device)
+            
+            #Forward Model 
+            tgt= y[:,:-1]
+            target= y[:,1:]
+            out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
+            #Encoder Loss
+            out_enc = F.log_softmax(out_enc, 2)
+            out_enc = out_enc.transpose(1,0)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+                
+            #Decoder Loss
+            out_dec=out_dec.permute(0,2,1)
+            loss_dec = loss_fn(out_dec, target)
+            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
 
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})')
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
 
     print('PER:', jiwer.wer(references, predictions))
 

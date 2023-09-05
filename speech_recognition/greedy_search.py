@@ -4,7 +4,7 @@ from absl import flags
 import numpy as np
 FLAGS = flags.FLAGS
 
-def run_greedy(model, X_raw, tgt, vocab_size, device):
+def run_greedy(model, length_raw_signal, X_raw, tgt, vocab_size, device):
   batch_len=tgt.shape[0]
   phones_seq = [['<S>'] for _ in range(batch_len)]
   start_tok = vocab_size - 2
@@ -13,12 +13,12 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
   phone_transform = PhoneTransform()
 
   # forward pass, attention is applied to data_encoded as trained
-  memory, out_enc = model(mode= 'greedy_search', part='encoder', x_raw= X_raw)
+  memory, out_enc = model(length_raw_signal , device, mode= 'greedy_search', part='encoder', x_raw= X_raw)
 
   with torch.no_grad():
     while True:
       #Decoder
-      step_logits = model(mode='greedy_search', part='decoder', y=dec_input, memory=memory)
+      step_logits = model(length_raw_signal , device, mode='greedy_search', part='decoder', y=dec_input, memory=memory)
       probs = torch.nn.functional.softmax(step_logits, dim=2)
       predicted_idx = torch.argmax(probs, dim=2)[:,-1]
 

@@ -13,7 +13,7 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 50, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.2 , 'importance for language model scoring')
 flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
@@ -37,7 +37,7 @@ def decode(l,dct,start_tok,end_tok):
 
 HypoHolder = collections.namedtuple('HypoHolder',['histories','probs','words','nodes'])
 
-def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
+def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length_raw_signal):
     def check_hypos_are_consistent(h,step):
         assert h.histories.ndim == 2 and h.histories.shape[1] == (step+1)
         assert len(h.nodes) == h.histories.shape[0]
@@ -89,7 +89,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     pr2 = False
    
     # forward pass, attention is applied to data_encoded as trained
-    memory = model(mode= 'beam_search', part='encoder', x_raw= data)
+    memory, _= model(length_raw_signal, device, mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
     end_tok = vocab_size - 3
@@ -118,7 +118,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         memory_stub= memory.repeat(hypos.histories.shape[0], 1, 1) 
         
         # decode_step treats the different hypos as though they were different elements of a batch apart from the last two token predicted which are <S> and <PAD>
-        step_logits = model(mode='beam_search', part='decoder',y=hypos.histories,memory=memory_stub) [:,-1,:-2]
+        step_logits = model(length_raw_signal, device, mode='beam_search', part='decoder',y=hypos.histories,memory=memory_stub) [:,-1,:-2]
 
         # step_logits and step_probs have the shape (hypos * tokens)
         step_probs = torch.nn.functional.log_softmax(step_logits,1)
@@ -206,7 +206,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, max_len):
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model, max_len):
     sentence= jiwer.ToLowerCase()(' '.join([item.name for item in words]))
-    logprob=language_model.score(sentence,bos = True, eos = True) / ((len(sentence) + 1)**0.9)
+    logprob=language_model.score(sentence,bos = True, eos = True) / ((len(sentence) + 1)**0.85)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 

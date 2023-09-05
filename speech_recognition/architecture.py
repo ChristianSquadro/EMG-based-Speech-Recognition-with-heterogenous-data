@@ -20,7 +20,7 @@ flags.DEFINE_integer('num_layers_decoder', 6, 'number of decoder layers')
 flags.DEFINE_integer('n_heads_encoder', 8, 'number of heads encoder')
 flags.DEFINE_integer('n_heads_decoder', 8, 'number of heads decoder')
 flags.DEFINE_integer('relative_distance', 300, 'relative positional distance')
-flags.DEFINE_float('dropout', .3, 'dropout')
+flags.DEFINE_float('dropout', .2, 'dropout')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
@@ -54,6 +54,13 @@ class Model(nn.Module):
     def __init__(self, num_features, num_outs_enc, num_outs_dec, device):
         super().__init__()
         
+        self.conv_blocks = nn.Sequential(
+            ResBlock(8, FLAGS.model_size, 2),
+            ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
+            ResBlock(FLAGS.model_size, FLAGS.model_size, 2),
+        )
+        self.w_raw_in = nn.Linear(FLAGS.model_size, FLAGS.model_size)
+        
         self.emg_projection = nn.Linear(num_features, FLAGS.model_size)
         
         self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
@@ -73,19 +80,6 @@ class Model(nn.Module):
         self.memory_key_padding_mask=None
         self.tgt_mask=None
 
-        #---Try Conformer Model---
-        '''
-        self.embed_positions = RelPositionalEncoding(max_len=100, d_model=FLAGS.model_size)
-        self.conformer_layers = torch.nn.ModuleList([ConformerEncoderLayer(embed_dim=FLAGS.model_size, 
-                                                                           ffn_embed_dim=FLAGS.feed_forward_layer_size,
-                                                                           attention_heads=FLAGS.n_heads_encoder,
-                                                                           dropout=FLAGS.dropout,
-                                                                           depthwise_conv_kernel_size=15,
-                                                                           pos_enc_type='rel_pos',
-                                                                           attn_type='espnet',
-                                                                           use_fp16=True) for _ in range(FLAGS.num_layers_encoder)])
-        '''
-        
     def create_tgt_padding_mask(self, tgt):
         # input tgt of shape ()
         tgt_padding_mask = tgt == FLAGS.pad
@@ -96,31 +90,44 @@ class Model(nn.Module):
         src_padding_mask = src == FLAGS.pad
         return src_padding_mask
     
-    def forward(self, x_raw= None, y= None, mode = 'default', part = None, memory=None):
+    def forward(self, length_raw_signal, device, x_raw= None, y= None, mode = 'default', part = None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
         if mode == "default":
-            return self.forward_training(x_raw=x_raw, y=y)
-        elif mode == "beam_search":
+            return self.forward_training(x_raw=x_raw, y=y, length_raw_signal=length_raw_signal, device=device)
+        elif mode == "greedy_search" or "beam_search":
             if part == 'encoder':
-                return self.forward_beam_search(part=part, x_raw=x_raw)
+                return self.forward_search(part=part, length_raw_signal=length_raw_signal ,x_raw=x_raw, device=device)
             elif part == 'decoder':
-                return self.forward_beam_search(part=part, y=y, memory=memory)
-        elif mode == "greedy_search":
-            if part == 'encoder':
-                return self.forward_greedy_search(part=part, x_raw=x_raw)
-            elif part == 'decoder':
-                return self.forward_greedy_search(part=part, y=y, memory=memory)
+                return self.forward_search(length_raw_signal=length_raw_signal, part=part, y=y, memory=memory, device=device)
       
-    def forward_training (self, x_raw= None, y= None) :       
+    def forward_training (self, length_raw_signal, device, x_raw= None, y= None):  
+        
+        #CNN
+        if self.training:
+             r = random.randrange(8)
+             if r > 0:
+                x_raw[:,:-r,:] = x_raw[:,r:,:] # shift left r
+                x_raw[:,-r:,:] = 0
+        x_raw = x_raw.transpose(1,2) # put channel before time for conv
+        x_raw = self.conv_blocks(x_raw)
+        x_raw = x_raw.transpose(1,2)
+        x_raw = self.w_raw_in(x_raw)
+        x = x_raw
+        
+        
+        #Momentary solution to handle the padding problem of VRAM overusage
+        x=decollate_tensor(x, length_raw_signal)
+        x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad).to(device)
+             
         #Padding Target Mask and attention mask
         self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-        self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
+        self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
         self.memory_key_padding_mask = self.src_key_padding_mask
         self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
 
         #Projection from emg input to the expected number of hidden dimension
-        x=self.emg_projection(x_raw)
+        #x=self.emg_projection(x_raw)
 
         #Embedding and positional encoding of tgt
         tgt=self.embedding_tgt(y)
@@ -130,12 +137,6 @@ class Model(nn.Module):
         tgt = tgt.transpose(0,1) # put sequence_length first
         x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
         
-        '''
-        position = self.embed_positions(x)
-        for layer in self.conformer_layers:
-            x_encoder, (attn, layer_res) = layer(x=x, encoder_padding_mask=self.src_key_padding_mask, position_emb=position)
-        '''
-        
         x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
 
         x_encoder = x_encoder.transpose(0,1)
@@ -144,59 +145,34 @@ class Model(nn.Module):
         
         return self.w_aux(x_encoder), self.w_out(x_decoder)
         
-    def forward_beam_search(self, part , x_raw=None, y=None, memory=None):
-        # x shape is (batch, time, electrode)
-        # y shape is (batch, sequence_length)           
-
-        if part == 'encoder':
-            #Projection from emg input to the expected number of hidden dimension
-            self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
-            x=self.emg_projection(x_raw)
-            x = x.transpose(0,1) # put time first
-            x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
-            
-            '''
-            position = self.embed_positions(x)
-            for layer in self.conformer_layers:
-                x_encoder, (attn, layer_res) = layer(x=x, encoder_padding_mask=self.src_key_padding_mask, position_emb=position)
-            '''
-            
-            x_encoder = x_encoder.transpose(0,1)
-            
-            return x_encoder
-            
-        elif part == 'decoder':
-            self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
-            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
-            self.memory_key_padding_mask = self.src_key_padding_mask
-
-            #Embedding and positional encoding of tgt
-            tgt=self.embedding_tgt(y)
-            tgt=self.pos_decoder(tgt)
-            
-            tgt = tgt.transpose(0,1) # put sequence_length first
-            memory = memory.transpose(0,1) # put sequence_length first
-            x_decoder = self.transformerDecoder(tgt, memory, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
-            x_decoder = x_decoder.transpose(0,1)
-            
-            return self.w_out(x_decoder)
-        
-    def forward_greedy_search(self, part , x_raw=None, y=None, memory=None):
+    def forward_search(self, part , length_raw_signal , device, x_raw=None, y=None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)      
 
         if part == 'encoder':
+               #CNN
+            if self.training:
+                r = random.randrange(8)
+                if r > 0:
+                    x_raw[:,:-r,:] = x_raw[:,r:,:] # shift left r
+                    x_raw[:,-r:,:] = 0
+            x_raw = x_raw.transpose(1,2) # put channel before time for conv
+            x_raw = self.conv_blocks(x_raw)
+            x_raw = x_raw.transpose(1,2)
+            x_raw = self.w_raw_in(x_raw)
+            x = x_raw
+            
+            
+            #Momentary solution to handle the padding problem of VRAM overusage
+            x=decollate_tensor(x, length_raw_signal)
+            x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad).to(device)
+            
+            
             #Projection from emg input to the expected number of hidden dimension
-            self.src_key_padding_mask = self.create_src_padding_mask(x_raw[:,:,0]).to(self.device)
-            x=self.emg_projection(x_raw)
+            self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
+            #x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first
             x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
-            
-            '''
-            position = self.embed_positions(x)
-            for layer in self.conformer_layers:
-                x_encoder, (attn, layer_res) = layer(x=x, encoder_padding_mask=self.src_key_padding_mask, position_emb=position)
-            '''
             
             x_encoder = x_encoder.transpose(0,1)
             

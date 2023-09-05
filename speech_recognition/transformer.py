@@ -407,9 +407,10 @@ class LearnedRelativePositionalEmbedding(nn.Module):
 # https://github.com/pytorch/examples/blob/master/word_language_model/model.py
 class PositionalEncoding(nn.Module):
 
-    def __init__(self, d_model, dropout=0.0, max_len=5000):
+    def __init__(self, d_model, dropout=0.2, max_len=5000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
+        self.d_model=d_model
         self.max_len = max_len
 
         pe = torch.zeros(max_len, d_model)
@@ -432,5 +433,5 @@ class PositionalEncoding(nn.Module):
         assert x.size(0) < self.max_len, (
             f"Too long sequence length: increase `max_len` of pos encoding")
         # shape of x (len, B, dim)
-        x = x + self.pe[:x.size(0), :]
+        x = x + (1/self.d_model * self.pe[:x.size(0), :])
         return self.dropout(x)
