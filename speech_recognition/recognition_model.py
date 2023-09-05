@@ -327,14 +327,14 @@ def evaluate_saved_beam_search():
             pred=run_single_bs(model,X,target,n_phones,tree,language_model,device, example['lengths'])
             torch.cuda.empty_cache()
  
-            pred_text = jiwer.ToLowerCase()(' '.join(pred[2]))
+            pred_text = testset.text_transform.clean_text(' '.join(pred[2]))
             target_text = testset.text_transform.clean_text(example['text'][0])
             if len(target_text) is not 0:
                 references.append(target_text)
                 predictions.append(pred_text)  
                 logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
-    print('Final WER:', jiwer.wer(references, predictions))
+    logging.info(f'Final WER: {jiwer.wer(references, predictions)}')
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
