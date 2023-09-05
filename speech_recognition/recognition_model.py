@@ -347,6 +347,9 @@ def evaluate_saved_greedy_search():
     dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
     loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
     alpha_loss= 0.3
+    dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
+    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
+    alpha_loss= 0.3
     references = []
     predictions = []
 
@@ -379,6 +382,7 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
             logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
 
     print('PER:', jiwer.wer(references, predictions))

@@ -14,8 +14,9 @@ PRINT_FIN = False
 from absl import flags
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
-flags.DEFINE_float('LMWeight', 0.2 , 'importance for language model scoring')
+flags.DEFINE_float('LMWeight', 0.2, 'importance for language model scoring')
 flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
     
 # Helpers
@@ -76,7 +77,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length
             # Get current nodes
         else:
             raise Exception('This is going to crash because of the nodes. Do I need to keep track of them at all?')
-            state = (flt_state,flt_align,flt_annotation)
             accu_probs = torch.sum(flt_probs,1) 
             probs = flt_probs
 
@@ -94,16 +94,16 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length
     # prepare some constants
     end_tok = vocab_size - 3
     start_tok = vocab_size - 2
-    max_len = torch.sum(target != end_tok) + 10
+    max_len = torch.sum(target != end_tok) + 20
     
     # initialize
 
     # create the initial hypo
     hypos = HypoHolder(
-            histories = torch.tensor([[ start_tok ]],device=device) ,
-            probs = torch.zeros(1,0,dtype=torch.float32,device=device),
-            words = [[]], 
-            nodes = [tree._root] 
+            histories = torch.tensor([[ start_tok ]] * FLAGS.BeamWidth,device=device) ,
+            probs = torch.zeros(FLAGS.BeamWidth,0,dtype=torch.float32,device=device),
+            words = [[]] * FLAGS.BeamWidth, 
+            nodes = [tree._root] * FLAGS.BeamWidth
         )
 
     finished_hypos = {}
@@ -111,8 +111,9 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length
 
     for step in range(max_len):
         check_hypos_are_consistent(hypos,step)
-        if pr2:
-            print('--- BEGIN STEP %d ---' % step)
+        
+        if hypos.histories.shape[0] == 0:
+            break
 
         # start here
         memory_stub= memory.repeat(hypos.histories.shape[0], 1, 1) 
@@ -208,7 +209,7 @@ def save_finished_hypo(finished_hypos,history, probs, words, language_model, max
     sentence= jiwer.ToLowerCase()(' '.join([item.name for item in words]))
     logprob=language_model.score(sentence,bos = True, eos = True) / ((len(sentence) + 1)**0.85)
     final_prob = torch.clone(probs)
-    final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
+    final_prob[-1] += (logprob * FLAGS.LMWeight) + ((abs((max_len - 20) - len(sentence)) + 1)**-0.85) + FLAGS.LMPenalty
 
     if FLAGS.Constrained:
         tup = (history,[x.name for x in words])

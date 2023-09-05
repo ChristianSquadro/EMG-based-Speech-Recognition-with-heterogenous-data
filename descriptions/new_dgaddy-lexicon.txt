@@ -9039,7 +9039,8 @@ DRUNKARD'S	D R AH NG K ER D Z
 D'YE	D AY											
 D'YER	D AY AH R											
 D'YOU	D AY UW											
-EARTHS	ER TH S											
+EARTH'S	ER TH S
+EARTHS	ER TH S										
 'EAT	IY T											
 'EIGHTY	EY T IY											
 EJACULATORY	IH JH AE K Y AH L AH T OW R IY											
