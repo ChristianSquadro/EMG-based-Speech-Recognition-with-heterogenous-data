@@ -40,9 +40,9 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_integer('learning_rate_warmup', 1500, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
+flags.DEFINE_float('step_sampling_rate', 0.05, 'how much increase sampling rate')
 flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
@@ -51,7 +51,7 @@ flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
-        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss
+        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss, sampling_rate
 
         #Warmup phase methods
         def set_lr(new_lr):
@@ -88,7 +88,7 @@ def train_model(trainset, devset, device, writer):
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
+            out_enc, out_dec = model(example['lengths'], device, sampling_rate, x_raw=X, y=tgt)
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
@@ -128,7 +128,7 @@ def train_model(trainset, devset, device, writer):
         
         
     def evaluation_loop():
-        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
+        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss, sampling_rate
 
         #Evaluation loop
         model.eval()
@@ -143,7 +143,7 @@ def train_model(trainset, devset, device, writer):
                 #Forward Model 
                 tgt= y[:,:-1]
                 target= y[:,1:]
-                out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
+                out_enc, out_dec = model(example['lengths'] , device, 0, x_raw=X, y=tgt)
 
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
@@ -252,7 +252,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.3; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[] ; sampling_rate=0
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -273,7 +273,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[18], gamma=.1)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[3], gamma=.1)
     
     ##MODEL TRAINING##
     
@@ -287,8 +287,13 @@ def train_model(trainset, devset, device, writer):
         #PER
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
-        #Change learning rate
+        #Change learning rate and sampling rate
         #lr_sched.step()
+        if epoch_idx  == 4:
+            sampling_rate = 0.1    
+        elif epoch_idx > 8:
+            sampling_rate += FLAGS.step_sampling_rate
+            sampling_rate=max(0.1, min(sampling_rate, 1.0))
         #Mean of the main loss and logging
         logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
         #Save the Best Model
@@ -382,7 +387,6 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
             logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
 
     print('PER:', jiwer.wer(references, predictions))

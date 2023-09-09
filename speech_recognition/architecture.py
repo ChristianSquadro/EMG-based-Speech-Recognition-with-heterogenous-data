@@ -79,6 +79,7 @@ class Model(nn.Module):
         self.src_key_padding_mask=None
         self.memory_key_padding_mask=None
         self.tgt_mask=None
+        self.sampling_rate=0.1
 
     def create_tgt_padding_mask(self, tgt):
         # input tgt of shape ()
@@ -90,18 +91,18 @@ class Model(nn.Module):
         src_padding_mask = src == FLAGS.pad
         return src_padding_mask
     
-    def forward(self, length_raw_signal, device, x_raw= None, y= None, mode = 'default', part = None, memory=None):
+    def forward(self, length_raw_signal, device, sampling_rate=0, x_raw= None, y= None, mode = 'default', part = None, memory=None):
         # x shape is (batch, time, electrode)
         # y shape is (batch, sequence_length)
         if mode == "default":
-            return self.forward_training(x_raw=x_raw, y=y, length_raw_signal=length_raw_signal, device=device)
+            return self.forward_training(x_raw=x_raw, y=y, length_raw_signal=length_raw_signal, device=device, sampling_rate=sampling_rate)
         elif mode == "greedy_search" or "beam_search":
             if part == 'encoder':
                 return self.forward_search(part=part, length_raw_signal=length_raw_signal ,x_raw=x_raw, device=device)
             elif part == 'decoder':
                 return self.forward_search(length_raw_signal=length_raw_signal, part=part, y=y, memory=memory, device=device)
       
-    def forward_training (self, length_raw_signal, device, x_raw= None, y= None):  
+    def forward_training (self, length_raw_signal, device, sampling_rate, x_raw= None, y= None):  
         
         #CNN
         if self.training:
@@ -121,27 +122,49 @@ class Model(nn.Module):
         x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad).to(device)
              
         #Padding Target Mask and attention mask
-        self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
         self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
         self.memory_key_padding_mask = self.src_key_padding_mask
-        self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
 
         #Projection from emg input to the expected number of hidden dimension
         #x=self.emg_projection(x_raw)
-
-        #Embedding and positional encoding of tgt
-        tgt=self.embedding_tgt(y)
-        tgt=self.pos_decoder(tgt)
         
         x = x.transpose(0,1) # put time first
-        tgt = tgt.transpose(0,1) # put sequence_length first
         x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
-        
-        x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+
+        #Randomly choose between teacher forcing or predicted ouput
+        use_model_predictions = (random.random() < sampling_rate)
+
+        if use_model_predictions: 
+            dec_input=y
+            for N in range(3):
+                self.tgt_key_padding_mask = self.create_tgt_padding_mask(dec_input).to(self.device)
+                self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(dec_input.shape[1]).to(self.device)
+                
+                dec_input_emb=self.embedding_tgt(dec_input)
+                dec_input_emb=self.pos_decoder(dec_input_emb)
+                dec_input_emb = dec_input_emb.transpose(0,1)
+                
+                x_decoder = self.transformerDecoder(dec_input_emb, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+                x_decoder = x_decoder.transpose(0,1)
+                out_decoder=self.w_out(x_decoder)
+                
+                probs = torch.nn.functional.softmax(out_decoder, dim=2)
+                predicted_idxs = torch.argmax(probs, dim=2)
+                sched_sampling=torch.tensor([random.random() < 0.5 for _ in range(y.shape[1])], dtype=torch.bool)
+                sched_sampling=sched_sampling.repeat(y.shape[0],1).to(device)
+                dec_input = torch.where(sched_sampling, predicted_idxs, y)
+        else:
+            # Use ground truth as input.
+            self.tgt_key_padding_mask = self.create_tgt_padding_mask(y).to(self.device)
+            self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
+            #Embedding and positional encoding of tgt
+            tgt=self.embedding_tgt(y)
+            tgt=self.pos_decoder(tgt)
+            tgt = tgt.transpose(0,1) # put sequence_length first
+            x_decoder = self.transformerDecoder(tgt, x_encoder, memory_key_padding_mask= self.memory_key_padding_mask, tgt_key_padding_mask=self.tgt_key_padding_mask, tgt_mask=self.tgt_mask)
+            x_decoder = x_decoder.transpose(0,1)            
 
         x_encoder = x_encoder.transpose(0,1)
-        x_decoder = x_decoder.transpose(0,1)
-
         
         return self.w_aux(x_encoder), self.w_out(x_decoder)
         
