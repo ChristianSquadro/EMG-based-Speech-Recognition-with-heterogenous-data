@@ -441,7 +441,7 @@ class EMGDataset(torch.utils.data.Dataset):
 
         if directory_info.silent:
             voiced_directory, voiced_idx = self.voiced_data_locations[book_location]
-            voiced_mfccs, voiced_emg, _, _, phonemes, _ = load_utterance(voiced_directory.directory, voiced_idx, False)
+            voiced_mfccs, voiced_emg, _, _, phonemes, _= load_utterance(voiced_directory.directory, voiced_idx, False)
 
             if not self.no_normalizers:
                 voiced_mfccs = self.mfcc_norm.normalize(voiced_mfccs)
@@ -466,15 +466,32 @@ class EMGDataset(torch.utils.data.Dataset):
         audio_features = []
         audio_feature_lengths = []
         parallel_emg = []
+        raw_emg_augmented = []
+        lengths_augmented=[]
         for ex in batch:
             if ex['silent']:
                 audio_features.append(ex['parallel_voiced_audio_features'])
                 audio_feature_lengths.append(ex['parallel_voiced_audio_features'].shape[0])
                 parallel_emg.append(ex['parallel_voiced_emg'])
+                '''
+                generator = torch.Generator().manual_seed(0)
+                silence = torch.zeros((torch.randint(200, 201,(1,), generator=generator).item(), 8))
+                raw_emg_augmented.append(torch.concatenate([ex['raw_emg'], silence, ex['silent_raw_emg']], axis=0))
+                phonemes_int_augmented.append(torch.concatenate([ex['phonemes_int'][:-1], ex['phonemes_int'][1:]], axis=0)) # to exclude </S> and <S> in the middle
+                lengths_augmented.append(ex['emg'].shape[0] + (silence.shape[0] // 8) + ex['parallel_voiced_emg'].shape[0])
+                '''
             else:
                 audio_features.append(ex['audio_features'])
                 audio_feature_lengths.append(ex['audio_features'].shape[0])
                 parallel_emg.append(np.zeros(1))
+                '''
+                raw_emg_augmented.append(ex['raw_emg'])
+                phonemes_int_augmented.append(ex['phonemes_int'])
+                lengths_augmented.append(ex['emg'].shape[0])
+                '''
+            raw_emg_augmented.append(torch.roll(ex['raw_emg'], shifts=random.randint(-2,2), dims=1))
+            lengths_augmented.append(ex['emg'].shape[0])
+
         phonemes = [ex['phonemes'] for ex in batch]
         phonemes_int = [ex['phonemes_int'] for ex in batch]
         phonemes_lengths = [ex['phonemes_int'].shape[0] for ex in batch]
@@ -491,12 +508,14 @@ class EMGDataset(torch.utils.data.Dataset):
                   'audio_feature_lengths':audio_feature_lengths,
                   'emg':emg,
                   'raw_emg':raw_emg,
+                  'raw_emg_augmented': raw_emg_augmented,
                   'parallel_voiced_emg':parallel_emg,
                   'phonemes':phonemes,
                   'phonemes_int':phonemes_int,
                   'phonemes_int_lengths': phonemes_lengths,
                   'session_ids':session_ids,
                   'lengths':lengths,
+                  'lengths_augmented': lengths_augmented,
                   'silent':silent,
                   'text':text,
                   'text_int':text_ints,

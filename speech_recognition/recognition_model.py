@@ -40,7 +40,7 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_integer('learning_rate_warmup', 1500, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
@@ -74,7 +74,7 @@ def train_model(trainset, devset, device, writer):
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
-            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            X=combine_fixed_length(example['raw_emg_augmented'], 200*8).to(device)
             #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
@@ -88,12 +88,12 @@ def train_model(trainset, devset, device, writer):
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
+            out_enc, out_dec = model(example['lengths_augmented'], device, x_raw=X, y=tgt)
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths_augmented'], example['phonemes_int_lengths'], blank = n_phones) 
             
             
             #Decoder Loss
@@ -252,7 +252,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.3; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
