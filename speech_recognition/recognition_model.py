@@ -361,13 +361,10 @@ def evaluate_saved_greedy_search():
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
     dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
-    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
-    alpha_loss= 0.3
-    dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
-    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
-    alpha_loss= 0.3
     references = []
     predictions = []
+    running_total=0
+    running_correct=0
 
     model.eval() 
     with torch.no_grad():
@@ -379,28 +376,16 @@ def evaluate_saved_greedy_search():
         
             #Forward Model
             target= y[:,1:]
-            phones_seq = run_greedy(model, example['lengths'], X, target, n_phones, device)
-            
-            #Forward Model 
-            tgt= y[:,:-1]
-            target= y[:,1:]
-            out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
-            #Encoder Loss
-            out_enc = F.log_softmax(out_enc, 2)
-            out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
-                
-            #Decoder Loss
-            out_dec=out_dec.permute(0,2,1)
-            loss_dec = loss_fn(out_dec, target)
-            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'], X, target, n_phones, device)
 
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
+            running_total += y.shape[0] * y.shape[1]
+            running_correct += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])} and Accuracy: {round(100 * sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item() / (y.shape[0] * y.shape[1]),1)})')
 
-    print('PER:', jiwer.wer(references, predictions))
+    print(f'PER: {jiwer.wer(references, predictions)} and accuracy: {round(100 * running_correct / running_total,1)}')
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)
