@@ -37,7 +37,17 @@ def run_greedy(model, length_raw_signal, X_raw, tgt, vocab_size, device):
       if all([any(phone == '</S>' for phone in item ) for item in phones_seq]) or dec_input.shape[1] >= max_seq_length:
         break
     
+    #Padding for Accuracy
+    word_seq_idx=[[phone_transform.phone_to_int([subitem]) for subitem in item ] for item in phones_seq ]
+    new_word_seq_idx=torch.ones(batch_len,max_seq_length,dtype=torch.int32).to(device)
+    for i, item in enumerate(word_seq_idx):
+      var_len = len(item)
+      new_item = [[FLAGS.pad]] * max_seq_length
+      new_item[:var_len] = item
+      new_word_seq_idx[i]= torch.tensor(new_item).transpose(0,1)
+      
     #Formatting phones
     phones_seq = [ ' '.join(item) for item in phones_seq ]
+    
 
-  return phones_seq
+  return phones_seq, new_word_seq_idx

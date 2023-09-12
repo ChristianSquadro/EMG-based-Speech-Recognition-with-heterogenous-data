@@ -40,7 +40,7 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_integer('learning_rate_warmup', 1500, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
 flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
@@ -195,6 +195,7 @@ def train_model(trainset, devset, device, writer):
 
     def report_PER():
         nonlocal predictions_train,references_train,predictions_eval,references_eval,curr_eval_PER, text_eval, text_train
+        running_total_train=0 ;running_correct_train=0; running_total_eval=0 ;running_correct_eval=0
 
         #Calculation PER
         model.eval()
@@ -204,11 +205,15 @@ def train_model(trainset, devset, device, writer):
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
             #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+            
             target= y[:,1:]
-            phones_seq = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
+            
             predictions_train += phones_seq
             references_train += example['phonemes']
             text_train += example['text']
+            running_total_train += y.shape[0] * y.shape[1]
+            running_correct_train += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
             #Pick up just 15 batches
             if step + 1 == 15:
                 break
@@ -222,12 +227,14 @@ def train_model(trainset, devset, device, writer):
         
             #Forward Model using Greedy Approach not teacher forcing
             target= y[:,1:]
-            phones_seq = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
             
             #Append lists to calculate the PER
             predictions_eval += phones_seq
             references_eval += example['phonemes']
             text_eval += example['text']
+            running_total_eval += y.shape[0] * y.shape[1]
+            running_correct_eval += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
 
         #Reporting PER
         logging.info(f'----Prediction Evaluation-----')
@@ -236,6 +243,11 @@ def train_model(trainset, devset, device, writer):
         logging.info(f'Training Prediction: {predictions_train[0]} ---> \n Training Reference: {references_train[0]}  (Training PER: {jiwer.wer(references_train[0], predictions_train[0])}) \n Training Reference Text: {text_train[0]}')
         writer.add_scalar('PhonemeErrorRate/Training', jiwer.wer(references_train, predictions_train), batch_idx)
         writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.wer(references_eval, predictions_eval), batch_idx)
+        writer.add_scalar('PhonemeErrorRate_Epoch/Training', jiwer.wer(references_train, predictions_train), epoch_idx)
+        writer.add_scalar('PhonemeErrorRate_Epoch/Evaluation', jiwer.wer(references_eval, predictions_eval), epoch_idx)
+        writer.add_scalar('Accuracy_Epoch/Training', round(100 * running_correct_train / running_total_train,1), epoch_idx)
+        writer.add_scalar('Accuracy_Epoch/Evaluation', round(100 * running_correct_eval / running_total_eval,1), epoch_idx)
+        
         curr_eval_PER=jiwer.wer(references_eval, predictions_eval)
         writer.flush()
         predictions_train=[]
@@ -244,6 +256,10 @@ def train_model(trainset, devset, device, writer):
         references_eval=[]
         text_train=[]
         text_eval=[]
+        running_total_train = 0
+        running_correct_train = 0
+        running_total_eval = 0
+        running_correct_eval = 0
 
 
 
@@ -252,7 +268,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.3; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -382,7 +398,6 @@ def evaluate_saved_greedy_search():
             #Append lists to calculate the PER
             predictions += phones_seq
             references += example['phonemes']
-            logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
             logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])})  (Loss Encoder: {loss_enc.item()}) (Loss Decoder: {loss_dec.item()})')
 
     print('PER:', jiwer.wer(references, predictions))
