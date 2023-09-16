@@ -1,19 +1,1100 @@
 train / dev split: 8055 200
-Prediction: +   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h ---> Reference: + The crowd about the pit had increased, and stood out black against the lemon yellow of the sky—a couple of hundred people, perhaps. =  (PER: 0.8153310104529616)
-finished epoch 1 - training loss: 3.4792
-Prediction: +   a n d   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h ---> Reference: + One of our chimneys cracked as if a shot had hit it, flew, and a piece of it came clattering down the tiles and made a heap of broken red fragments upon the flower bed by my study window. =  (PER: 0.792)
-finished epoch 2 - training loss: 2.4907
-Prediction: +   t h e   w a s   a n d   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e a n   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   ---> Reference: + Never once, after the Martian at St. George’s Hill was brought down, did they give the artillery the ghost of a chance against them. =  (PER: 0.7662835249042146)
-finished epoch 3 - training loss: 2.4246
-Prediction: +   t h e   w a s   f r e   t h e   t h e   s   s t h e   = ---> Reference: + I went in again, according to my promise, to get my servant’s box, lugged it out, clapped it beside her on the tail of the dog cart, and then caught the reins and jumped up into the driver’s seat beside my wife. =  (PER: 2.7966101694915255)
-finished epoch 4 - training loss: 2.3430
-Prediction: +   t h e   w a s   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h e   t h ---> Reference: + Not stopping to look again, I wrenched the horse’s head hard round to the right and in another moment the dog cart had heeled over upon the horse; the shafts smashed noisily, and I was flung sideways and fell heavily into a shallow pool of water. =  (PER: 0.7864476386036962)
-finished epoch 5 - training loss: 2.2757
-Prediction: +   t h e   t h e   s e   t h e   s   t o   t h e   s   t h e   s   t h e   s   t o   t   t h e     s   t h e   s   t   t h e     s   t h e     s   t o   t   t   t   t   t h e       s   t h e     s   t   t   t   t   t     t h e       s   t h e     s   t   t   t     s   t   t   t   t   t ---> Reference: + It was the head of the shopman who had fallen in, but showing as a little black object against the hot western sun. =  (PER: 0.794425087108014)
-finished epoch 6 - training loss: 2.1816
-Prediction: +   a n d   s   a n d   t   t h e   s   s   a n d   s   s   s   s   m m   t   t   t   s   s   s   s   s   s   s   s   s   n d   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   n d   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   s   ---> Reference: + The night was warm and still, and a little oppressive; the sound of guns continued intermittently, and after midnight there seemed to be sheet lightning in the south. =  (PER: 0.8591549295774648)
-finished epoch 7 - training loss: 2.1017
-Prediction: +   t h e   e   e       e e                                                                                                                                             ---> Reference: + The Martians appear to be moving slowly towards Chertsey or Windsor. =  (PER: 2.074074074074074)
-finished epoch 8 - training loss: 2.0431
-Prediction: +   t h e   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t   t ---> Reference: + The night was warm and still, and a little oppressive; the sound of guns continued intermittently, and after midnight there seemed to be sheet lightning in the south. =  (PER: 0.8599439775910365)
-finished epoch 9 - training loss: 1.9835
+Dictionary error for the word '&' in the phrase: I am Alexander Holder, of the banking firm of Holder & Stevenson, of Threadneedle Street.”
+Dictionary error for the word 'CARRÉE' in the phrase: I had brought a pack of cards in my pocket, and I thought that, as we were a _partie carrée_, you might have your rubber after all.
+Dictionary error for the word 'FIANCÉ' in the phrase: The man in the road was, undoubtedly, some friend of hers—possibly her _fiancé_—and no doubt, as you wore the girl’s dress and were so like her, he was convinced from your laughter, whenever he saw you, and afterwards from your gesture, that Miss Rucastle was perfectly happy, and that she no longer desired his attentions.
+Dictionary error for the word 'ENCYCLOPÆDIA' in the phrase: “You see, Watson,” he explained, in the early hours of the morning, as we sat over a glass of whiskey-and-soda in Baker Street, “it was perfectly obvious from the first that the only possible object of this rather fantastic business of the advertisement of the League, and the copying of the ‘Encyclopædia,’ must be to get this not over-bright pawnbroker out of the way for a number of hours every day.
+Dictionary error for the word 'RÉPERTOIRE' in the phrase: Again I changed my dress, again I sat in the window, and again I laughed very heartily at the funny stories of which my employer had an immense _répertoire_, and which he told inimitably.
+Dictionary error for the word 'DÉTOUR' in the phrase: Sometimes Holmes would hurry on, sometimes stop dead, and once he made quite a little _détour_ into the meadow.
+Dictionary error for the word 'PÂTÉ' in the phrase: There were a couple of brace of cold woodcock, a pheasant, a _pâté de foie gras_ pie, with a group of ancient and cobwebby bottles.
+Dictionary error for the word 'OUTRÉ' in the phrase: Too little, if he could not invent a cause of quarrel which would give him the sympathy of the jury; too much, if he evolved from his own inner consciousness anything so _outré_ as a dying reference to a rat, and the incident of the vanishing cloth.
+Dictionary error for the word 'MÉTIER' in the phrase: Therein lies my _métier_, and it is just possible that it may be of some service in the investigation which lies before us.
+Dictionary error for the word 'CŒUR' in the phrase: “Oscillation upon the pavement always means an _affaire de cœur_.
+Dictionary error for the word 'OUTRÉ' in the phrase: If we could fly out of that window hand in hand, hover over this great city, gently remove the roofs, and peep in at the queer things which are going on, the strange coincidences, the plannings, the cross-purposes, the wonderful chains of events, working through generations, and leading to the most _outré_ results, it would make all fiction with its conventionalities and foreseen conclusions most stale and unprofitable.”
+Dictionary error for the word '&' in the phrase: The same post brought me a letter from Westhouse & Marbank, of Fenchurch Street, to say that the description tallied in every respect with that of their employé, James Windibank.
+Dictionary error for the word 'EMPLOYÉ' in the phrase: The same post brought me a letter from Westhouse & Marbank, of Fenchurch Street, to say that the description tallied in every respect with that of their employé, James Windibank.
+Dictionary error for the word '&' in the phrase: By profession I am an hydraulic engineer, and I have had considerable experience of my work during the seven years that I was apprenticed to Venner & Matheson, the well-known firm, of Greenwich.
+Dictionary error for the word 'ENCYCLOPÆDIAS' in the phrase: To carry the art, however, to its highest pitch, it is necessary that the reasoner should be able to utilize all the facts which have come to his knowledge; and this in itself implies, as you will readily see, a possession of all knowledge, which, even in these days of free education and encyclopædias, is a somewhat rare accomplishment.
+Dictionary error for the word 'CÉLÈBRES' in the phrase: It is pleasant to me to observe, Watson, that you have so far grasped this truth that in these little records of our cases which you have been good enough to draw up, and, I am bound to say, occasionally to embellish, you have given prominence not so much to the many _causes célèbres_ and sensational trials in which I have figured, but rather to those incidents which may have been trivial in themselves, but which have given room for those faculties of deduction and of logical synthesis which I have made my special province.”
+Dictionary error for the word 'DÉNOUEMENT' in the phrase: It was not until close upon six o’clock that I found myself free, and was able to spring into a hansom and drive to Baker Street, half afraid that I might be too late to assist at the _dénouement_ of the little mystery.
+Dictionary error for the word 'ENCYCLOPÆDIA' in the phrase: Kindly hand me down the letter K of the American Encyclopædia which stands upon the shelf beside you.
+Dictionary error for the word '&' in the phrase: “He travels for Westhouse & Marbank, the great claret importers of Fenchurch Street.”
+----Prediction Evaluation-----
+Evaluation Prediction: +ithasandowasthedouredoforedoredoredoredoredoredoredoredoredoredoredoredoredor ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.8625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ithasandowhedouredoforedoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredoredore ---> 
+ Training Reference: + If you would have the great kindness to get rid of that sottish friend of yours I should be exceedingly glad to have a little talk with you.” =  (Training PER: 0.8551724137931035) 
+ Training Reference Text: + If you would have the great kindness to get rid of that sottish friend of yours I should be exceedingly glad to have a little talk with you.” =
+-----finished epoch 1 - training loss: 2.8803------
+----Prediction Evaluation-----
+Evaluation Prediction: +imandbethereremandtherererererereremandtherererererererererererererererererem ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.825) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itisandtheremeredbetontheremererererereredbetontherer ---> 
+ Training Reference: + “You’ll see your pal again presently,” said Jones. =  (Training PER: 0.8888888888888888) 
+ Training Reference Text: + “You’ll see your pal again presently,” said Jones. =
+-----finished epoch 2 - training loss: 2.4443------
+----Prediction Evaluation-----
+Evaluation Prediction: +yewasthereandtheremeningthementhementhementhementonementhemementonementhememe ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.775) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ymasconimescon= ---> 
+ Training Reference: + You must lock yourself up from him to-night. =  (Training PER: 0.8125) 
+ Training Reference Text: + You must lock yourself up from him to-night. =
+-----finished epoch 3 - training loss: 2.2563------
+----Prediction Evaluation-----
+Evaluation Prediction: +westremeredandoneandonlyacouldbent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.7125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +onlyprosssingtheformmesstattheformestandpersingathescommentothescommentothescoulderbentomentomentobenthescoulderes= ---> 
+ Training Reference: + “You will observe,” said Holmes, laying down the volume, “that the sudden breaking up of the society was coincident with the disappearance of Openshaw from America with their papers. =  (Training PER: 0.7204301075268817) 
+ Training Reference Text: + “You will observe,” said Holmes, laying down the volume, “that the sudden breaking up of the society was coincident with the disappearance of Openshaw from America with their papers. =
+-----finished epoch 4 - training loss: 2.0553------
+----Prediction Evaluation-----
+Evaluation Prediction: +wasatrayveryandthereandthereandthereactionthackedownthereaction= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.6875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thesaremonewhichwasbeformedowntosentrandtheforstrandlandlandlandlandlandlastastimentherofthebroackwhichasasasidesisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisisis ---> 
+ Training Reference: + “‘The ceremony, which was performed at St. George’s, Hanover Square, was a very quiet one, no one being present save the father of the bride, Mr. Aloysius Doran, the Duchess of Balmoral, Lord Backwater, Lord Eustace, and Lady Clara St. Simon (the younger brother and sister of the bridegroom), and Lady Alicia Whittington. =  (Training PER: 0.8865030674846626) 
+ Training Reference Text: + “‘The ceremony, which was performed at St. George’s, Hanover Square, was a very quiet one, no one being present save the father of the bride, Mr. Aloysius Doran, the Duchess of Balmoral, Lord Backwater, Lord Eustace, and Lady Clara St. Simon (the younger brother and sister of the bridegroom), and Lady Alicia Whittington. =
+-----finished epoch 5 - training loss: 1.8021------
+----Prediction Evaluation-----
+Evaluation Prediction: +wasandriverathereardilleryandownlyandownlyandownlyamoutsevered= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.525) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +theyandthefaceandmatteraforpeateroforplesinerofwetreatedoutblesinedoutblesinedablesinentoutwasofthefoldsoingthatitisaxplachinedowasaficentoingthatisixplaingsidentoachisalitstreeemeanigsinededofthefolloongsandinanditisachasixplaningsinedinedin ---> 
+ Training Reference: + On the other hand, the face and manner of my patron had made an unpleasant impression upon me, and I could not think that his explanation of the fuller’s-earth was sufficient to explain the necessity for my coming at midnight, and his extreme anxiety lest I should tell any one of my errand. =  (Training PER: 0.7491525423728813) 
+ Training Reference Text: + On the other hand, the face and manner of my patron had made an unpleasant impression upon me, and I could not think that his explanation of the fuller’s-earth was sufficient to explain the necessity for my coming at midnight, and his extreme anxiety lest I should tell any one of my errand. =
+-----finished epoch 6 - training loss: 1.5388------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasandraveratheretilltryandtheonlyandthonlyandtheonlygupandactionupent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.6375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +iferythingaplosionshookthespotwatersemedbutisshuderedbettleshuddenbutttelshouldenbettheskylind= ---> 
+ Training Reference: + A violent explosion shook the air, and a spout of water, steam, mud, and shattered metal shot far up into the sky. =  (Training PER: 0.652542372881356) 
+ Training Reference Text: + A violent explosion shook the air, and a spout of water, steam, mud, and shattered metal shot far up into the sky. =
+-----finished epoch 7 - training loss: 1.3079------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasatriveratheartillearyandthoughlycomeintactionaboutsever= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +mayiseeed= ---> 
+ Training Reference: + “May I see it?” =  (Training PER: 0.631578947368421) 
+ Training Reference Text: + “May I see it?” =
+-----finished epoch 8 - training loss: 1.1335------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasatriverattheretilleryandtonlingamintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +abecamewereofhimasasthatfigureandstoodsmoundshertleeevesandwithhhhisomperedcleashaveafaceseringonfaceflickeringthedastoftheside= ---> 
+ Training Reference: + I became aware of him as a seated figure in soot-smudged shirt sleeves, and with his upturned, clean-shaven face staring at a faint flickering that danced over the sky. =  (Training PER: 0.45348837209302323) 
+ Training Reference Text: + I became aware of him as a seated figure in soot-smudged shirt sleeves, and with his upturned, clean-shaven face staring at a faint flickering that danced over the sky. =
+-----finished epoch 9 - training loss: 1.0041------
+----Prediction Evaluation-----
+Evaluation Prediction: +wasadriverattheartilleryandnonlyimantactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +themanintheroadwasadounderlysomefriendofhersbosablyourfeelondsayandlodoubtyouwouldsfromyourglaufterwheneverysawnlikerthatmisssenfromyourgestandweresonlikerthatmissserucastlewasbrefurctlyhavedwasbrefurctlyhavedwandsfromyourgestiredhishinglongerdisinchiredhi ---> 
+ Training Reference: + The man in the road was, undoubtedly, some friend of hers—possibly her _fiancé_—and no doubt, as you wore the girl’s dress and were so like her, he was convinced from your laughter, whenever he saw you, and afterwards from your gesture, that Miss Rucastle was perfectly happy, and that she no longer desired his attentions. =  (Training PER: 0.636085626911315) 
+ Training Reference Text: + The man in the road was, undoubtedly, some friend of hers—possibly her _fiancé_—and no doubt, as you wore the girl’s dress and were so like her, he was convinced from your laughter, whenever he saw you, and afterwards from your gesture, that Miss Rucastle was perfectly happy, and that she no longer desired his attentions. =
+-----finished epoch 10 - training loss: 0.8872------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasatriverandtheartilleryandanonlyandanonlingamantactionaboutstaffaent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +asitisanopenstakerittthattheduseofbemorelhasbeencompeledtostellhisbickerswithinthelastfugeersandaslordstatefulyerswithinthecallastfugenableofhisownsavethesmallestateofmersmoreitishishavethesmallastateofmersmoreitiseventhesmallableherstateofmeinreproplecantladytoabridgestpeeyress= ---> 
+ Training Reference: + As it is an open secret that the Duke of Balmoral has been compelled to sell his pictures within the last few years, and as Lord St. Simon has no property of his own, save the small estate of Birchmoor, it is obvious that the Californian heiress is not the only gainer by an alliance which will enable her to make the easy and common transition from a Republican lady to a British peeress.’” =  (Training PER: 0.569620253164557) 
+ Training Reference Text: + As it is an open secret that the Duke of Balmoral has been compelled to sell his pictures within the last few years, and as Lord St. Simon has no property of his own, save the small estate of Birchmoor, it is obvious that the Californian heiress is not the only gainer by an alliance which will enable her to make the easy and common transition from a Republican lady to a British peeress.’” =
+-----finished epoch 11 - training loss: 0.8110------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasatriverontheartilleryandtonlyandtonlyameandtactionaboutshaver= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itrustsirthatyouwillsucceedingprovingwhenifeeldshureisthegroaththatmycousionarthurinsinistentofthiscrime= ---> 
+ Training Reference: + I trust, sir, that you will succeed in proving, what I feel sure is the truth, that my cousin Arthur is innocent of this crime.” =  (Training PER: 0.3484848484848485) 
+ Training Reference Text: + I trust, sir, that you will succeed in proving, what I feel sure is the truth, that my cousin Arthur is innocent of this crime.” =
+-----finished epoch 12 - training loss: 0.7367------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasatriverandtheartilleryandanonlyumintactionaboutsavered= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +butathetimedayournightutelicramewouldbringmenowntoyourhope= ---> 
+ Training Reference: + “But at any time, day or night, a telegram would bring me down to your help.” =  (Training PER: 0.4074074074074074) 
+ Training Reference Text: + “But at any time, day or night, a telegram would bring me down to your help.” =
+-----finished epoch 13 - training loss: 0.6745------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +theniwalkedacrosstothewindowopingthatimightcutsomeclipseofthecountrysidebutaknowkshutterheavilybarredwithfoldedacrossit= ---> 
+ Training Reference: + Then I walked across to the window, hoping that I might catch some glimpse of the country-side, but an oak shutter, heavily barred, was folded across it. =  (Training PER: 0.29936305732484075) 
+ Training Reference Text: + Then I walked across to the window, hoping that I might catch some glimpse of the country-side, but an oak shutter, heavily barred, was folded across it. =
+-----finished epoch 14 - training loss: 0.6199------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverattheortilleryandtonlycomeandtactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itwashoweverstillsohotfromitsflightthroughtheeairastofrombeenhisnearapproach= ---> 
+ Training Reference: + It was, however, still so hot from its flight through the air as to forbid his near approach. =  (Training PER: 0.27835051546391754) 
+ Training Reference Text: + It was, however, still so hot from its flight through the air as to forbid his near approach. =
+-----finished epoch 15 - training loss: 0.5741------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartillearyandtonlyanddonlyupintactionaboutsafent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +themoneexceptenotracesofviolenceandtherecanbeenodoubtthatthedeceasedhadbeenthevictimeofanofortunateaccidentwhichhhavetheafffectofcallingtheintentionoftheriniestotheconditionoftherevertidelandingtantionoftherever ---> 
+ Training Reference: + The body exhibited no traces of violence, and there can be no doubt that the deceased had been the victim of an unfortunate accident, which should have the effect of calling the attention of the authorities to the condition of the river-side landing-stages.’” =  (Training PER: 0.33840304182509506) 
+ Training Reference Text: + The body exhibited no traces of violence, and there can be no doubt that the deceased had been the victim of an unfortunate accident, which should have the effect of calling the attention of the authorities to the condition of the river-side landing-stages.’” =
+-----finished epoch 16 - training loss: 0.5336------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasatriverintheartilleryandnolingupintactionaboutsafit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.425) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ofinturallyandtheyareandtheyareandteenedsixtyeyeyedthenmovementrathersuddenlyclapsedallthoughtherehavebeensprancoutbreaksofthesamesortsincethatdate= ---> 
+ Training Reference: + Eventually, in the year 1869, the movement rather suddenly collapsed, although there have been sporadic outbreaks of the same sort since that date.’ =  (Training PER: 0.4342105263157895) 
+ Training Reference Text: + Eventually, in the year 1869, the movement rather suddenly collapsed, although there have been sporadic outbreaks of the same sort since that date.’ =
+-----finished epoch 17 - training loss: 0.4964------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyamintactionabowshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thatnighttootherewasanotherjettingoutofagasfromthedistantplanet= ---> 
+ Training Reference: + That night, too, there was another jetting out of gas from the distant planet. =  (Training PER: 0.23170731707317074) 
+ Training Reference Text: + That night, too, there was another jetting out of gas from the distant planet. =
+-----finished epoch 18 - training loss: 0.4687------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryanditonlingupintactionaboutsaffet= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +istartedwhenisawthenameforitwasthatofnoneotherthanwellperhapseventoyouihadbettersaynomorethanthatitwasanamewhichisahouseholdwordallovertheearthoneofthehighestdoblessmostexaltedamesinengland= ---> 
+ Training Reference: + I started when I saw the name, for it was that of none other than—well, perhaps even to you I had better say no more than that it was a name which is a household word all over the earth—one of the highest, noblest, most exalted names in England. =  (Training PER: 0.2570281124497992) 
+ Training Reference Text: + I started when I saw the name, for it was that of none other than—well, perhaps even to you I had better say no more than that it was a name which is a household word all over the earth—one of the highest, noblest, most exalted names in England. =
+-----finished epoch 19 - training loss: 0.4430------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryanddidonlingupintactionaboutsaveit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +hehadbeenconsurmedwiththirstuntilheyfoundoneofthewatermainsundeartherailwayarchsmashedandthewaterpublingoutlikeasbringuponthero ---> 
+ Training Reference: + He had been consumed with thirst until he found one of the water mains near the railway arch smashed, and the water bubbling out like a spring upon the road. =  (Training PER: 0.2608695652173913) 
+ Training Reference Text: + He had been consumed with thirst until he found one of the water mains near the railway arch smashed, and the water bubbling out like a spring upon the road. =
+-----finished epoch 20 - training loss: 0.4205------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandinonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thebestpossible= ---> 
+ Training Reference: + “The best possible.” =  (Training PER: 0.3333333333333333) 
+ Training Reference Text: + “The best possible.” =
+-----finished epoch 21 - training loss: 0.3946------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +stillitdidnotgoforverymuchfortheoldermanmighthaveturnedhisbackbeforetheblowfell= ---> 
+ Training Reference: + Still, it did not go for very much, for the older man might have turned his back before the blow fell. =  (Training PER: 0.24528301886792453) 
+ Training Reference Text: + Still, it did not go for very much, for the older man might have turned his back before the blow fell. =
+-----finished epoch 22 - training loss: 0.3706------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriveorintheartilleryandtonlingupintactionabowseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itsfinderhascarrieditofftheirforetopultimatestityofagoosewhileicontinuetoretainthehatoftheunknowngentlemanwholosthiscristmasdener= ---> 
+ Training Reference: + Its finder has carried it off, therefore, to fulfil the ultimate destiny of a goose, while I continue to retain the hat of the unknown gentleman who lost his Christmas dinner.” =  (Training PER: 0.31666666666666665) 
+ Training Reference Text: + Its finder has carried it off, therefore, to fulfil the ultimate destiny of a goose, while I continue to retain the hat of the unknown gentleman who lost his Christmas dinner.” =
+-----finished epoch 23 - training loss: 0.3565------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasatriveorintheartilleryandtonlyupintactionaboutsafit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +abrownshestofdrawersstoodinonecornerandnarrowwhitecounterpainedmeadinanotherandadressingtableonthelefthandsideofthewindow= ---> 
+ Training Reference: + A brown chest of drawers stood in one corner, a narrow white-counterpaned bed in another, and a dressing-table on the left-hand side of the window. =  (Training PER: 0.25165562913907286) 
+ Training Reference Text: + A brown chest of drawers stood in one corner, a narrow white-counterpaned bed in another, and a dressing-table on the left-hand side of the window. =
+-----finished epoch 24 - training loss: 0.3407------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +mrmeryweatheristhegeatmanofdirectorsandhewillexplainedtoyouthattherearereasonswhythemoredaringcriminalsoflondonshouldsakeaconsiderableinterestinthiscellaratpresent= ---> 
+ Training Reference: + Mr. Merryweather is the chairman of directors, and he will explain to you that there are reasons why the more daring criminals of London should take a considerable interest in this cellar at present.” =  (Training PER: 0.24019607843137256) 
+ Training Reference Text: + Mr. Merryweather is the chairman of directors, and he will explain to you that there are reasons why the more daring criminals of London should take a considerable interest in this cellar at present.” =
+-----finished epoch 25 - training loss: 0.3216------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandtoldingupintactionabowshavit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thelittlegroupofblackspeckswiththeflagofwhitehadbeensweptoutofexistenceandthestillnessoftheeveningsoitseemedtomeasscarcelybenbroken= ---> 
+ Training Reference: + The little group of black specks with the flag of white had been swept out of existence, and the stillness of the evening, so it seemed to me, had scarcely been broken. =  (Training PER: 0.23837209302325582) 
+ Training Reference Text: + The little group of black specks with the flag of white had been swept out of existence, and the stillness of the evening, so it seemed to me, had scarcely been broken. =
+-----finished epoch 26 - training loss: 0.3138------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandonlyupintactionaboutshavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +yetitwasalittletoolargeforassuranceonthisidea= ---> 
+ Training Reference: + Yet it was a little too large for assurance on this idea. =  (Training PER: 0.2459016393442623) 
+ Training Reference Text: + Yet it was a little too large for assurance on this idea. =
+-----finished epoch 27 - training loss: 0.2950------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlyupintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +butishallcomebackintheeveningatthehouryouhavementionedforishouldliketoseethesolutionofsotangledabusiness= ---> 
+ Training Reference: + But I shall come back in the evening at the hour you have mentioned, for I should like to see the solution of so tangled a business.” =  (Training PER: 0.24817518248175183) 
+ Training Reference Text: + But I shall come back in the evening at the hour you have mentioned, for I should like to see the solution of so tangled a business.” =
+-----finished epoch 28 - training loss: 0.2860------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverandtheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +quickquickoritllbetoolate= ---> 
+ Training Reference: + Quick, quick, or it’ll be too late!” =  (Training PER: 0.35) 
+ Training Reference Text: + Quick, quick, or it’ll be too late!” =
+-----finished epoch 29 - training loss: 0.2720------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanolingupandactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +abouthalfpastforiwentuptotherailwaystationtogetaneveningpaperforthemorningpapershadcontainedonlyaveryinacuratedescriptionofthekilingofstentersonogilvyandtheothers= ---> 
+ Training Reference: + About half past four I went up to the railway station to get an evening paper, for the morning papers had contained only a very inaccurate description of the killing of Stent, Henderson, Ogilvy, and the others. =  (Training PER: 0.2523364485981308) 
+ Training Reference Text: + About half past four I went up to the railway station to get an evening paper, for the morning papers had contained only a very inaccurate description of the killing of Stent, Henderson, Ogilvy, and the others. =
+-----finished epoch 30 - training loss: 0.2620------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryanditonlyupintactionaboutsaffened= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +whatdoyouwanttofrightenachapforehesankhisfaceontohisarmsandbegantostobinaheyetreblekey= ---> 
+ Training Reference: + What d’you want to frighten a chap for?” He sank his face onto his arms, and began to sob in a high treble key. =  (Training PER: 0.3130434782608696) 
+ Training Reference Text: + What d’you want to frighten a chap for?” He sank his face onto his arms, and began to sob in a high treble key. =
+-----finished epoch 31 - training loss: 0.2522------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinnonlingupintoactionaboutsheavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +allnightthroughtheirastructivetubesadvanced= ---> 
+ Training Reference: + All night through their destructive tubes advanced. =  (Training PER: 0.21818181818181817) 
+ Training Reference Text: + All night through their destructive tubes advanced. =
+-----finished epoch 32 - training loss: 0.2404------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlingupintactionaboutsaveit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +yetihaveavagueimpressionthatasiranforwardsomethinglayuponthegroundtotheleftofme= ---> 
+ Training Reference: + Yet I have a vague impression that as I ran forward something lay upon the ground to the left of me. =  (Training PER: 0.25) 
+ Training Reference Text: + Yet I have a vague impression that as I ran forward something lay upon the ground to the left of me. =
+-----finished epoch 33 - training loss: 0.2311------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartillaryandanonlyumintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +whatdoyoumean= ---> 
+ Training Reference: + What do you mean?” =  (Training PER: 0.36363636363636365) 
+ Training Reference Text: + What do you mean?” =
+-----finished epoch 34 - training loss: 0.2331------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartillaryandanonlyumintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +bymiddayamartianhadbeenseenatmartiansandacloudofslowlysinkingblackvapourdrovealongthethamesandacrosstheflampithcuttingoffallescapeoverthebridgesinitssluggishadvance= ---> 
+ Training Reference: + By midday a Martian had been seen at Barnes, and a cloud of slowly sinking black vapour drove along the Thames and across the flats of Lambeth, cutting off all escape over the bridges in its sluggish advance. =  (Training PER: 0.2688679245283019) 
+ Training Reference Text: + By midday a Martian had been seen at Barnes, and a cloud of slowly sinking black vapour drove along the Thames and across the flats of Lambeth, cutting off all escape over the bridges in its sluggish advance. =
+-----finished epoch 35 - training loss: 0.2164------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverandtheartilleryandnonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +icaughtitandpryingitsbellopenithrustthestonedownitsthoatasfarasmyfingercouldreach= ---> 
+ Training Reference: + I caught it, and, prying its bill open, I thrust the stone down its throat as far as my finger could reach. =  (Training PER: 0.27927927927927926) 
+ Training Reference Text: + I caught it, and, prying its bill open, I thrust the stone down its throat as far as my finger could reach. =
+-----finished epoch 36 - training loss: 0.2098------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverandtheartilleryandanonlycomeintactionaboutsevenat= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ifyoudontitsafinelawabidingcountryisenglandandtheresalwaysapolicemanwithinhail= ---> 
+ Training Reference: + If you don’t—it’s a fine, law-abiding country is England, and there’s always a policeman within hail.’ =  (Training PER: 0.2641509433962264) 
+ Training Reference Text: + If you don’t—it’s a fine, law-abiding country is England, and there’s always a policeman within hail.’ =
+-----finished epoch 37 - training loss: 0.2056------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandtonlycomeintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +lookoutformetomorrowabouteleven= ---> 
+ Training Reference: + Look out for me to-morrow, about eleven. =  (Training PER: 0.2727272727272727) 
+ Training Reference Text: + Look out for me to-morrow, about eleven. =
+-----finished epoch 38 - training loss: 0.1963------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ahusbanddescrueltytohiswifethereishalfacolumnofprintbutiknowwithoutreadingitthatitisallperfectlyfamiliartome= ---> 
+ Training Reference: + ‘A husband’s cruelty to his wife.’ There is half a column of print, but I know without reading it that it is all perfectly familiar to me. =  (Training PER: 0.2676056338028169) 
+ Training Reference Text: + ‘A husband’s cruelty to his wife.’ There is half a column of print, but I know without reading it that it is all perfectly familiar to me. =
+-----finished epoch 39 - training loss: 0.2019------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasatriverintheartilleryandanonlyupintactionaboutshavenit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +therehewassittingwithanewlyopenedenvelopeinonehandandfivedriedorangepipsintheoutstretchedbalmoftheotherone= ---> 
+ Training Reference: + There he was, sitting with a newly-opened envelope in one hand and five dried orange pips in the outstretched palm of the other one. =  (Training PER: 0.22058823529411764) 
+ Training Reference Text: + There he was, sitting with a newly-opened envelope in one hand and five dried orange pips in the outstretched palm of the other one. =
+-----finished epoch 40 - training loss: 0.1885------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandinonlycumintoactionaboutshavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +forsevenhoursipliedmytradeandwhenireturnedhomeintheeveningifoundtomysurprisethatihadreceivednolessthantwentsixhillings4777= ---> 
+ Training Reference: + For seven hours I plied my trade, and when I returned home in the evening I found, to my surprise, that I had received no less than 26_s._ 4_d._ =  (Training PER: 0.36486486486486486) 
+ Training Reference Text: + For seven hours I plied my trade, and when I returned home in the evening I found, to my surprise, that I had received no less than 26_s._ 4_d._ =
+-----finished epoch 41 - training loss: 0.1831------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasatriverintheartilleryandanonlycomeandactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +mightnotthenatureoftheinjuriesrevealsomethingtomymedicalinstincts= ---> 
+ Training Reference: + Might not the nature of the injuries reveal something to my medical instincts? =  (Training PER: 0.1951219512195122) 
+ Training Reference Text: + Might not the nature of the injuries reveal something to my medical instincts? =
+-----finished epoch 42 - training loss: 0.1746------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupinactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +nearthetopinstumbleduponsomethingsoftandbyaflashoflightingsawbetweenmyfeetaheapofblackbroadclothandapairofboots= ---> 
+ Training Reference: + Near the top I stumbled upon something soft, and, by a flash of lightning, saw between my feet a heap of black broadcloth and a pair of boots. =  (Training PER: 0.2465753424657534) 
+ Training Reference Text: + Near the top I stumbled upon something soft, and, by a flash of lightning, saw between my feet a heap of black broadcloth and a pair of boots. =
+-----finished epoch 43 - training loss: 0.1693------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thecardiganmenhadtriedarushinskirmushingorderatthepitsimplytobesweptoutofexistence= ---> 
+ Training Reference: + The Cardigan men had tried a rush, in skirmishing order, at the pit, simply to be swept out of existence. =  (Training PER: 0.25688073394495414) 
+ Training Reference Text: + The Cardigan men had tried a rush, in skirmishing order, at the pit, simply to be swept out of existence. =
+-----finished epoch 44 - training loss: 0.1677------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverandtheartilleryandinolingupintoactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itwasstatedthatthepeopleofwaltonandweybridgeandallthedistrictwerepouringalongtheroadlondonwardandthatwasall= ---> 
+ Training Reference: + It was stated that the people of Walton and Weybridge, and all the district were pouring along the roads Londonward, and that was all. =  (Training PER: 0.2391304347826087) 
+ Training Reference Text: + It was stated that the people of Walton and Weybridge, and all the district were pouring along the roads Londonward, and that was all. =
+-----finished epoch 45 - training loss: 0.1592------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlingupintactionaboutsaften= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +fromtherewecouldseethecearchlightsonrichmondhillandkingstonhillgoingtoandfroandabouteleventhewindowsrattledandweheardthesoundofthehugeseegegunsthathadbeenputinpositionthere= ---> 
+ Training Reference: + From there we could see the searchlights on Richmond Hill and Kingston Hill going to and fro, and about eleven the windows rattled, and we heard the sound of the huge siege guns that had been put in position there. =  (Training PER: 0.23394495412844038) 
+ Training Reference Text: + From there we could see the searchlights on Richmond Hill and Kingston Hill going to and fro, and about eleven the windows rattled, and we heard the sound of the huge siege guns that had been put in position there. =
+-----finished epoch 46 - training loss: 0.1589------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandtonlyumintactionaboutshavened= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +almostnoiselessandblindingflashoflightandamanfellhidlongandlaystillandastheunseenshaftofheatpassedoverthempinetreesburstintofireandeverydryfurzebushbecamewithonedullthudamassofflames= ---> 
+ Training Reference: + An almost noiseless and blinding flash of light, and a man fell headlong and lay still; and as the unseen shaft of heat passed over them, pine trees burst into fire, and every dry furze bush became with one dull thud a mass of flames. =  (Training PER: 0.23109243697478993) 
+ Training Reference Text: + An almost noiseless and blinding flash of light, and a man fell headlong and lay still; and as the unseen shaft of heat passed over them, pine trees burst into fire, and every dry furze bush became with one dull thud a mass of flames. =
+-----finished epoch 47 - training loss: 0.1526------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandknowlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +doyouthinkthatiwouldrespondtosuchatrifleandyetbeignorantofhisdeath= ---> 
+ Training Reference: + Do you think that I would respond to such a trifle, and yet be ignorant of his death?” =  (Training PER: 0.26666666666666666) 
+ Training Reference Text: + Do you think that I would respond to such a trifle, and yet be ignorant of his death?” =
+-----finished epoch 48 - training loss: 0.1516------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverandtheartilleryandknowlycomeintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ahailroseoverthearchandthefigureofaworkmencarryingabasketappeared= ---> 
+ Training Reference: + A head rose over the arch, and the figure of a workman carrying a basket appeared. =  (Training PER: 0.26744186046511625) 
+ Training Reference Text: + A head rose over the arch, and the figure of a workman carrying a basket appeared. =
+-----finished epoch 49 - training loss: 0.1483------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandaknownlycomeandactionaboutshavin= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +herewearejacksayshetouchingmeonthearmwellbeasgoodasafamilytoyou= ---> 
+ Training Reference: + “‘Here we are, Jack,’ says he, touching me on the arm; ‘we’ll be as good as a family to you. =  (Training PER: 0.34375) 
+ Training Reference Text: + “‘Here we are, Jack,’ says he, touching me on the arm; ‘we’ll be as good as a family to you. =
+-----finished epoch 50 - training loss: 0.1455------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandnonlyupintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itwaslaringlyhotnotacloudintheskynorabreathofwindtheonlyshadowwasthatofthefewscatteredpinetrees= ---> 
+ Training Reference: + It was glaringly hot, not a cloud in the sky nor a breath of wind, and the only shadow was that of the few scattered pine trees. =  (Training PER: 0.2727272727272727) 
+ Training Reference Text: + It was glaringly hot, not a cloud in the sky nor a breath of wind, and the only shadow was that of the few scattered pine trees. =
+-----finished epoch 51 - training loss: 0.1398------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycumeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ihavereadinanotheraccountoftheseeventsthatonsundaymorningallondonwaselectrifiedbythenewsfromwokingasamatterofacttherewasnothingtojustifythatveryextravagantphraise= ---> 
+ Training Reference: + I have read, in another account of these events, that on Sunday morning “all London was electrified by the news from Woking.” As a matter of fact, there was nothing to justify that very extravagant phrase. =  (Training PER: 0.24401913875598086) 
+ Training Reference Text: + I have read, in another account of these events, that on Sunday morning “all London was electrified by the news from Woking.” As a matter of fact, there was nothing to justify that very extravagant phrase. =
+-----finished epoch 52 - training loss: 0.1386------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlyupintactionaboutsheven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thechimneyiswidebutisbarredupbyfourlargestaples= ---> 
+ Training Reference: + The chimney is wide, but is barred up by four large staples. =  (Training PER: 0.25) 
+ Training Reference Text: + The chimney is wide, but is barred up by four large staples. =
+-----finished epoch 53 - training loss: 0.1360------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlyumintactionaboutshavin= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +hadheeverspokenofswandamlane= ---> 
+ Training Reference: + “Had he ever spoken of Swandam Lane?” =  (Training PER: 0.34146341463414637) 
+ Training Reference Text: + “Had he ever spoken of Swandam Lane?” =
+-----finished epoch 54 - training loss: 0.1318------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintoactionaboutsevena= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +praycomposeyoursaidholmesandletmehaveaclearaccountofwhoyouareandwhatitisthathasbefallenyou= ---> 
+ Training Reference: + “Pray compose yourself, sir,” said Holmes, “and let me have a clear account of who you are, and what it is that has befallen you.” =  (Training PER: 0.3283582089552239) 
+ Training Reference Text: + “Pray compose yourself, sir,” said Holmes, “and let me have a clear account of who you are, and what it is that has befallen you.” =
+-----finished epoch 55 - training loss: 0.1327------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandknowlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +sofranktookmyweddingclothesandthingsandmadeabundleofthemsothatishouldnotbetracedanddroppedthemawaysomewherewherenoonecouldfindthem= ---> 
+ Training Reference: + So Frank took my wedding-clothes and things and made a bundle of them, so that I should not be traced, and dropped them away somewhere where no one could find them. =  (Training PER: 0.23214285714285715) 
+ Training Reference Text: + So Frank took my wedding-clothes and things and made a bundle of them, so that I should not be traced, and dropped them away somewhere where no one could find them. =
+-----finished epoch 56 - training loss: 0.1307------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlycumandactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ohcertainlyifitwouldgiveyouanypleasureheputouthishandandcoldlygraspthatwhichsheextendedtohim= ---> 
+ Training Reference: + “Oh, certainly, if it would give you any pleasure.” He put out his hand and coldly grasped that which she extended to him. =  (Training PER: 0.2698412698412698) 
+ Training Reference Text: + “Oh, certainly, if it would give you any pleasure.” He put out his hand and coldly grasped that which she extended to him. =
+-----finished epoch 57 - training loss: 0.1216------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriveorintheartilleryandknowlyupintactionaboutsevened= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +heshotoneofhisdispiciouslooksatme= ---> 
+ Training Reference: + “He shot one of his suspicious looks at me. =  (Training PER: 0.3191489361702128) 
+ Training Reference Text: + “He shot one of his suspicious looks at me. =
+-----finished epoch 58 - training loss: 0.1243------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandatonlycumintactionaboutsavit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +islippedoutofbedallpalpitatingwithfearandpeepedroundthecornerofmydressingroomdoor= ---> 
+ Training Reference: + I slipped out of bed, all palpitating with fear, and peeped round the corner of my dressing-room door. =  (Training PER: 0.22641509433962265) 
+ Training Reference Text: + I slipped out of bed, all palpitating with fear, and peeped round the corner of my dressing-room door. =
+-----finished epoch 59 - training loss: 0.1234------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +noaclient= ---> 
+ Training Reference: + “No; a client. =  (Training PER: 0.4444444444444444) 
+ Training Reference Text: + “No; a client. =
+-----finished epoch 60 - training loss: 0.1201------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlycumintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thisnoteihadthismorningmarksmyzelofpointifancy= ---> 
+ Training Reference: + This note I had this morning marks my zero-point, I fancy. =  (Training PER: 0.3064516129032258) 
+ Training Reference Text: + This note I had this morning marks my zero-point, I fancy. =
+-----finished epoch 61 - training loss: 0.1182------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandinonlycumeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +herglovesweregrayishandwerewornthroughattherightforefinger= ---> 
+ Training Reference: + Her gloves were grayish, and were worn through at the right forefinger. =  (Training PER: 0.21333333333333335) 
+ Training Reference Text: + Her gloves were grayish, and were worn through at the right forefinger. =
+-----finished epoch 62 - training loss: 0.1181------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandnonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +horderingmycabtowaitipasseddownthestepswornhollowinthecentrebytheceaselesstreadofdrunkenfeetandbythelightofaflickeringoilampabovethedoorifoundthelatchandmademywayintoalonglowroomthickandheavywiththebrownopiumsmokeandterracedwithwoodenberthsliketheforecastleofanemigrantship= ---> 
+ Training Reference: + Ordering my cab to wait, I passed down the steps, worn hollow in the centre by the ceaseless tread of drunken feet, and by the light of a flickering oil-lamp above the door I found the latch, and made my way into a long, low room, thick and heavy with the brown opium smoke, and terraced with wooden berths, like the forecastle of an emigrant ship. =  (Training PER: 0.23011363636363635) 
+ Training Reference Text: + Ordering my cab to wait, I passed down the steps, worn hollow in the centre by the ceaseless tread of drunken feet, and by the light of a flickering oil-lamp above the door I found the latch, and made my way into a long, low room, thick and heavy with the brown opium smoke, and terraced with wooden berths, like the forecastle of an emigrant ship. =
+-----finished epoch 63 - training loss: 0.1181------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandanonlycumintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +theyseemedbusyintheirpitandtherewasasoundofhammeringandanalmostcontinuousstreamerofsmoke= ---> 
+ Training Reference: + They seemed busy in their pit, and there was a sound of hammering and an almost continuous streamer of smoke. =  (Training PER: 0.21238938053097345) 
+ Training Reference Text: + They seemed busy in their pit, and there was a sound of hammering and an almost continuous streamer of smoke. =
+-----finished epoch 64 - training loss: 0.1135------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandholingupintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +praytakeaseat= ---> 
+ Training Reference: + “Pray take a seat.” =  (Training PER: 0.391304347826087) 
+ Training Reference Text: + “Pray take a seat.” =
+-----finished epoch 65 - training loss: 0.1093------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutshavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ihammeredatthedoorbuticouldnotmakethepeopleheariftherewereanypeopleinsideandavailingmyselfofaditchforthegreaterpartofthewaysucceededincrawlingunobservedbythesemonstrousmachinesintothepinewoodsmaybury= ---> 
+ Training Reference: + I hammered at the door, but I could not make the people hear (if there were any people inside), and after a time I desisted, and, availing myself of a ditch for the greater part of the way, succeeded in crawling, unobserved by these monstrous machines, into the pine woods towards Maybury. =  (Training PER: 0.3242320819112628) 
+ Training Reference Text: + I hammered at the door, but I could not make the people hear (if there were any people inside), and after a time I desisted, and, availing myself of a ditch for the greater part of the way, succeeded in crawling, unobserved by these monstrous machines, into the pine woods towards Maybury. =
+-----finished epoch 66 - training loss: 0.1099------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlycomeintactionaboutshavit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +justlikeparadeithadbeenaminutebeforethenstumblebangswish= ---> 
+ Training Reference: + Just like parade it had been a minute before—then stumble, bang, swish!” =  (Training PER: 0.25) 
+ Training Reference Text: + Just like parade it had been a minute before—then stumble, bang, swish!” =
+-----finished epoch 67 - training loss: 0.1069------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandnonlyupintactionaboutsevened= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ofallthesevariedcaseshowevericannotrecallanywhichpresentedmoresingularfeaturesthanthatwhichwasassociatedwiththewellknownsurreyfamilyoftheroylottsofstokemoran= ---> 
+ Training Reference: + Of all these varied cases, however, I cannot recall any which presented more singular features than that which was associated with the well-known Surrey family of the Roylotts of Stoke Moran. =  (Training PER: 0.2153846153846154) 
+ Training Reference Text: + Of all these varied cases, however, I cannot recall any which presented more singular features than that which was associated with the well-known Surrey family of the Roylotts of Stoke Moran. =
+-----finished epoch 68 - training loss: 0.1057------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandknowlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ordidamartiansitwithineachrulingdirectingusingmuchasamansbrainsitsandrulesinhisbody= ---> 
+ Training Reference: + Or did a Martian sit within each, ruling, directing, using, much as a man’s brain sits and rules in his body? =  (Training PER: 0.26548672566371684) 
+ Training Reference Text: + Or did a Martian sit within each, ruling, directing, using, much as a man’s brain sits and rules in his body? =
+-----finished epoch 69 - training loss: 0.1039------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlingupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +soyouuuuunderstandtheroaringwaveoffearthatsweptthroughthegreatestcityandtheworldjustasmondaywasdawningthestreamofflightrisingswiftlytoatorrentlashinginafamingtumultroundtherailwaystationsbankedupintoahorriblestruggleabouttheshippinginthethamesandhurryingbyeveryavailablechanelnorthwardandeastwar ---> 
+ Training Reference: + So you understand the roaring wave of fear that swept through the greatest city in the world just as Monday was dawning—the stream of flight rising swiftly to a torrent, lashing in a foaming tumult round the railway stations, banked up into a horrible struggle about the shipping in the Thames, and hurrying by every available channel northward and eastward. =  (Training PER: 0.20994475138121546) 
+ Training Reference Text: + So you understand the roaring wave of fear that swept through the greatest city in the world just as Monday was dawning—the stream of flight rising swiftly to a torrent, lashing in a foaming tumult round the railway stations, banked up into a horrible struggle about the shipping in the Thames, and hurrying by every available channel northward and eastward. =
+-----finished epoch 70 - training loss: 0.1024------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandinonlyupintactionaboutsevened= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +siricannotfindwordstothankyoubutyoushallnotfindmeungratefulforwhatyouhavedone= ---> 
+ Training Reference: + “Sir, I cannot find words to thank you, but you shall not find me ungrateful for what you have done. =  (Training PER: 0.25961538461538464) 
+ Training Reference Text: + “Sir, I cannot find words to thank you, but you shall not find me ungrateful for what you have done. =
+-----finished epoch 71 - training loss: 0.1002------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thehusbandwasateetotalertherewasnootherwomanandtheconductcomplainedofwasthathehaddriftedintothehabitofwindingupeverymealbytakingouthisfalseteethandhurlingthemathiswifewhichyouwilalowisnotanactionlikelytooccurtotheimaginationoftheaveragestoryteler= ---> 
+ Training Reference: + The husband was a teetotaler, there was no other woman, and the conduct complained of was that he had drifted into the habit of winding up every meal by taking out his false teeth and hurling them at his wife, which, you will allow, is not an action likely to occur to the imagination of the average story-teller. =  (Training PER: 0.22082018927444794) 
+ Training Reference Text: + The husband was a teetotaler, there was no other woman, and the conduct complained of was that he had drifted into the habit of winding up every meal by taking out his false teeth and hurling them at his wife, which, you will allow, is not an action likely to occur to the imagination of the average story-teller. =
+-----finished epoch 72 - training loss: 0.0994------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandknowlingupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +closeontheheelsofthatcameaviolentrattlingcrashquiteclosetousthatshookthegroundandstartingoutuponthelawnisawthetopsofthetreesabouttheorientalcollegeburstintosmokyredflameandthetowerofthelittlechurchbesideitslidedownintoruin= ---> 
+ Training Reference: + Close on the heels of that came a violent rattling crash, quite close to us, that shook the ground; and, starting out upon the lawn, I saw the tops of the trees about the Oriental College burst into smoky red flame, and the tower of the little church beside it slide down into ruin. =  (Training PER: 0.23076923076923078) 
+ Training Reference Text: + Close on the heels of that came a violent rattling crash, quite close to us, that shook the ground; and, starting out upon the lawn, I saw the tops of the trees about the Oriental College burst into smoky red flame, and the tower of the little church beside it slide down into ruin. =
+-----finished epoch 73 - training loss: 0.0975------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanollingupintactionaboutsavit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itstruckcoldtoourheartsandistoodgazingatholmesandheatmeuntilthelastehouseofithaddiedawayintothesilencefromwhichitrose= ---> 
+ Training Reference: + It struck cold to our hearts, and I stood gazing at Holmes, and he at me, until the last echoes of it had died away into the silence from which it rose. =  (Training PER: 0.2692307692307692) 
+ Training Reference Text: + It struck cold to our hearts, and I stood gazing at Holmes, and he at me, until the last echoes of it had died away into the silence from which it rose. =
+-----finished epoch 74 - training loss: 0.0946------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlingupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +nowmrsherlockholmessaidtheladyasweenteredawellitdiningroomuponthetableofwhichacoldsupperhadbeenlaidoubtishouldverymuchliketoaskyouoneortwoplainquestionstowhichibegthatyouwillgiveaplainanswer= ---> 
+ Training Reference: + “Now, Mr. Sherlock Holmes,” said the lady, as we entered a well-lit dining-room, upon the table of which a cold supper had been laid out, “I should very much like to ask you one or two plain questions, to which I beg that you will give a plain answer.” =  (Training PER: 0.28125) 
+ Training Reference Text: + “Now, Mr. Sherlock Holmes,” said the lady, as we entered a well-lit dining-room, upon the table of which a cold supper had been laid out, “I should very much like to ask you one or two plain questions, to which I beg that you will give a plain answer.” =
+-----finished epoch 75 - training loss: 0.1049------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ahyeshecriedherestheendofalonglightladderagainsttheeaves= ---> 
+ Training Reference: + “Ah, yes,” he cried; “here’s the end of a long light ladder against the eaves. =  (Training PER: 0.3048780487804878) 
+ Training Reference Text: + “Ah, yes,” he cried; “here’s the end of a long light ladder against the eaves. =
+-----finished epoch 76 - training loss: 0.0929------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandhadonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.25) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +youhaveerriedperhapsheobservedtakingupaglowingcinderwiththetongsandlightingwithitthelongcherrywoodpipewhichwaswonttoreplacehisclaywhenhewasinadisputativemootyouhaveerredperhapsinattemptingtoputcolorandlifeintoeachofyourstatementsinstetofconfiningyourselftothetaskofplacinguponrecordthatsevereasoningfromcausetoeffectwhichisreallytheonlynotablefeatureaboutthething= ---> 
+ Training Reference: + “You have erred, perhaps,” he observed, taking up a glowing cinder with the tongs, and lighting with it the long cherry-wood pipe which was wont to replace his clay when he was in a disputatious, rather than a meditative mood—“you have erred perhaps in attempting to put color and life into each of your statements, instead of confining yourself to the task of placing upon record that severe reasoning from cause to effect which is really the only notable feature about the thing.” =  (Training PER: 0.25925925925925924) 
+ Training Reference Text: + “You have erred, perhaps,” he observed, taking up a glowing cinder with the tongs, and lighting with it the long cherry-wood pipe which was wont to replace his clay when he was in a disputatious, rather than a meditative mood—“you have erred perhaps in attempting to put color and life into each of your statements, instead of confining yourself to the task of placing upon record that severe reasoning from cause to effect which is really the only notable feature about the thing.” =
+-----finished epoch 77 - training loss: 0.0973------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlyupintactionaboutshavit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itisverynaturalthatthepledgeofsecrecywhichwehaveexactedfromyoushouldhavearousedyourcuriosity= ---> 
+ Training Reference: + It is very natural that the pledge of secrecy which we have exacted from you should have aroused your curiosity. =  (Training PER: 0.19827586206896552) 
+ Training Reference Text: + It is very natural that the pledge of secrecy which we have exacted from you should have aroused your curiosity. =
+-----finished epoch 78 - training loss: 0.0898------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandaknowlycumintactionaboutsavents= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +itwasnowonderthatnoonewasstirring= ---> 
+ Training Reference: + It was no wonder that no one was stirring. =  (Training PER: 0.2608695652173913) 
+ Training Reference Text: + It was no wonder that no one was stirring. =
+-----finished epoch 79 - training loss: 0.0902------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandtonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +inwokingtheshopshadclosedwhenthetragedyhappenedandanumberofpeopleshoppeopleandsoforthattractedbythestreestheyhadheardwerewalkingoverthehorsellbridgeandalongtheroadbetweenthehedgesthatrunsoutatlastuponthecommon= ---> 
+ Training Reference: + In Woking the shops had closed when the tragedy happened, and a number of people, shop people and so forth, attracted by the stories they had heard, were walking over the Horsell Bridge and along the road between the hedges that runs out at last upon the common. =  (Training PER: 0.22556390977443608) 
+ Training Reference Text: + In Woking the shops had closed when the tragedy happened, and a number of people, shop people and so forth, attracted by the stories they had heard, were walking over the Horsell Bridge and along the road between the hedges that runs out at last upon the common. =
+-----finished epoch 80 - training loss: 0.0956------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycomeintactionaboutsaveit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ofcourse= ---> 
+ Training Reference: + “Of course! =  (Training PER: 0.4) 
+ Training Reference Text: + “Of course! =
+-----finished epoch 81 - training loss: 0.0935------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlingupintactionaboutsafit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +yourowndeathbedswhentheycomewillbetheeasierforthethoughtofthepeacewhichyouhavegiventominetotteringandshakinginallhisgiantframehestumbledslowlyfromtheroom= ---> 
+ Training Reference: + “Your own death-beds, when they come, will be the easier for the thought of the peace which you have given to mine.” Tottering and shaking in all his giant frame, he stumbled slowly from the room. =  (Training PER: 0.235) 
+ Training Reference Text: + “Your own death-beds, when they come, will be the easier for the thought of the peace which you have given to mine.” Tottering and shaking in all his giant frame, he stumbled slowly from the room. =
+-----finished epoch 82 - training loss: 0.0884------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryanditonlyupinactionaboutsaved= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +holmeschuckledheartily= ---> 
+ Training Reference: + Holmes chuckled heartily. =  (Training PER: 0.20689655172413793) 
+ Training Reference Text: + Holmes chuckled heartily. =
+-----finished epoch 83 - training loss: 0.0864------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryanditonlycomeintactionaboutsafit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +theyspokeofthosehoursofburrowing= ---> 
+ Training Reference: + They spoke of those hours of burrowing. =  (Training PER: 0.23255813953488372) 
+ Training Reference Text: + They spoke of those hours of burrowing. =
+-----finished epoch 84 - training loss: 0.0847------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandinonlyupintactionaboutschaping= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.4) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +youmayimaginetheyoungpeoplebrushedupafterthelaboursofthedayandmakingthisnoveltyastheywouldmakeanynoveltytheexcuseforwalkingtogetherandenjoyingatrivialflirtation= ---> 
+ Training Reference: + You may imagine the young people brushed up after the labours of the day, and making this novelty, as they would make any novelty, the excuse for walking together and enjoying a trivial flirtation. =  (Training PER: 0.19900497512437812) 
+ Training Reference Text: + You may imagine the young people brushed up after the labours of the day, and making this novelty, as they would make any novelty, the excuse for walking together and enjoying a trivial flirtation. =
+-----finished epoch 85 - training loss: 0.0840------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycomeintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thereissomethinginwhatthefellowsaysaboutoutdoorworkheremarkedsoithinkwatsonthatimustleaveyoutoyourpapersforalittle= ---> 
+ Training Reference: + “There is something in what the fellow says about out-door work,” he remarked, “so I think, Watson, that I must leave you to your papers for a little.” =  (Training PER: 0.27741935483870966) 
+ Training Reference Text: + “There is something in what the fellow says about out-door work,” he remarked, “so I think, Watson, that I must leave you to your papers for a little.” =
+-----finished epoch 86 - training loss: 0.0882------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlycomeintactionaboutssafent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +afterihadspokentothemaboutittheybeganplayingattouchinandoutofthegroupofbystanders= ---> 
+ Training Reference: + After I had spoken to them about it, they began playing at “touch” in and out of the group of bystanders. =  (Training PER: 0.25688073394495414) 
+ Training Reference Text: + After I had spoken to them about it, they began playing at “touch” in and out of the group of bystanders. =
+-----finished epoch 87 - training loss: 0.0815------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandaknowlyupintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +alltheworkallthesundayschoolswhathavewedonewhathasweybridgedone= ---> 
+ Training Reference: + “All the work—all the Sunday schools—What have we done—what has Weybridge done? =  (Training PER: 0.26506024096385544) 
+ Training Reference Text: + “All the work—all the Sunday schools—What have we done—what has Weybridge done? =
+-----finished epoch 88 - training loss: 0.0827------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycumeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +foramomentiheedednothingoftheheatforgotthepatentneedofselfpreservation= ---> 
+ Training Reference: + For a moment I heeded nothing of the heat, forgot the patent need of self-preservation. =  (Training PER: 0.23076923076923078) 
+ Training Reference Text: + For a moment I heeded nothing of the heat, forgot the patent need of self-preservation. =
+-----finished epoch 89 - training loss: 0.0881------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlycomeintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +herearetheduplicatesofmrrucastles= ---> 
+ Training Reference: + Here are his keys, which are the duplicates of Mr. Rucastle’s.” =  (Training PER: 0.5223880597014925) 
+ Training Reference Text: + Here are his keys, which are the duplicates of Mr. Rucastle’s.” =
+-----finished epoch 90 - training loss: 0.0834------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +inthecardcaseisanote= ---> 
+ Training Reference: + In the card-case is a note. =  (Training PER: 0.3225806451612903) 
+ Training Reference Text: + In the card-case is a note. =
+-----finished epoch 91 - training loss: 0.0841------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadrivethearintheartilleryandanonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +freshattemptshavebeenmadetosignalbutwithoutsuccesswasthestereotypedformulaofthepapers= ---> 
+ Training Reference: + “Fresh attempts have been made to signal, but without success,” was the stereotyped formula of the papers. =  (Training PER: 0.21818181818181817) 
+ Training Reference Text: + “Fresh attempts have been made to signal, but without success,” was the stereotyped formula of the papers. =
+-----finished epoch 92 - training loss: 0.0814------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycomeintactionaboutsevent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.275) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ishallbetruetohosmer= ---> 
+ Training Reference: + I shall be true to Hosmer. =  (Training PER: 0.3333333333333333) 
+ Training Reference Text: + I shall be true to Hosmer. =
+-----finished epoch 93 - training loss: 0.0808------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlycomeintactionaboutsaveit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3125) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +towardssunburywasadarkappearanceasthoughaconicalhillhadsuddenlycomeintherehidingourviewofthefarthercountryandthenremoteracrosstheriveroverwaltonwesawanothersuchsummit= ---> 
+ Training Reference: + Towards Sunbury was a dark appearance, as though a conical hill had suddenly come into being there, hiding our view of the farther country; and then, remoter across the river, over Walton, we saw another such summit. =  (Training PER: 0.25) 
+ Training Reference Text: + Towards Sunbury was a dark appearance, as though a conical hill had suddenly come into being there, hiding our view of the farther country; and then, remoter across the river, over Walton, we saw another such summit. =
+-----finished epoch 94 - training loss: 0.0790------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverandtheartilleryandanonlycomeintactionaboutsuvid= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ithadescapedmymemory= ---> 
+ Training Reference: + It had escaped my memory. =  (Training PER: 0.27586206896551724) 
+ Training Reference Text: + It had escaped my memory. =
+-----finished epoch 95 - training loss: 0.0780------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutsafent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +whateverhewantedhemusthaveandwhateveritwasigavehimwithoutquestionlandmoneyhousesuntilatlastheaskedathingwhichicouldnotgive= ---> 
+ Training Reference: + Whatever he wanted he must have, and whatever it was I gave him without question, land, money, houses, until at last he asked a thing which I could not give. =  (Training PER: 0.2484472049689441) 
+ Training Reference Text: + Whatever he wanted he must have, and whatever it was I gave him without question, land, money, houses, until at last he asked a thing which I could not give. =
+-----finished epoch 96 - training loss: 0.0751------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.275) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +iwasayoungchapthenhotbloodedandrecklessreadytoturnmyhandatanythingigotamongbadcompanionstooktodrinkhadnoluckwithmyclaimtooktothebushandinawordbecamewhatyouwouldcalloverhereahighwayrober= ---> 
+ Training Reference: + I was a young chap then, hot-blooded and reckless, ready to turn my hand at anything; I got among bad companions, took to drink, had no luck with my claim, took to the bush, and in a word became what you would call over here a highway robber. =  (Training PER: 0.24796747967479674) 
+ Training Reference Text: + I was a young chap then, hot-blooded and reckless, ready to turn my hand at anything; I got among bad companions, took to drink, had no luck with my claim, took to the bush, and in a word became what you would call over here a highway robber. =
+-----finished epoch 97 - training loss: 0.0771------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintoactionaboutshavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +ifipromisetokeepasecretsaidiyoumayabsolutelydependuponmydoingso= ---> 
+ Training Reference: + “‘If I promise to keep a secret,’ said I, ‘you may absolutely depend upon my doing so.’ =  (Training PER: 0.31868131868131866) 
+ Training Reference Text: + “‘If I promise to keep a secret,’ said I, ‘you may absolutely depend upon my doing so.’ =
+-----finished epoch 98 - training loss: 0.0811------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlycomeintoactionaboutsavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.275) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +hesprangroundandicouldseeinthegaslightthateveryvestigeofcolorhadbeendrivenfromhisface= ---> 
+ Training Reference: + He sprang round, and I could see in the gaslight that every vestige of color had been driven from his face. =  (Training PER: 0.23423423423423423) 
+ Training Reference Text: + He sprang round, and I could see in the gaslight that every vestige of color had been driven from his face. =
+-----finished epoch 99 - training loss: 0.0748------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyupintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +iwilldosoandiwillshowyouthestepsbywhichireachedit= ---> 
+ Training Reference: + “I will do so, and I will show you the steps by which I reached it. =  (Training PER: 0.323943661971831) 
+ Training Reference Text: + “I will do so, and I will show you the steps by which I reached it. =
+-----finished epoch 100 - training loss: 0.0704------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanolingcomeintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +hadmyfootstumbleditwouldhavebeentheend= ---> 
+ Training Reference: + Had my foot stumbled, it would have been the end. =  (Training PER: 0.2641509433962264) 
+ Training Reference Text: + Had my foot stumbled, it would have been the end. =
+-----finished epoch 101 - training loss: 0.0695------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverandtheartilleryandanonlycupintactionaboutsavent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +upperswandamlaneisavilealleylurkingbehindthehighwharveswhichlinethenorthsideoftherivertotheeastoflondonbridge= ---> 
+ Training Reference: + Upper Swandam Lane is a vile alley lurking behind the high wharves which line the north side of the river to the east of London Bridge. =  (Training PER: 0.23741007194244604) 
+ Training Reference Text: + Upper Swandam Lane is a vile alley lurking behind the high wharves which line the north side of the river to the east of London Bridge. =
+-----finished epoch 102 - training loss: 0.0744------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutstaveit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +onedaymyeditorwishedtohaveaseriesofarticlesuponbegginginthemetropolisandivolunteeredtosupplythem= ---> 
+ Training Reference: + One day my editor wished to have a series of articles upon begging in the metropolis, and I volunteered to supply them. =  (Training PER: 0.21951219512195122) 
+ Training Reference Text: + One day my editor wished to have a series of articles upon begging in the metropolis, and I volunteered to supply them. =
+-----finished epoch 103 - training loss: 0.0719------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +herfeaturesandfigurewerethoseofawomanofthirtybutherhairwasshotwithprematuregrayandherexpressionwaswearyandhaggard= ---> 
+ Training Reference: + Her features and figure were those of a woman of thirty, but her hair was shot with premature gray, and her expression was weary and haggard. =  (Training PER: 0.21379310344827587) 
+ Training Reference Text: + Her features and figure were those of a woman of thirty, but her hair was shot with premature gray, and her expression was weary and haggard. =
+-----finished epoch 104 - training loss: 0.0701------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlycomeintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +youseewatsonheexplainedintheearlyhoursofthemorningaswesatoveraglassofwhiskeyandsodainbakerstreetitwasperfectlyobviousfromthefirstthattheonlypossibleobjectofthisratherfantasticbusinessoftheadvertisementoftheleagueandthecopyingoftheencyclopaediamustbetogetthisnotoverbrightpawnbrokeroutofthewayforanumberofhourseveryday= ---> 
+ Training Reference: + “You see, Watson,” he explained, in the early hours of the morning, as we sat over a glass of whiskey-and-soda in Baker Street, “it was perfectly obvious from the first that the only possible object of this rather fantastic business of the advertisement of the League, and the copying of the ‘Encyclopædia,’ must be to get this not over-bright pawnbroker out of the way for a number of hours every day. =  (Training PER: 0.23645320197044334) 
+ Training Reference Text: + “You see, Watson,” he explained, in the early hours of the morning, as we sat over a glass of whiskey-and-soda in Baker Street, “it was perfectly obvious from the first that the only possible object of this rather fantastic business of the advertisement of the League, and the copying of the ‘Encyclopædia,’ must be to get this not over-bright pawnbroker out of the way for a number of hours every day. =
+-----finished epoch 105 - training loss: 0.0780------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyumeintactionaboutsafent= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +mrs= ---> 
+ Training Reference: + “Mrs. =  (Training PER: 0.5555555555555556) 
+ Training Reference Text: + “Mrs. =
+-----finished epoch 106 - training loss: 0.0823------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyupintactionaboutsavence= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +downbelowinthedarknesswereottershawandchertseyandalltheirhundredsofpeoplesleepinginpeace= ---> 
+ Training Reference: + Down below in the darkness were Ottershaw and Chertsey and all their hundreds of people, sleeping in peace. =  (Training PER: 0.21621621621621623) 
+ Training Reference Text: + Down below in the darkness were Ottershaw and Chertsey and all their hundreds of people, sleeping in peace. =
+-----finished epoch 107 - training loss: 0.0764------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverandtheartilleryandanonlycomeinactionaboutsaffen= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +sherlockholmeshadbeensilentallthemorningdippingcontinuouslyintotheadvertisementcolumnsofasuccessionofpapersuntilatlasthavingapparentlygivenuphissearchhehademergedinnoverysweettempertolecturemeuponmylittleraryshortcoming ---> 
+ Training Reference: + Sherlock Holmes had been silent all the morning, dipping continuously into the advertisement columns of a succession of papers, until at last, having apparently given up his search, he had emerged in no very sweet temper to lecture me upon my literary shortcomings. =  (Training PER: 0.20446096654275092) 
+ Training Reference Text: + Sherlock Holmes had been silent all the morning, dipping continuously into the advertisement columns of a succession of papers, until at last, having apparently given up his search, he had emerged in no very sweet temper to lecture me upon my literary shortcomings. =
+-----finished epoch 108 - training loss: 0.0737------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyupintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +praytakethebasketchair= ---> 
+ Training Reference: + Pray take the basket-chair. =  (Training PER: 0.25806451612903225) 
+ Training Reference Text: + Pray take the basket-chair. =
+-----finished epoch 109 - training loss: 0.0650------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlinghimintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thequestionwashardlyoutofmymouthandholmeshadnotyetopenedhislipstoreplywhenweheardaheavyfootfallinthepassageandatapatthedoor= ---> 
+ Training Reference: + The question was hardly out of my mouth, and Holmes had not yet opened his lips to reply, when we heard a heavy footfall in the passage, and a tap at the door. =  (Training PER: 0.24539877300613497) 
+ Training Reference Text: + The question was hardly out of my mouth, and Holmes had not yet opened his lips to reply, when we heard a heavy footfall in the passage, and a tap at the door. =
+-----finished epoch 110 - training loss: 0.0680------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyumintactionaboutsteven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +youmayimaginetheyoungpeoplebrushedupafterthelaboursofthedayandmakingthisnoveltyastheywouldmakeanynoveltyastheexcuseforwalkingtogetherandenjoyingatrivialflirtation ---> 
+ Training Reference: + You may imagine the young people brushed up after the labours of the day, and making this novelty, as they would make any novelty, the excuse for walking together and enjoying a trivial flirtation. =  (Training PER: 0.20398009950248755) 
+ Training Reference Text: + You may imagine the young people brushed up after the labours of the day, and making this novelty, as they would make any novelty, the excuse for walking together and enjoying a trivial flirtation. =
+-----finished epoch 111 - training loss: 0.0643------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.325) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +heretheyareshoutedamaninabluejersey= ---> 
+ Training Reference: + “Here they are!” shouted a man in a blue jersey. =  (Training PER: 0.3076923076923077) 
+ Training Reference Text: + “Here they are!” shouted a man in a blue jersey. =
+-----finished epoch 112 - training loss: 0.0678------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlingupintactionaboutsavens= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +soldtomrwindigateofthealphaaat12s= ---> 
+ Training Reference: + “‘Sold to Mr. Windigate of the ‘Alpha,’ at 12_s._’” =  (Training PER: 0.45454545454545453) 
+ Training Reference Text: + “‘Sold to Mr. Windigate of the ‘Alpha,’ at 12_s._’” =
+-----finished epoch 113 - training loss: 0.0698------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlyupintactionaboutsafit= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +irelyuponyounotonlytobediscreetandtorefrainfromallgossipuponthematterbutabovealltopreservethiscoronetwitheverypossibleprecautionbecauseineednotsaythatagreatpublicscandalwouldbecausedifanyharmweretobefallit= ---> 
+ Training Reference: + I rely upon you not only to be discreet and to refrain from all gossip upon the matter, but, above all, to preserve this coronet with every possible precaution, because I need not say that a great public scandal would be caused if any harm were to befall it. =  (Training PER: 0.21755725190839695) 
+ Training Reference Text: + I rely upon you not only to be discreet and to refrain from all gossip upon the matter, but, above all, to preserve this coronet with every possible precaution, because I need not say that a great public scandal would be caused if any harm were to befall it. =
+-----finished epoch 114 - training loss: 0.0703------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +excellent= ---> 
+ Training Reference: + “Excellent! =  (Training PER: 0.3333333333333333) 
+ Training Reference Text: + “Excellent! =
+-----finished epoch 115 - training loss: 0.0644------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartillaryandanonlyupintactionaboutshaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.375) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +buttheartillerymandissuadedmeitsnokindnesstotherightsortofwifehesaidtomakeherawidowandintheendiagreedtogowithhimundercoverofthewoodsnorthwardasfarasstreetcobhambeforeipartedwithhim= ---> 
+ Training Reference: + But the artilleryman dissuaded me: “It’s no kindness to the right sort of wife,” he said, “to make her a widow”; and in the end I agreed to go with him, under cover of the woods, northward as far as Street Cobham before I parted with him. =  (Training PER: 0.2727272727272727) 
+ Training Reference Text: + But the artilleryman dissuaded me: “It’s no kindness to the right sort of wife,” he said, “to make her a widow”; and in the end I agreed to go with him, under cover of the woods, northward as far as Street Cobham before I parted with him. =
+-----finished epoch 116 - training loss: 0.0673------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlyupintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.35) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +hornerwhohadshownsignsofintenseemotionduringtheproceedingsfaintenseemotionduringtheproceedingsfaintedawayattheconclusionandwascarrie ---> 
+ Training Reference: + Horner, who had shown signs of intense emotion during the proceedings, fainted away at the conclusion, and was carried out of court.’ =  (Training PER: 0.5182481751824818) 
+ Training Reference Text: + Horner, who had shown signs of intense emotion during the proceedings, fainted away at the conclusion, and was carried out of court.’ =
+-----finished epoch 117 - training loss: 0.0661------
+----Prediction Evaluation-----
+Evaluation Prediction: +itwasadriverintheartilleryandanonlycomeintactionaboutsaven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +therewasnomakersnamebutasholmeshadremarkedtheinitialshtch= ---> 
+ Training Reference: + There was no maker’s name; but, as Holmes had remarked, the initials “H. =  (Training PER: 0.3026315789473684) 
+ Training Reference Text: + There was no maker’s name; but, as Holmes had remarked, the initials “H. =
+-----finished epoch 118 - training loss: 0.0668------
+----Prediction Evaluation-----
+Evaluation Prediction: +iwasadriverintheartilleryandanonlycomeintactionaboutseven= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.2875) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +foranhourormorehewasatworkreturningatlastwithhisfeetheavywithsnowandhisfeaturesasinscrutableasever= ---> 
+ Training Reference: + For an hour or more he was at work, returning at last with his feet heavy with snow and his features as inscrutable as ever. =  (Training PER: 0.2265625) 
+ Training Reference Text: + For an hour or more he was at work, returning at last with his feet heavy with snow and his features as inscrutable as ever. =
+-----finished epoch 119 - training loss: 0.0659------
+----Prediction Evaluation-----
+Evaluation Prediction: +hewasadriverintheartilleryandanonlyupintactionaboutsafet= ---> 
+  Evaluation Reference: + He was a driver in the artillery, and had only come into action about seven. =  (Evaluation PER: 0.3625) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: +thepassagewasdarkandbycontrastwiththepicturethewindowframeenclosedthesideoftheroomseemedimpenetrablydark= ---> 
+ Training Reference: + The passage was dark, and, by contrast with the picture the window frame enclosed, the side of the room seemed impenetrably dark. =  (Training PER: 0.21052631578947367) 
+ Training Reference Text: + The passage was dark, and, by contrast with the picture the window frame enclosed, the side of the room seemed impenetrably dark. =
+-----finished epoch 120 - training loss: 0.0622------

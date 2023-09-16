@@ -5,6 +5,7 @@ import numpy as np
 import logging
 import jiwer
 import PrefixTree
+import re
 from torch.utils.tensorboard import SummaryWriter
 
 import torch
@@ -15,7 +16,7 @@ from read_emg import EMGDataset, DynamicBatchSampler
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
-from greedy_search import run_greedy
+from data_utils import load_dictionary,combine_fixed_length
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -29,27 +30,29 @@ flags.DEFINE_string('start_training_from', None, 'start training from this model
 #File model paths
 flags.DEFINE_string('output_directory', 'output', 'where to save models and outputs')
 flags.DEFINE_string('phonesSet', "descriptions/phonesSet", 'the set of all phones in the lexicon')
-flags.DEFINE_string('vocabulary', "descriptions/vocabulary", 'the set of all words in the lexicon')
-flags.DEFINE_string('dict', "descriptions/dgaddy-lexicon.txt", 'the pronunciation dictionary')
+flags.DEFINE_string('vocabulary', "descriptions/new_vocabulary", 'the set of all words in the lexicon')
+flags.DEFINE_string('dict', "descriptions/new_dgaddy-lexicon.txt", 'the pronunciation dictionary')
 flags.DEFINE_string('lang_model', "descriptions/lm.binary", 'the language model')
 
 #Parameters
-flags.DEFINE_integer('pad', 39, 'Padding value according to the position on phoneme inventory')
+flags.DEFINE_integer('pad', 38, 'Padding value according to the position on phoneme inventory')
 flags.DEFINE_integer('report_PER', 1, "How many epochs to report PER")
 flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-flags.DEFINE_integer('learning_rate_warmup', 1000, 'steps of linear warmup')
+flags.DEFINE_integer('learning_rate_warmup', 1500, 'steps of linear warmup')
 flags.DEFINE_float('l2', 0., 'weight decay')
-flags.DEFINE_float('alpha_loss', 0.3, 'parameter alpha for the two losses')
+flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
+flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
-flags.DEFINE_integer('n_epochs', 100, 'number of epochs')
-flags.DEFINE_integer('n_buckets', 32, 'number of buckets in the dataset')
+flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
+flags.DEFINE_integer('n_buckets', 16, 'number of buckets in the dataset')
+flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
-        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps
+        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss
 
         #Warmup phase methods
         def set_lr(new_lr):
@@ -60,8 +63,8 @@ def train_model(trainset, devset, device, writer):
             iteration = iteration + 1
             if iteration <= FLAGS.learning_rate_warmup:
                 set_lr(iteration*target_lr/FLAGS.learning_rate_warmup)
-        
-        #Training loop 
+
+        #Training loop
         optim.zero_grad()  
         sum_batch_size=0  
         for step,example in enumerate(dataloader_training):
@@ -72,11 +75,12 @@ def train_model(trainset, devset, device, writer):
             schedule_lr(batch_idx)
             
             #Preprosessing of the input and target for the model
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
-            print(len(X))
+            #print(len(X))
             sum_batch_size += len(X)
 
             
@@ -85,7 +89,7 @@ def train_model(trainset, devset, device, writer):
             target= y[:,1:]
 
             #Prediction
-            out_enc, out_dec = model(x_raw=X, y=tgt)
+            out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
@@ -97,8 +101,9 @@ def train_model(trainset, devset, device, writer):
             out_dec=out_dec.permute(0,2,1)
             loss_dec = loss_fn(out_dec, target)
 
-            #Combination the two losses
-            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                
+            #Combination the two losses   
+            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
             train_dec_loss += loss_dec.item()
@@ -106,10 +111,12 @@ def train_model(trainset, devset, device, writer):
 
             #Alternative Gradient Update
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), FLAGS.grad_clipping)
             if sum_batch_size >= FLAGS.batch_size_grad:
                 optim.step()
                 optim.zero_grad()
                 sum_batch_size=0
+
 
             #Increment counter batch and counter for steps of losses   
             batch_idx += 1
@@ -117,16 +124,12 @@ def train_model(trainset, devset, device, writer):
             
             #Run the model on evaluation set and report the loss
             if (step + 1) % FLAGS.report_loss == 0:  
-                evaluation_loop() 
+                evaluation_loop()
                 report_loss()
-                
         
-        #To report the remained loss history
-        evaluation_loop() 
-        report_loss()
-  
+        
     def evaluation_loop():
-        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
+        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
 
         #Evaluation loop
         model.eval()
@@ -134,13 +137,14 @@ def train_model(trainset, devset, device, writer):
             for step,example in enumerate(dataloader_evaluation):
                 torch.cuda.empty_cache()
                 #Collect the data
-                X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+                X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+                #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
                 y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             
-                #Forward Model using Greedy Approach not teacher forcing
+                #Forward Model 
                 tgt= y[:,:-1]
                 target= y[:,1:]
-                out_enc, out_dec = model(x_raw=X, y=tgt)
+                out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
 
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
@@ -152,7 +156,7 @@ def train_model(trainset, devset, device, writer):
                 loss_dec = loss_fn(out_dec, target)
 
                 #Combination the two losses
-                loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
+                loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
                 eval_loss += loss.item()
                 eval_dec_loss += loss_dec.item()
                 eval_enc_loss += loss_enc.item()
@@ -191,47 +195,73 @@ def train_model(trainset, devset, device, writer):
         run_eval_steps=0
 
     def report_PER():
-        nonlocal predictions_train,references_train,predictions_eval,references_eval
+        nonlocal predictions_train,references_train,predictions_eval,references_eval,curr_eval_PER, text_eval, text_train
+        running_total_train=0 ;running_correct_train=0; running_total_eval=0 ;running_correct_eval=0
 
         #Calculation PER
         model.eval()
         #Greedy Search Training Set Subset
         for step,example in enumerate(dataloader_training):
             torch.cuda.empty_cache()
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+            
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
+            
             predictions_train += phones_seq
             references_train += example['text']
-            #Pick up just 10 batches
-            if step + 1 == 10:
+            text_train += example['text']
+            running_total_train += y.shape[0] * y.shape[1]
+            running_correct_train += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
+            #Pick up just 15 batches
+            if step + 1 == 15:
                 break
         
         #Greedy Search Evaluation Set
         for step, example in enumerate(dataloader_evaluation):
             torch.cuda.empty_cache()
-            #Collect the data
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model using Greedy Approach not teacher forcing
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
             
             #Append lists to calculate the PER
             predictions_eval += phones_seq
             references_eval += example['text']
+            text_eval += example['text']
+            running_total_eval += y.shape[0] * y.shape[1]
+            running_correct_eval += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
 
         #Reporting PER
-        logging.info(f'Prediction: {predictions_eval[0]} ---> Reference: {references_eval[0]}  (PER: {jiwer.cer(predictions_eval[0], references_eval[0])})')
+        logging.info(f'----Prediction Evaluation-----')
+        logging.info(f'Evaluation Prediction: {predictions_eval[0]} ---> \n  Evaluation Reference: {references_eval[0]}  (Evaluation PER: {jiwer.cer(references_eval[0], predictions_eval[0])}) \n Evaluation Reference Text: {text_eval[0]}')
+        logging.info(f'----Prediction Training-----')
+        logging.info(f'Training Prediction: {predictions_train[0]} ---> \n Training Reference: {references_train[0]}  (Training PER: {jiwer.cer(references_train[0], predictions_train[0])}) \n Training Reference Text: {text_train[0]}')
         writer.add_scalar('PhonemeErrorRate/Training', jiwer.cer(references_train, predictions_train), batch_idx)
         writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.cer(references_eval, predictions_eval), batch_idx)
+        writer.add_scalar('PhonemeErrorRate_Epoch/Training', jiwer.cer(references_train, predictions_train), epoch_idx)
+        writer.add_scalar('PhonemeErrorRate_Epoch/Evaluation', jiwer.cer(references_eval, predictions_eval), epoch_idx)
+        writer.add_scalar('Accuracy_Epoch/Training', round(100 * running_correct_train / running_total_train,1), epoch_idx)
+        writer.add_scalar('Accuracy_Epoch/Evaluation', round(100 * running_correct_eval / running_total_eval,1), epoch_idx)
+        
+        curr_eval_PER=jiwer.cer(references_eval, predictions_eval)
         writer.flush()
         predictions_train=[]
         references_train=[]
         predictions_eval=[]
         references_eval=[]
+        text_train=[]
+        text_eval=[]
+        running_total_train = 0
+        running_correct_train = 0
+        running_total_eval = 0
+        running_correct_eval = 0
+
 
 
     ################################################### TRAINING MODEL BELOW ########################################################################       
@@ -239,11 +269,11 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
-    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
-    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, 138000, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
+    dynamicBatchEvaluationSampler=DynamicBatchSampler(devset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
     dataloader_training = torch.utils.data.DataLoader(trainset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchTrainingSampler)
     dataloader_evaluation = torch.utils.data.DataLoader(devset, pin_memory=(device=='cuda'), num_workers=0,collate_fn=EMGDataset.collate_raw, batch_sampler= dynamicBatchEvaluationSampler)
     
@@ -260,7 +290,7 @@ def train_model(trainset, devset, device, writer):
 
     #Define optimizer and scheduler for the learning rate
     optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[20], gamma=.1)
+    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[18], gamma=.1)
     
     ##MODEL TRAINING##
     
@@ -271,18 +301,19 @@ def train_model(trainset, devset, device, writer):
         training_loop()  
         #Random shift batches
         dynamicBatchTrainingSampler.set_epoch(epoch_idx + 1)
-        dynamicBatchEvaluationSampler.set_epoch(epoch_idx + 1)
         #PER
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
         #Change learning rate
-        lr_sched.step()
+        #lr_sched.step()
         #Mean of the main loss and logging
-        logging.info(f'finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}')
-        #Save Model
-        torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
+        logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
+        #Save the Best Model
+        if curr_eval_PER < best_eval_PER:
+            torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
+            best_eval_PER= curr_eval_PER
         #Stop if Training loss reaches convergence
-        if round(np.mean(losses), 1) == 0.0:
+        if round(np.mean(losses), 1) == 0.00:
             break
 
     return model
@@ -290,62 +321,72 @@ def train_model(trainset, devset, device, writer):
 
 def evaluate_saved_beam_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
-    n_phones = len(testset.phone_transform.phoneme_inventory)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
+    n_phones = len(testset.text_transform.chars)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
-    dataloader = torch.utils.data.DataLoader(testset, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset,  collate_fn=EMGDataset.collate_raw,shuffle=False ,batch_size=1)
     references = []
     predictions = []
      
+    model.eval() 
     with torch.no_grad():
         for example in dataloader:
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
-            tgt = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
             target= tgt[:,1:]
-            pred=run_single_bs(model,X,target,n_phones,tree,language_model,device)
+            pred=run_single_bs(model,X,target,n_phones,tree,language_model,device, example['lengths'])
+            torch.cuda.empty_cache()
  
-            pred_text = testset.text_transform.clean_text(' '.join(pred[2]))
-            target_text = testset.text_transform.clean_text(example['text'][0])
-            references.append(target_text)
-            predictions.append(pred_text)
-            
-            logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
+            pred_text =jiwer.Compose([ jiwer.ToLowerCase()])(' '.join(pred[2]))
+            target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""}), jiwer.Strip() ])(example['text'][0])
+            if len(target_text) != 0:
+                references.append(target_text)
+                predictions.append(pred_text)  
+                logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
         
-    print('WER:', jiwer.wer(references, predictions))
+    logging.info(f'Final WER: {jiwer.wer(references, predictions)}')
 
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
-    #testset = EMGDataset(test=True)
-    testset = EMGDataset(dev=False,test=False)
-    n_phones = len(testset.phone_transform.phoneme_inventory)
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
+    n_phones = len(testset.text_transform.chars)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
-    dataloader = torch.utils.data.DataLoader(testset, shuffle=True , batch_size=1)
+    dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
     references = []
     predictions = []
+    running_total=0
+    running_correct=0
 
+    model.eval() 
     with torch.no_grad():
         for idx, example in enumerate(dataloader):
             #Collect the data
-            X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model
             target= y[:,1:]
-            phones_seq = run_greedy(model, X, target, n_phones, device)
+            phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'], X, target, n_phones, device)
 
             #Append lists to calculate the PER
             predictions += phones_seq
-            references += example['phonemes']
+            references += [testset.text_transform.clean_text(''.join(example['text']))]
+            running_total += y.shape[0] * y.shape[1]
+            running_correct += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
+            logging.info(f'Prediction:{phones_seq} ---> Reference:{references[-1]}  (CER: {jiwer.cer(phones_seq, references[-1])} and Accuracy: {round(100 * sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item() / (y.shape[0] * y.shape[1]),1)})')
 
-    print('WER:', jiwer.wer(references, predictions))
+    print(f'PER: {jiwer.cer(references, predictions)} and accuracy: {round(100 * running_correct / running_total,1)}')
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)
@@ -366,9 +407,20 @@ def main():
 
 if __name__ == '__main__':
     FLAGS(sys.argv)
+    load_dictionary()
     if FLAGS.evaluate_saved_beam_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_beam_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_beam_search()
     elif FLAGS.evaluate_saved_greedy_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_greedy_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
         evaluate_saved_greedy_search()
     else:
         main()

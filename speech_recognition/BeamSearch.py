@@ -5,6 +5,7 @@ import numpy as np
 import collections
 import matplotlib.pyplot as plt
 import PrefixTree
+import jiwer
 
 PRINT_DUP = False
 PRINT_HYP = False
@@ -12,10 +13,10 @@ PRINT_FIN = False
 
 from absl import flags
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('BeamWidth', 200, 'width for pruning the prefix_tree')
+flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
-flags.DEFINE_float('LMWeight', 0.9 , 'importance for language model scoring')
-flags.DEFINE_float('LMPenalty', -1.0, 'penalty to penalize short words insertion')
+flags.DEFINE_float('LMWeight', 0.4, 'importance for language model scoring')
+flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
     
 # Helpers
 def replicate(l,t):
@@ -36,7 +37,7 @@ def decode(l,dct,start_tok,end_tok):
 
 HypoHolder = collections.namedtuple('HypoHolder',['histories','probs','words','nodes'])
 
-def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
+def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length_raw_signal):
     def check_hypos_are_consistent(h,step):
         assert h.histories.ndim == 2 and h.histories.shape[1] == (step+1)
         assert len(h.nodes) == h.histories.shape[0]
@@ -75,7 +76,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
             # Get current nodes
         else:
             raise Exception('This is going to crash because of the nodes. Do I need to keep track of them at all?')
-            state = (flt_state,flt_align,flt_annotation)
             accu_probs = torch.sum(flt_probs,1) 
             probs = flt_probs
 
@@ -88,21 +88,21 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
     pr2 = False
    
     # forward pass, attention is applied to data_encoded as trained
-    memory = model(mode= 'beam_search', part='encoder', x_raw= data)
+    memory, _= model(length_raw_signal, device, mode= 'beam_search', part='encoder', x_raw= data)
 
     # prepare some constants
     end_tok = vocab_size - 3
     start_tok = vocab_size - 2
-    max_len = torch.sum(target != end_tok) + 40
+    max_len = torch.sum(target != end_tok) + 10
     
     # initialize
 
     # create the initial hypo
     hypos = HypoHolder(
             histories = torch.tensor([[ start_tok ]],device=device) ,
-            probs = torch.zeros(1,0,dtype=torch.float32,device=device),
+            probs = torch.zeros(1, 0,dtype=torch.float32,device=device),
             words = [[]], 
-            nodes = [tree._root] 
+            nodes = [tree._root]
         )
 
     finished_hypos = {}
@@ -110,24 +110,23 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
 
     for step in range(max_len):
         check_hypos_are_consistent(hypos,step)
-        if pr2:
-            print('--- BEGIN STEP %d ---' % step)
+        
+        if hypos.histories.shape[0] == 0:
+            break
 
         # start here
-        last_frame_hypo = hypos.histories[:,-1].unsqueeze(1) # hypos is always the MOST RECENT hypo in the history
-        memory_stub= memory.repeat(last_frame_hypo.shape[0], 1, 1) 
+        memory_stub= memory.repeat(hypos.histories.shape[0], 1, 1) 
         
         # decode_step treats the different hypos as though they were different elements of a batch apart from the last two token predicted which are <S> and <PAD>
-        step_logits = model(mode='beam_search', part='decoder',y=last_frame_hypo,memory=memory_stub) [:,:,:-2]
+        step_logits = model(length_raw_signal, device, mode='beam_search', part='decoder',y=hypos.histories,memory=memory_stub) [:,-1,:-2]
+        #step_logits = torch.cat([step_logits[:,:-2], step_logits[:,-1:]], dim=1)
 
         # step_logits and step_probs have the shape (hypos * tokens)
-        step_probs = torch.nn.functional.log_softmax(step_logits,2)
+        step_probs = torch.nn.functional.log_softmax(step_logits,1)
         
         if step == 0:
-            step_probs=step_probs[0,:,:] #to remove the batch dimension (the code doesn't take into account batches)
             full_probs = step_probs
         else:
-            step_probs=step_probs[:,0,:] #to remove the batch dimension (the code doesn't take into account batches)
             full_probs = step_probs + torch.sum(hypos.probs,1,keepdim=True)
         
         if FLAGS.Constrained:
@@ -144,7 +143,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
         new_hypos = update_hypos(hypos,top_hypos,step_probs,dct)
 
         # save and remove finished hypos
-        unfinished_hypos = save_finished_hypos(new_hypos,finished_hypos,end_tok, language_model, target.shape[1]) 
+        unfinished_hypos = save_finished_hypos(new_hypos,finished_hypos,end_tok, language_model, max_len) 
         assert not torch.any(unfinished_hypos.histories[:,-1] == end_tok)
 
         # propagate across word boundaries
@@ -172,7 +171,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
 
 
     # NEW
-    save_finished_hypos(hypos, finished_hypos, end_tok, language_model, target.shape[1])
+    save_finished_hypos(hypos, finished_hypos, end_tok, language_model, max_len)
     keys = [x for x in finished_hypos.keys()]
     max_prob = np.max(keys)    
     
@@ -181,7 +180,7 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device):
 
 # Save all finished hypos from the hypos (to be recognized by end_tok as the last token in the history).
 # finished_hypos is where finished hypos are permanently collected, we return a hypo holder with the remaining active hypos
-def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target):
+def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, max_len):
     assert type(hypos) is HypoHolder
 
     end_reached = (hypos.histories[:,-1] == end_tok)
@@ -196,7 +195,7 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
     remaining_nodes = [ hypos.nodes[p] for p in active_pos ]
     
     for p in end_reached_pos:
-        save_finished_hypo(finished_hypos,hypos.histories[p],hypos.probs[p],hypos.words[p],language_model)
+        save_finished_hypo(finished_hypos,hypos.histories[p],hypos.probs[p],hypos.words[p],language_model,max_len)
 
     remaining_hypos = HypoHolder(
             histories = remaining_histories,
@@ -206,9 +205,9 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, len_target
             )
     return remaining_hypos
 
-def save_finished_hypo(finished_hypos,history, probs, words, language_model):
-    sentence= ' '.join([item.name for item in words])
-    logprob=language_model.score(sentence,bos = True, eos = True)
+def save_finished_hypo(finished_hypos,history, probs, words, language_model, max_len):
+    sentence= jiwer.ToLowerCase()(' '.join([item.name for item in words]))
+    logprob=language_model.score(sentence,bos = True, eos = True) + ((len(sentence) + 1)**0.95)
     final_prob = torch.clone(probs)
     final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
 

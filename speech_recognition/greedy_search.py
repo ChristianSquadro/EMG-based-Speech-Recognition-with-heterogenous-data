@@ -1,24 +1,24 @@
 import torch
-from data_utils import PhoneTransform, TextTransform
+from data_utils import TextTransform
 from absl import flags
 import numpy as np
 FLAGS = flags.FLAGS
 
-def run_greedy(model, X_raw, tgt, vocab_size, device):
+def run_greedy(model, length_raw_signal, X_raw, tgt, vocab_size, device):
   batch_len=tgt.shape[0]
   phones_seq = [['+'] for _ in range(batch_len)]
-  start_tok = vocab_size - 3
-  max_seq_length= tgt.shape[1]  
+  start_tok = vocab_size - 2
+  max_seq_length= tgt.shape[1] + 1 #+1 for <S> removed  
   dec_input = torch.full([batch_len, 1], start_tok).to(device)
   text_transform = TextTransform()
 
   # forward pass, attention is applied to data_encoded as trained
-  memory, _ = model(mode= 'greedy_search', part='encoder', x_raw= X_raw)
+  memory, out_enc = model(length_raw_signal , device, mode= 'greedy_search', part='encoder', x_raw= X_raw)
 
   with torch.no_grad():
     while True:
       #Decoder
-      step_logits = model(mode='greedy_search', part='decoder', y=dec_input, memory=memory)
+      step_logits = model(length_raw_signal , device, mode='greedy_search', part='decoder', y=dec_input, memory=memory)
       probs = torch.nn.functional.softmax(step_logits, dim=2)
       predicted_idx = torch.argmax(probs, dim=2)[:,-1]
 
@@ -37,7 +37,17 @@ def run_greedy(model, X_raw, tgt, vocab_size, device):
       if all([any(phone == '=' for phone in item ) for item in phones_seq]) or dec_input.shape[1] >= max_seq_length:
         break
     
+    #Padding for Accuracy
+    word_seq_idx=[text_transform.text_to_int(''.join(item)) for item in phones_seq ]
+    new_word_seq_idx=torch.ones(batch_len,max_seq_length,dtype=torch.int32).to(device)
+    for i, item in enumerate(word_seq_idx):
+      var_len = len(item)
+      new_item = [FLAGS.pad] * max_seq_length
+      new_item[:var_len] = item
+      new_word_seq_idx[i]= torch.tensor(new_item)
+      
     #Formatting phones
-    phones_seq = [ ' '.join(item) for item in phones_seq ]
+    phones_seq = [ ''.join(item) for item in phones_seq ]
+    
 
-  return phones_seq
+  return phones_seq, new_word_seq_idx

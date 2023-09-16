@@ -26,9 +26,9 @@ class TransformerEncoderLayer(nn.Module):
         >>> out = encoder_layer(src)
     """
 
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
+    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional_distance=100):
         super(TransformerEncoderLayer, self).__init__()
-        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
+        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=True, relative_positional_distance=relative_positional_distance)
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)
@@ -83,11 +83,11 @@ class TransformerDecoderLayer(nn.Module):
             Default: ``False`` (after).
         """
     # Adapted from pytorch source
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional=True, relative_positional_distance=100):
+    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, relative_positional_distance=100):
         super(TransformerDecoderLayer, self).__init__()
         #Attention Mechanism
-        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
-        self.multihead_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional=relative_positional, relative_positional_distance=relative_positional_distance)
+        self.self_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional= False, relative_positional_distance=relative_positional_distance)
+        self.multihead_attn = MultiHeadAttention(d_model, nhead, dropout=dropout, relative_positional= False, relative_positional_distance=relative_positional_distance)
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)
@@ -180,7 +180,7 @@ class MultiHeadAttention(nn.Module):
     
     #Apply padding_mask to the attention weights if provided
     if tgt_key_padding_mask is not None:
-       logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8)
+       logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(2), -1e8) 
        logits = logits.masked_fill(tgt_key_padding_mask.unsqueeze(1).unsqueeze(3), -1e8)
 
     #Apply padding_mask to the attention weights if provided
@@ -407,9 +407,10 @@ class LearnedRelativePositionalEmbedding(nn.Module):
 # https://github.com/pytorch/examples/blob/master/word_language_model/model.py
 class PositionalEncoding(nn.Module):
 
-    def __init__(self, d_model, dropout=0.0, max_len=5000):
+    def __init__(self, d_model, dropout=0.2, max_len=5000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
+        self.d_model=d_model
         self.max_len = max_len
 
         pe = torch.zeros(max_len, d_model)
@@ -432,5 +433,5 @@ class PositionalEncoding(nn.Module):
         assert x.size(0) < self.max_len, (
             f"Too long sequence length: increase `max_len` of pos encoding")
         # shape of x (len, B, dim)
-        x = x + self.pe[:x.size(0), :]
+        x = x + (1/self.d_model * self.pe[:x.size(0), :])
         return self.dropout(x)

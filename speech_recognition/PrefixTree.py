@@ -3,6 +3,7 @@ import torch
 import kenlm
 import Words
 import Phones
+import jiwer
 import Dictionary
 
 class Node:
@@ -268,8 +269,8 @@ def coverage_penalty():
 
 def check_language_model(lm, sentence):
     # tranform from list of word into a string (lm accepts only string)
-    sentence= ' '.join(sentence)
-    logprob = lm.score(sentence, bos = False, eos = False)
+    sentence= jiwer.ToLowerCase()(' '.join(sentence))
+    logprob = lm.score(sentence, bos = False, eos = False) + ((len(sentence) + 1)**0.85)
     return logprob
 
 
@@ -285,7 +286,7 @@ def init_tree(phones, voc, words):
     t = set(test_words)
     test_words = list(t)
     
-    d= { line.split()[0] : line.split()[1:] for line in open('descriptions/dgaddy-lexicon.txt') if line.split() != [] }
+    d= { line.split()[0] : line.split()[1:] for line in open('descriptions/new_dgaddy-lexicon.txt', encoding='latin-1') if line.split() != [] }
 
     test_dct = Dictionary.Dictionary()
     for p in phones:
