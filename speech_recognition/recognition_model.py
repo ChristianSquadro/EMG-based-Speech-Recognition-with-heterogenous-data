@@ -12,6 +12,7 @@ from torch import nn
 import torch.nn.functional as F
 
 from read_emg import EMGDataset, DynamicBatchSampler
+from LabelSmoothingLoss import LabelSmoothingLoss
 from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
@@ -280,7 +281,8 @@ def train_model(trainset, devset, device, writer):
     n_phones = len(devset.phone_transform.phoneme_inventory)
     model = Model(devset.num_features, n_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
-    loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
+    #loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
+    loss_fn = LabelSmoothingLoss(epsilon=0.1, num_classes=n_phones)
 
     #If it is enable and you want to start from a pre-trained model
     if FLAGS.start_training_from is not None:
@@ -305,6 +307,11 @@ def train_model(trainset, devset, device, writer):
             report_PER()
         #Change learning rate
         #lr_sched.step()
+        '''
+        if epoch_idx % 3 == 0:
+            alpha_loss += -0.1
+            alpha_loss=max(alpha_loss,0.1)
+        '''
         #Mean of the main loss and logging
         logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
         #Save the Best Model
