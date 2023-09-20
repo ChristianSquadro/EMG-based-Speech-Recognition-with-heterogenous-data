@@ -17,6 +17,7 @@ from architecture import Model
 from BeamSearch import run_single_bs
 from greedy_search import run_greedy
 from data_utils import load_dictionary,combine_fixed_length
+from ctcdecode import CTCBeamDecoder
 
 from absl import flags
 FLAGS = flags.FLAGS
@@ -345,6 +346,42 @@ def evaluate_saved_beam_search():
             torch.cuda.empty_cache()
  
             pred_text =jiwer.Compose([ jiwer.ToLowerCase()])(' '.join(pred[2]))
+            target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""}), jiwer.Strip() ])(example['text'][0])
+            if len(target_text) != 0:
+                references.append(target_text)
+                predictions.append(pred_text)  
+                logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
+        
+    logging.info(f'Final WER: {jiwer.wer(references, predictions)}')
+    
+def evaluate_saved_ctc_beam_search():
+    device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
+    testset = EMGDataset(test=True)
+    #testset = EMGDataset(dev=False,test=False)
+    n_phones = len(testset.text_transform.chars)
+    model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
+    model=nn.DataParallel(model).to(device)
+    model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
+    dataloader = torch.utils.data.DataLoader(testset,  collate_fn=EMGDataset.collate_raw,shuffle=False ,batch_size=1)
+    references = []
+    predictions = []
+    model.eval()
+    blank_id = len(testset.text_transform.chars)
+    decoder = CTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
+            model_path='lm.binary', alpha=1.5, beta=1.85)
+     
+    model.eval() 
+    with torch.no_grad():
+        for example in dataloader:
+            X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+            tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
+
+            out_enc, _ = model(example['lengths'] , device, x_raw=X, y=tgt)
+            out_enc = F.log_softmax(out_enc, 2)
+            beam_results, _, _, out_lens = decoder.decode(out_enc)
+            pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
+            pred_text = testset.text_transform.int_to_text(pred_int)
             target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""}), jiwer.Strip() ])(example['text'][0])
             if len(target_text) != 0:
                 references.append(target_text)
