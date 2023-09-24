@@ -286,7 +286,7 @@ def init_tree(phones, voc, words):
     t = set(test_words)
     test_words = list(t)
     
-    d= { line.split()[0] : line.split()[1:] for line in open('descriptions/new_dgaddy-lexicon.txt', encoding='latin-1') if line.split() != [] }
+    d= { line.split()[0] : line.split()[1:] for line in open('descriptions/new_dgaddy-lexicon.txt') if line.split() != [] }
 
     test_dct = Dictionary.Dictionary()
     for p in phones:

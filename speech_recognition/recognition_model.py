@@ -1,5 +1,6 @@
 import datetime
 import os
+import string
 import sys
 import numpy as np
 import logging
@@ -25,6 +26,7 @@ FLAGS = flags.FLAGS
 #Settings
 flags.DEFINE_boolean('debug', False, 'debug')
 flags.DEFINE_string('evaluate_saved_beam_search', None, 'run beam_evaluation on given model file')
+flags.DEFINE_string('evaluate_saved_ctc_beam_search', None, 'run ctc_beam_evaluation on given model file')
 flags.DEFINE_string('evaluate_saved_greedy_search', None, 'run greedy_evaluation on given model file')
 flags.DEFINE_string('start_training_from', None, 'start training from this model')
 
@@ -36,7 +38,7 @@ flags.DEFINE_string('dict', "descriptions/new_dgaddy-lexicon.txt", 'the pronunci
 flags.DEFINE_string('lang_model', "descriptions/lm.binary", 'the language model')
 
 #Parameters
-flags.DEFINE_integer('pad', 38, 'Padding value according to the position on phoneme inventory')
+flags.DEFINE_integer('pad', 39, 'Padding value according to the position on phoneme inventory')
 flags.DEFINE_integer('report_PER', 1, "How many epochs to report PER")
 flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 
@@ -212,7 +214,7 @@ def train_model(trainset, devset, device, writer):
             phones_seq, new_word_seq_idx = run_greedy(model, example['lengths'] ,X, target, n_phones, device)
             
             predictions_train += phones_seq
-            references_train += example['text']
+            references_train += [devset.text_transform.clean_text(text) for text in example['text']]
             text_train += example['text']
             running_total_train += y.shape[0] * y.shape[1]
             running_correct_train += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
@@ -233,7 +235,7 @@ def train_model(trainset, devset, device, writer):
             
             #Append lists to calculate the PER
             predictions_eval += phones_seq
-            references_eval += example['text']
+            references_eval += [devset.text_transform.clean_text(text) for text in example['text']]
             text_eval += example['text']
             running_total_eval += y.shape[0] * y.shape[1]
             running_correct_eval += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
@@ -270,7 +272,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.85; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -361,29 +363,27 @@ def evaluate_saved_ctc_beam_search():
     n_phones = len(testset.text_transform.chars)
     model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
-    model.load_state_dict(torch.load(FLAGS.evaluate_saved_beam_search))
+    model.load_state_dict(torch.load(FLAGS.evaluate_saved_ctc_beam_search))
     dataloader = torch.utils.data.DataLoader(testset,  collate_fn=EMGDataset.collate_raw,shuffle=False ,batch_size=1)
     references = []
     predictions = []
     model.eval()
     blank_id = len(testset.text_transform.chars)
-    decoder = CTCBeamDecoder(testset.text_transform.chars+'_', blank_id=blank_id, log_probs_input=True,
-            model_path='lm.binary', alpha=1.5, beta=1.85)
+    decoder = CTCBeamDecoder(testset.text_transform.chars + '_', blank_id=blank_id, log_probs_input=True,model_path=FLAGS.lang_model, alpha=1.5, beta=1.85)
      
-    model.eval() 
     with torch.no_grad():
         for example in dataloader:
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
             #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
-
             out_enc, _ = model(example['lengths'] , device, x_raw=X, y=tgt)
             out_enc = F.log_softmax(out_enc, 2)
+
             beam_results, _, _, out_lens = decoder.decode(out_enc)
             pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
             pred_text = testset.text_transform.int_to_text(pred_int)
-            target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""}), jiwer.Strip() ])(example['text'][0])
-            if len(target_text) != 0:
+            if len(example['text'][0]) != 5:
+                target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""})])(example['text'][0])
                 references.append(target_text)
                 predictions.append(pred_text)  
                 logging.info(f'Prediction:{pred_text} ---> Reference:{target_text}  (WER: {jiwer.wer(target_text, pred_text)})')
@@ -459,5 +459,12 @@ if __name__ == '__main__':
             logging.StreamHandler()
             ], level=logging.INFO, format="%(message)s")
         evaluate_saved_greedy_search()
+    elif FLAGS.evaluate_saved_ctc_beam_search is not None:
+        os.makedirs(FLAGS.output_directory, exist_ok=True)
+        logging.basicConfig(handlers=[
+            logging.FileHandler(os.path.join(FLAGS.output_directory, 'log_ctc_beam_search.txt'), 'w'),
+            logging.StreamHandler()
+            ], level=logging.INFO, format="%(message)s")
+        evaluate_saved_ctc_beam_search()
     else:
         main()

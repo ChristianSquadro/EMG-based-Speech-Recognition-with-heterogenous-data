@@ -21,7 +21,7 @@ pron_dct={}
 
 def load_dictionary():
     global pron_dct
-    pron_dct= { line.split()[0] : line.split()[1:] for line in open(FLAGS.dict, encoding='latin-1') if line.split() != [] }
+    pron_dct= { line.split()[0] : line.split()[1:] for line in open(FLAGS.dict) if line.split() != [] }
 
 def normalize_volume(audio):
     rms = librosa.feature.rms(audio)
@@ -262,8 +262,8 @@ def read_phonemes(sentence):
 
 class TextTransform(object):
     def __init__(self):
-        self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase(), jiwer.RemoveWhiteSpace()])
-        self.chars = string.ascii_lowercase+string.digits + '=' + '+' + '-' #the = is <\S>, + is <S> and - is <PAD>
+        self.transformation = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
+        self.chars = string.ascii_lowercase+string.digits + ' ' + '=' + '+' + '-' #the = is <\S>, + is <S> and - is <PAD>
         self.vocabulary_size=len(self.chars)
 
     def clean_text(self, text):

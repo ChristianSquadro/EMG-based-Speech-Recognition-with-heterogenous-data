@@ -1,3 +1,4 @@
+ &      a m p e r s a n d
  *  	a s t e r i s k
  A	 a
  ABANDONED	 a b a n d o n e d
@@ -1122,6 +1123,7 @@
  CARRIES	 c a r r i e s
  CARRY	 c a r r y
  CARRYING	 c a r r y i n g
+ CARRÉE     c a r r e e
  CARS	 c a r s
  CART	 c a r t
  CARTE	 c a r t e
@@ -1167,6 +1169,7 @@
  CEILING	 c e i l i n g
  CELEBRATED	 c e l e b r a t e d
  CELEBRATION	 c e l e b r a t i o n
+ CÉLÈBRES    c e l e b r e s
  CELL	 c e l l
  CELLAR	 c e l l a r
  CELLARS	 c e l l a r s
@@ -1684,6 +1687,7 @@
  COPPERS	 c o p p e r s
  COPSE	 c o p s e
  COPY	 c o p y
+ CŒUR    c o e u r
  COPYING	 c o p y i n g
  COQUETTISH	 c o q u e t t i s h
  CORD	 c o r d
@@ -2021,6 +2025,7 @@
  DENSEST	 d e n s e s t
  DENY	 d e n y
  DENYING	 d e n y i n g
+ DÉNOUEMENT  d e n o u e m e n t
  DEPARTED	 d e p a r t e d
  DEPARTURE	 d e p a r t u r e
  DEPEND	 d e p e n d
@@ -2524,6 +2529,7 @@
  EMOTIONS	 e m o t i o n s
  EMPIRE	 e m p i r e
  EMPLOY	 e m p l o y
+ EMPLOYÉ	 e m p l o y e
  EMPLOYED	 e m p l o y e d
  EMPLOYER	 e m p l o y e r
  EMPLOYERS	 e m p l o y e r s
@@ -2792,6 +2798,8 @@
  EYES	 e y e s
  EYEWITNESS	 e y e w i t n e s s
  EYFORD	 e y f o r d
+ ENCYCLOPÆDIA e n c y c l o p e d i a
+ ENCYCLOPÆDIAS e n c y c l o p e d i a s
  F	 f
  FABRICATION	 f a b r i c a t i o n
  FACE	 f a c e
@@ -4895,6 +4903,7 @@
  METROPOLIS	 m e t r o p o l i s
  METROPOLITAN	 m e t r o p o l i t a n
  METTLE	 m e t t l e
+ MÉTIER  m e t i e r
  MEXICO	 m e x i c o
  MICE	 m i c e
  MICROSCOPE	 m i c r o s c o p e
@@ -5457,6 +5466,7 @@
  OXFORDSHIRE	 o x f o r d s h i r e
  OXIDE	 o x i d e
  OXYGEN	 o x y g e n
+ OUTRÉ   o u t r e
  PA	 p a
  PACE	 p a c e
  PACED	 p a c e d
@@ -5577,6 +5587,7 @@
  PATTED	 p a t t e d
  PATTERED	 p a t t e r e d
  PATTING	 p a t t i n g
+ PÂTÉ        p a t e
  PAUPER	 p a u p e r
  PAUSE	 p a u s e
  PAUSED	 p a u s e d
@@ -6385,6 +6396,7 @@
  REPEATEDLY	 r e p e a t e d l y
  REPEATING	 r e p e a t i n g
  REPELLED	 r e p e l l e d
+ RÉPERTOIRE  r e p e r t o i r e
  REPENTED	 r e p e n t e d
  REPLACE	 r e p l a c e
  REPLACED	 r e p l a c e d
@@ -9007,6 +9019,7 @@ DEATH'S	d e a t h s
 DENOUNCING	d e n o u n c i n g
 DESERTION	d e s e r t i o n
 DETACHMENT	d e t a c h m e n t
+DÉTOUR      d e t o u r
 DEVIL'S	d e v i l s
 DIDN'T	d i d n t
 DISH	d i s h
@@ -9041,6 +9054,7 @@ FATHER'S	f a t h e r s
 FEARFUL	f e a r f u l
 FEARING	f e a r i n g
 FEVERISHLY	f e v e r i s h l y
+FIANCÉ      f i a n c e
 FINGERING	f i n g e r i n g
 FISHERMAN'S	f i s h e r m a n s
 FORTNIGHT'S	f o r t n i g h t s
