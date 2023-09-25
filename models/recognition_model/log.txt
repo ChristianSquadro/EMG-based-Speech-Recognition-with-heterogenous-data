@@ -1,1 +1,154 @@
 train / dev split: 8055 200
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY HH AE D IH Z HH AE D IH Z HH AE D IH Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE D IH Z AH N D IH Z AH N D IH Z AH N D IH Z AH N D IH Z AH N D ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.9818181818181818) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AY HH AE D IH Z HH AE D IH Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE Z HH AE D IH Z HH AE Z HH AE D IH Z HH AE Z HH AE Z HH AE D IH Z HH AE Z HH AE Z HH AE D AH N D AH N D AH N D IH Z AH N D IH Z AH N D IH Z AH N D IH Z AH N D IH Z AH N D IH Z AH N ---> 
+ Training Reference: <S> IH F Y UW W UH D HH AE V DH AH G R EY T K AY N D N AH S T UW G EH T R IH D AH V DH AE T S AA T AH SH F R EH N D AH V Y UH R Z AY SH UH D B IY IH K S IY D IH NG L IY G L AE D T UW HH AE V EY L IH T AH L T AO K W IH DH Y UW </S>  (Training PER: 1.1304347826086956) 
+ Training Reference Text: If you would have the great kindness to get rid of that sottish friend of yours I should be exceedingly glad to have a little talk with you.”
+-----finished epoch 1 - training loss: 5.8029------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> DH AH S T AH N D DH AH S T AH S T AH S T AH L AH S T AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.9636363636363636) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> IH T S IY S T UW M AY T UW S T UW S T UW S T UW S T UW M IY S T UW S T UW S T UW S T UW M IY ---> 
+ Training Reference: <S> Y UW L S IY Y AO R P AE L AH G EH N P R EH Z AH N T L IY S EH D JH OW N Z </S>  (Training PER: 1.0606060606060606) 
+ Training Reference Text: “You’ll see your pal again presently,” said Jones.
+-----finished epoch 2 - training loss: 2.5650------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY W AA Z AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.9272727272727272) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> Y UW M AH S T K AH M AH M AH N D F AY T UW M AH M AH N D F AO R M AH M AH M AH M AH M AH N S AH M AH M AH ---> 
+ Training Reference: <S> Y UW M AH S T L AA K Y ER S EH L F AH P F R AH M HH IH M T UW N AY T </S>  (Training PER: 0.967741935483871) 
+ Training Reference Text: You must lock yourself up from him to-night.
+-----finished epoch 3 - training loss: 2.3383------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY DH ER D IH L IY AH N D IH NG AH N D IH NG AH N D HH OW L IY R IY K SH EH V ER S EH V ER S EH V ER </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.6909090909090909) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> Y UW HH AE V S EH D HH OW M Z S EH D HH OW M Z W IH DH AH F R EY K AH N D AH V DH AH S AY N D IY W IH DH EY S T R EY S T AH N D AH N D AH N D IY W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W IH CH W ---> 
+ Training Reference: <S> Y UW W IH L AH B Z ER V S EH D HH OW M Z L EY IH NG D AW N DH AH V AA L Y UW M DH AE T DH AH S AH D AH N B R EY K IH NG AH P AH V DH AH S OW S AY IH T IY W AA Z K OW IH N S AH D AH N T W IH DH DH AH D IH S AH P IH R AH N S AH V OW P AH N SH AO F R AH M AH M EH R IH K AH W IH DH DH EH R P EY P ER Z </S>  (Training PER: 0.8181818181818182) 
+ Training Reference Text: “You will observe,” said Holmes, laying down the volume, “that the sudden breaking up of the society was coincident with the disappearance of Openshaw from America with their papers.
+-----finished epoch 4 - training loss: 2.0910------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY W AA Z EY D R AY V ER AH N D DH AH R EY N D IH NG AH N D T R IY AH N D AH N D AH N D IH NG AH N D IH T UW B AW T S EH V AH N D AH N D AH N D AH N D AH N D AH B AW ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.7636363636363637) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> DH AH S AW ER M OW N T UW HH AE D S EY N IH N T UW SH ER D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH S EY N D SH AO R D AH N AH N AH N AH N AH N AH N AH N AH N AH N AH N AH N AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH N D AH V ER S K W EH R IY K W AA Z EY V EH R IY K W AH N D B IH NG K W IH N D B IH S T ER AH N D B IH S T ER AH V DH AH F AA DH AH F AA DH AH F AA DH AH F AA DH AH F AA DH AH F AA DH AH N AH F AA DH AH N AH N AH N AH N AH N AH N AH N AH N AH N D AH V DH AH N AH N AH N AH N AH N AH N AH N D AH V DH AH N AH N AH N AH N AH N AH N AH N AH N D AH V DH AH N AH N AH N AH N AH N AH N AH N AH N D AH V DH AH N AH N AH N AH ---> 
+ Training Reference: <S> DH AH S EH R AH M OW N IY W IH CH W AA Z P ER F AO R M D AE T EH S T JH AO R JH AH Z HH AE N OW V ER S K W EH R W AA Z EY V EH R IY K W AY AH T W AH N N OW W AH N B IY IH NG P R EH Z AH N T S EY V DH AH F AA DH ER AH V DH AH B R AY D M IH S T ER AE L OW IH SH IH S D AO R AE N DH AH D AH CH AH S AH V B AE L M AO R AH L L AO R D B AE K W AO T ER L AO R D Y UW S T AH S AH N D L EY D IY K L AE R AH EH S T S AY M AH N DH AH Y AH NG G ER B R AH DH ER AH N D S IH S T ER AH V DH AH B R AY D G R UW M AH N D L EY D IY AH L IH SH AH W IH T IH NG T AH N </S>  (Training PER: 0.9641255605381166) 
+ Training Reference Text: “‘The ceremony, which was performed at St. George’s, Hanover Square, was a very quiet one, no one being present save the father of the bride, Mr. Aloysius Doran, the Duchess of Balmoral, Lord Backwater, Lord Eustace, and Lady Clara St. Simon (the younger brother and sister of the bridegroom), and Lady Alicia Whittington.
+-----finished epoch 5 - training loss: 1.7919------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY W AA Z EY N R EY V ER AH N AH DH AH ER AH R AH R AH N D IH L IH T R IY AH N D D D T R IY AH M IH N D AE K SH AH N AH B AW T S EH V ER </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.4727272727272727) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AA N DH AH EH N DH AH EH N DH ER HH EH N D DH AH F EY N D DH AH F EY N Z AH N D M AE T ER HH AE D B L EH S AH N D B L EH S AH N D B L EH S AH N D B L EH SH AH N AH P AA N M IY AH N D AY K UH D N DH AE T HH IH Z AE K DH AE K DH AE T IH T IH Z AE K S P L EY K UH D N AH N AH N D IH S P L EY K AH M IH NG S AY K AH M IH NG S AY K AH M IH NG S AY K AH M IH NG S AY N AY T DH AE T HH IH Z IH Z IH K S P L EY K AH M IH NG S AY N D IY DH AE T HH IH Z IH Z IH S EH K S EH S P L IY T IY T IY T IY T IY DH AE T HH IY W AA ---> 
+ Training Reference: <S> AA N DH AH AH DH ER HH AE N D DH AH F EY S AH N D M AE N ER AH V M AY P EY T R AH N HH AE D M EY D AE N AH N P L EH Z AH N T IH M P R EH SH AH N AH P AA N M IY AH N D AY K UH D N AA T TH IH NG K DH AE T HH IH Z EH K S P L AH N EY SH AH N AH V DH AH F UH L ER Z ER TH W AA Z S AH F IH SH AH N T T UW IH K S P L EY N DH AH N AH S EH S AH T IY F AO R M AY K AH M IH NG AE T M IH D N AY T AH N D HH IH Z IH K S T R IY M AE NG Z AY AH T IY L EH S T AY SH UH D T EH L EH N IY W AH N AH V M AY EH R AH N D </S>  (Training PER: 0.6881188118811881) 
+ Training Reference Text: On the other hand, the face and manner of my patron had made an unpleasant impression upon me, and I could not think that his explanation of the fuller’s-earth was sufficient to explain the necessity for my coming at midnight, and his extreme anxiety lest I should tell any one of my errand.
+-----finished epoch 6 - training loss: 1.5137------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY D R AY V ER AH N D DH AH AA R T IH L T R IY AH N D IH N OW N L IY AH N D IH N OW N L IY AH M AH N D AE K SH AH N AH B AW T S T S T EH V AH N IY </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.43636363636363634) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> IH F AY L AH N D IH K S P L OW SH AH N S CH EH K DH AH HH EH R DH AH S P AW N W AO T IH NG DH AH N W AO T ER S IY M P AA D AH N D SH AE L ER D B EH T AH L SH AA T IH F AA R N HH AE D HH AE P IH N D DH IH ---> 
+ Training Reference: <S> EY V AY AH L AH N T IH K S P L OW ZH AH N SH UH K DH AH EH R AH N D EY S P AW T AH V W AO T ER S T IY M M AH D AH N D SH AE T ER D M EH T AH L SH AA T F AA R AH P IH N T UW DH AH S K AY </S>  (Training PER: 0.4935064935064935) 
+ Training Reference Text: A violent explosion shook the air, and a spout of water, steam, mud, and shattered metal shot far up into the sky.
+-----finished epoch 7 - training loss: 1.2709------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY T R AY V ER AH N D DH AH AA R T IH L AH R IY AH N D T OW N L IH NG AH M AH N D AE K SH AH N AH B AW T S EH V AH N </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.2727272727272727) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> M EY AY S IY IH T </S> ---> 
+ Training Reference: <S> M EY AY S IY IH T </S>  (Training PER: 0.0) 
+ Training Reference Text: “May I see it?”
+-----finished epoch 8 - training loss: 1.1023------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY T R AY F ER AH N D DH AH AA R T IH L IH T R IY AH N D T UW L IH T R IY AH N D T UW T OW N L IH NG AH M AH N D AE K SH AH N AH B AW T S EH V AH N </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.4727272727272727) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AY B IH G AH M W EH R AH V HH IH M AE Z EY S T EH R AH F IH G Y ER AH N D S M AA JH SH AH N S L IY V Z AH N D W IH DH IH S AA M P Y AH L ER N D K L IY JH EH F T S S S EH R IH NG AE T EY F EY S L IH G ER IH NG DH AE T D AE T S AO F Y ER DH IH S K AY </S> ---> 
+ Training Reference: <S> AY B IH K EY M AH W EH R AH V HH IH M AE Z EY S IY T AH D F IH G Y ER IH N S UH T S M AH JH D SH ER T S L IY V Z AH N D W IH DH HH IH Z AH P T ER N D K L IY N SH EY V AH N F EY S S T EH R IH NG AE T EY F EY N T F L IH K ER IH NG DH AE T D AE N S T OW V ER DH AH S K AY </S>  (Training PER: 0.35135135135135137) 
+ Training Reference Text: I became aware of him as a seated figure in soot-smudged shirt sleeves, and with his upturned, clean-shaven face staring at a faint flickering that danced over the sky.
+-----finished epoch 9 - training loss: 0.9749------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D IH D N OW N L IY AH N D IH D N OW N L IY AH M AH N D AE K SH AH N AH B AW T S EH V AH D </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.34545454545454546) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> DH AH M AE N IH N DH AH R OW D W AA Z AH N D AW N D AH N D AW N D AH N L IY S AH M F R EH N D AH V ER Z B R EH N D AH V ER Z B AA S AH B IH R F Y UW AH L Z EY AH N OW D AW T Y UW W AO R DH AH G ER L Z D R EH S AH N D W ER DH AH G ER L Z D R EH S AH N D W ER S OW L AY G ER HH IY W AA Z K AH N V EY S F R AH M Y AO R L AE F T ER W EH N EH V ER IY S AO NG Y UW AH N D AE F T ER W ER JH EH N EH V ER IY S AO NG Y UW AH N D AE F T ER W ER JH EH N EH V ER JH EH N EH V ER W ER JH EH N EH V ER IY S AO NG Y UW AH N D AE F T ---> 
+ Training Reference: <S> DH AH M AE N IH N DH AH R OW D W AA Z AH N D AW T IH D L IY S AH M F R EH N D AH V HH ER Z P AA S AH B L IY HH ER F AY AH NG K EH AH N D N OW D AW T AE Z Y UW W AO R DH AH G ER L Z D R EH S AH N D W ER S OW L AY K HH ER HH IY W AA Z K AH N V IH N S T F R AH M Y AO R L AE F T ER W EH N EH V ER HH IY S AO Y UW AH N D AE F T ER W ER D Z F R AH M Y AO R JH EH S CH ER DH AE T M IH S R UW K AH S AH L W AA Z P ER F AH K T L IY HH AE P IY AH N D DH AE T SH IY N OW L AO NG G ER D IH Z AY ER D HH IH Z AH T EH N SH AH N Z </S>  (Training PER: 0.5639810426540285) 
+ Training Reference Text: The man in the road was, undoubtedly, some friend of hers—possibly her _fiancé_—and no doubt, as you wore the girl’s dress and were so like her, he was convinced from your laughter, whenever he saw you, and afterwards from your gesture, that Miss Rucastle was perfectly happy, and that she no longer desired his attentions.
+-----finished epoch 10 - training loss: 0.8794------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> W AA Z EY D R AY V ER AH N D DH AH AA R T IH L AH R IY AH N D IH N OW N L IY AH N D IH N OW N L IY AH M AH N D AE K SH AH N AH B AW T S EH V AH N </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.36363636363636365) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AE Z IH T IH Z IH N OW P AH N S EY K R AH T DH AE T DH AH D UW Z K AH V B IH M P AH N M AO R AH L HH AE Z B IH N K AH M P EH L D T UW S EH L AH S T EH L AH S AH V B IH K CH ER Z W IH DH IH N DH AH L AE S F Y UW ZH IH R Z AH N ER Z AH N D AE Z L AO R D S EY T S AY M AH N HH AE Z N UW M K DH AE T HH IY S IY AH N K AA M AH N T R IH SH AH N F R AH M EY K DH AE T HH IY S IY AH N K AA M AH N T R EH N S IH SH AH N F R AH N F R AH M EY K AH N T L EY D IY T IY T UW EY B R EH S IH SH AH N F R AH N AH M EY K DH AE T IY S IY AH N K AA M AH N T L EY D IY T IY T UW EY B R EH S P IH SH AH N F R IH SH AH N F R AH M EY R IH Z P R IH SH AH N AH N P R IH SH AH N F R IH Z P R IH SH AH N P IY R IH Z P R IH N AH S ---> 
+ Training Reference: <S> AE Z IH T IH Z AE N OW P AH N S IY K R AH T DH AE T DH AH D UW K AH V B AE L M AO R AH L HH AE Z B IH N K AH M P EH L D T UW S EH L HH IH Z P IH K CH ER Z W IH DH IH N DH AH L AE S T F Y UW Y IH R Z AH N D AE Z L AO R D EH S T S AY M AH N HH AE Z N OW P R AA P ER T IY AH V HH IH Z OW N S EY V DH AH S M AO L EH S T EY T AH V B ER CH M UH R IH T IH Z AA B V IY AH S DH AE T DH AH K AE L IH F AO R N Y AH N EH R AH S IH Z N AA T DH AH OW N L IY G EY N ER B AY AE N AH L AY AH N S W IH CH W IH L EH N EY B AH L HH ER T UW M EY K DH AH IY Z IY AH N D K AA M AH N T R AE N Z IH SH AH N F R AH M EY R IH P AH B L IH K AH N L EY D IY T UW EY B R IH T IH SH P IH ER AH S </S>  (Training PER: 0.6037037037037037) 
+ Training Reference Text: As it is an open secret that the Duke of Balmoral has been compelled to sell his pictures within the last few years, and as Lord St. Simon has no property of his own, save the small estate of Birchmoor, it is obvious that the Californian heiress is not the only gainer by an alliance which will enable her to make the easy and common transition from a Republican lady to a British peeress.’”
+-----finished epoch 11 - training loss: 0.8052------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY W AA Z EY D R AY V ER AH N D DH AH AA R T IH L ER IY AH N D N OW N L IY AH M IH N D AE K SH AH N AH B AW T S T EH V AH N IY </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.21818181818181817) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AY D R AH S T S ER DH AE T Y UW W IH L T UW K S IY D IH D IH D P R UW V IH NG W EH N AY F IY L CH ER IH Z DH AH D R UW TH DH AE T M AY K AH Z AH N AA R TH ER AH N D IH N HH IH Z AH N D AH V DH AH S K R AY M </S> ---> 
+ Training Reference: <S> AY T R AH S T S ER DH AE T Y UW W IH L S AH K S IY D IH N P R UW V IH NG W AH T AY F IY L SH UH R IH Z DH AH T R UW TH DH AE T M AY K AH Z AH N AA R TH ER IH Z IH N AH S AH N T AH V DH IH S K R AY M </S>  (Training PER: 0.24390243902439024) 
+ Training Reference Text: I trust, sir, that you will succeed in proving, what I feel sure is the truth, that my cousin Arthur is innocent of this crime.”
+-----finished epoch 12 - training loss: 0.7346------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> HH IY W AA Z EY D R AY V ER AH N D DH AH AA R T IH L ER IY AH N D IH N DH AH OW N L IY AH N D IH N DH OW N L IY AH M IH N T AE K SH AH N AH B AW T S EH V AH T </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.32727272727272727) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> B AH T AE T EH N IY T AY M D IH R N AY T AH T EH L AH G R AE M W UH D B R IH NG M IY D AW N T UW Y AO R HH AH P </S> ---> 
+ Training Reference: <S> B AH T AE T EH N IY T AY M D EY AO R N AY T EY T EH L AH G R AE M W UH D B R IH NG M IY D AW N T UW Y AO R HH EH L P </S>  (Training PER: 0.1) 
+ Training Reference Text: “But at any time, day or night, a telegram would bring me down to your help.”
+-----finished epoch 13 - training loss: 0.6808------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> AY W AA Z EY D R AY V ER IH N DH AH AA R T IH L AH T R IY AH N D IH N OW N L IY AH M AH N T AE K SH AH N AH B AW T S SH AE V AH N </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.23636363636363636) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> DH EH N AY W AO K T AH K R AO S T UW DH AH W IH N D OW OW OW OW P IH NG DH AE T AY M AY T K AE SH AH N S AH M G L EH P S AH V EY K AH N T R IY T AY D B AH T IH N OW K SH AH T ER HH EH V AH L IY B AA R D W IH DH F OW L D AH N AH K R AO S IH T ---> 
+ Training Reference: <S> DH EH N AY W AO K T AH K R AO S T UW DH AH W IH N D OW HH OW P IH NG DH AE T AY M AY T K AE CH S AH M G L IH M P S AH V DH AH K AH N T R IY S AY D B AH T AE N OW K SH AH T ER HH EH V AH L IY B AA R D W AA Z F OW L D AH D AH K R AO S IH T </S>  (Training PER: 0.15306122448979592) 
+ Training Reference Text: Then I walked across to the window, hoping that I might catch some glimpse of the country-side, but an oak shutter, heavily barred, was folded across it.
+-----finished epoch 14 - training loss: 0.6365------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> HH IY W AA Z EY D R AY V ER AH N D DH AH AA R T IH L IH T ER IY AH N D IH N OW N L IY K AH M IH N T EH K SH AH N AH B AW T S AE V AH T </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.2) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> IH T W AA Z HH AW EH V ER S T IH L S OW HH AA T F R AH M HH IH Z F L EY T TH R UW DH AH EH R AE Z T UW F AO R EY B IH N HH IH Z N IH R AH P R OW CH </S> ---> 
+ Training Reference: <S> IH T W AA Z HH AW EH V ER S T IH L S OW HH AA T F R AH M IH T S F L AY T TH R UW DH AH EH R AE Z T UW F ER B IH D HH IH Z N IH R AH P R OW CH </S>  (Training PER: 0.13559322033898305) 
+ Training Reference Text: It was, however, still so hot from its flight through the air as to forbid his near approach.
+-----finished epoch 15 - training loss: 0.5941------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L EH R IY AH N D IH N OW N L IY AH N D IH N OW N L IY K AH M IH N T AE K SH AH N AH B AW T S T AE V AH N T </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.2909090909090909) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> DH AH B AA D IY IH NG G Z IH P T IH D N OW T R EY S T AH V AY L AH N S AH N D DH EH R K AE N B IY N OW D AW T DH AE T DH AH D IH S IY S T HH AE D B IH N DH AH V IH K T AH M EH V ER F AO R CH AH N T AE K S T AH N T W IH CH SH UH D HH AE V DH AH IH F EH K T AH V K AO L IH NG DH AH IH N T EY SH AH N AH V DH AH TH AO R AH N IY AH S T UW DH AH K AH N D IH SH AH N AH V DH AH R IH V ER T AH N T S AY N D IH NG S T EY SH AH S </S> ---> 
+ Training Reference: <S> DH AH B AA D IY IH G Z IH B AH T AH D N OW T R EY S AH Z AH V V AY AH L AH N S AH N D DH EH R K AE N B IY N OW D AW T DH AE T DH AH D IH S IY S T HH AE D B IH N DH AH V IH K T IH M AH V AE N AH N F AO R CH AH N AH T AE K S AH D AH N T W IH CH SH UH D HH AE V DH AH IH F EH K T AH V K AO L IH NG DH AH AH T EH N SH AH N AH V DH AH AH TH AO R AH T IY Z T UW DH AH K AH N D IH SH AH N AH V DH AH R IH V ER S AY D L AE N D IH NG S T EY JH IH Z </S>  (Training PER: 0.19318181818181818) 
+ Training Reference Text: The body exhibited no traces of violence, and there can be no doubt that the deceased had been the victim of an unfortunate accident, which should have the effect of calling the attention of the authorities to the condition of the river-side landing-stages.’”
+-----finished epoch 16 - training loss: 0.5554------
+----Prediction Evaluation-----
+Evaluation Prediction: <S> HH IY W AA Z EY D R AY V ER AH N D DH AH AA R T IH L AH T ER IY AH N D IH N OW N L IY AH M IH N T AE K SH AH N AH B AW T S T EH V AH N D </S> ---> 
+  Evaluation Reference: <S> HH IY W AA Z EY D R AY V ER IH N DH AH AA R T IH L ER IY AH N D HH AE D OW N L IY K AH M IH N T UW AE K SH AH N AH B AW T S EH V AH N </S>  (Evaluation PER: 0.2) 
+ Evaluation Reference Text: He was a driver in the artillery, and had only come into action about seven.
+----Prediction Training-----
+Training Prediction: <S> AH V IH N CH AH L IY AH N D DH AH IH R IH N T AH N D S IH K S T IY N AY N DH AH M UW V M AE N R AH DH ER S AH D AH N L IY K L AE P S T AO L DH OW DH EH R HH AE V B IH N S P R EY K AW N B R IH K S AH V DH AH S EY M S AO R T S EH N S EH N S T EY T </S> ---> 
+ Training Reference: <S> IH V EH N CH AH W AH L IY IH N DH AH Y IH R W AH N TH AW Z AH N D EY T HH AH N D R AH D AH N D S IH K S T IY N AY N DH AH M UW V M AH N T R AE DH ER S AH D AH N L IY K AH L AE P S T AO L DH OW DH EH R HH AE V B IH N S P ER AE D IH K AW T B R EY K S AH V DH AH S EY M S AO R T S IH N S DH AE T D EY T </S>  (Training PER: 0.3064516129032258) 
+ Training Reference Text: Eventually, in the year 1869, the movement rather suddenly collapsed, although there have been sporadic outbreaks of the same sort since that date.’
+-----finished epoch 17 - training loss: 0.5229------

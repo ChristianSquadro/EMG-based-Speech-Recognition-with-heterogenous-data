@@ -77,7 +77,7 @@ def train_model(trainset, devset, device, writer):
             #Preprosessing of the input and target for the model
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
             #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            y=example['phonemes_int']
             
             #To take into account the length of the batch dimension and for gradient accumulation
             #print(len(X))
@@ -85,8 +85,9 @@ def train_model(trainset, devset, device, writer):
 
             
             #Shifting target for input decoder and loss
-            tgt= y[:,:-1]
-            target= y[:,1:]
+            target= nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            tgt= target[:,:-1]
+            target= target[:,1:]
 
             #Prediction
             out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
@@ -94,7 +95,10 @@ def train_model(trainset, devset, device, writer):
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+            phonemes_int_lengths=[item - 2 for item in example['phonemes_int_lengths']]
+            y=[item[1:-1] for item in y]
+            y = nn.utils.rnn.pad_sequence(y, batch_first=True, padding_value= FLAGS.pad).to(device)
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_ctc_phones) 
             
             
             #Decoder Loss
@@ -139,17 +143,21 @@ def train_model(trainset, devset, device, writer):
                 #Collect the data
                 X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
                 #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-                y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
+                y = example['phonemes_int']
             
                 #Forward Model 
-                tgt= y[:,:-1]
-                target= y[:,1:]
+                target= nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+                tgt= target[:,:-1]
+                target= target[:,1:]
                 out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
 
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
                 out_enc = out_enc.transpose(1,0)
-                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['phonemes_int_lengths'], blank = n_phones) 
+                phonemes_int_lengths=[item - 2 for item in example['phonemes_int_lengths']]
+                y=[item[1:-1] for item in y]
+                y = nn.utils.rnn.pad_sequence(y, batch_first=True, padding_value= FLAGS.pad).to(device)
+                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_ctc_phones) 
                     
                 #Decoder Loss
                 out_dec=out_dec.permute(0,2,1)
@@ -269,7 +277,7 @@ def train_model(trainset, devset, device, writer):
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.25; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.20; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -279,7 +287,8 @@ def train_model(trainset, devset, device, writer):
     
     #Define model and loss function
     n_phones = len(devset.phone_transform.phoneme_inventory)
-    model = Model(devset.num_features, n_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
+    n_ctc_phones = len(devset.phone_transform.phoneme_inventory) - 3
+    model = Model(devset.num_features, n_ctc_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     #loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
     loss_fn = LabelSmoothingLoss(epsilon=0.1, num_classes=n_phones)
@@ -330,7 +339,8 @@ def evaluate_saved_beam_search():
     testset = EMGDataset(test=True)
     #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
-    model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
+    n_ctc_phones= len(testset.phone_transform.phoneme_inventory) - 3
+    model = Model(testset.num_features, n_ctc_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
@@ -364,7 +374,8 @@ def evaluate_saved_greedy_search():
     testset = EMGDataset(test=True)
     #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
-    model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
+    n_ctc_phones= len(testset.phone_transform.phoneme_inventory) - 3
+    model = Model(testset.num_features, n_ctc_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
     dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
