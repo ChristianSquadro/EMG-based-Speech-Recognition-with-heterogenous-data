@@ -1,1 +1,53 @@
 train / dev split: 8055 200
+----Prediction Evaluation-----
+Evaluation Prediction: + i i the the the the the the the the the the the the the the the the the the the the the the t ---> 
+  Evaluation Reference: + he was a driver in the artillery and had only come into action about seven =  (Evaluation CER: 0.8974358974358975) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: + i i the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the ---> 
+ Training Reference: + if you would have the great kindness to get rid of that sottish friend of yours i should be exceedingly glad to have a little talk with you =  (Training CER: 0.8671328671328671) 
+ Training Reference Text: + If you would have the great kindness to get rid of that sottish friend of yours I should be exceedingly glad to have a little talk with you.” =
+----Prediction Evaluation Beam Search-----
+Evaluation Prediction: i had a red and a hesitation to  ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation WER: 0.8666666666666667) 
+
+-----finished epoch 1 - training loss: 3.6929------
+----Prediction Evaluation-----
+Evaluation Prediction: i had a red and a hesitation to  ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation CER: 0.6756756756756757) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: + i i the said the sto the said the sto the sto the sto the sto t ---> 
+ Training Reference: + youll see your pal again presently said jones =  (Training CER: 0.9387755102040817) 
+ Training Reference Text: + “You’ll see your pal again presently,” said Jones. =
+----Prediction Evaluation Beam Search-----
+Evaluation Prediction: i had a easier to aid in the stath ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation WER: 0.9333333333333333) 
+
+-----finished epoch 2 - training loss: 2.7715------
+----Prediction Evaluation-----
+Evaluation Prediction: i had a easier to aid in the stath ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation CER: 0.7162162162162162) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: + the said the said the said the said the said the said the the s ---> 
+ Training Reference: + you must lock yourself up from him tonight =  (Training CER: 1.0217391304347827) 
+ Training Reference Text: + You must lock yourself up from him to-night. =
+----Prediction Evaluation Beam Search-----
+Evaluation Prediction: i aaaaa to a a  ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation WER: 1.0) 
+
+-----finished epoch 3 - training loss: 2.5810------
+----Prediction Evaluation-----
+Evaluation Prediction: i aaaaa to a a  ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation CER: 0.8243243243243243) 
+ Evaluation Reference Text: + He was a driver in the artillery, and had only come into action about seven. =
+----Prediction Training-----
+Training Prediction: + it was that i the was the shall the shall the shall the had the sharrrre had the she he had the she he had the sharrrre = ---> 
+ Training Reference: + you will observe said holmes laying down the volume that the sudden breaking up of the society was coincident with the disappearance of openshaw from america with their papers =  (Training CER: 0.6815642458100558) 
+ Training Reference Text: + “You will observe,” said Holmes, laying down the volume, “that the sudden breaking up of the society was coincident with the disappearance of Openshaw from America with their papers. =
+----Prediction Evaluation Beam Search-----
+Evaluation Prediction: aeiirii ---> 
+  Evaluation Reference:  he was a driver in the artillery and had only come into action about seven   (Evaluation WER: 1.0) 
+
+-----finished epoch 4 - training loss: 2.4760------

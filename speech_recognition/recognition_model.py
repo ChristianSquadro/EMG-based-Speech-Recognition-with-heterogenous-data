@@ -80,24 +80,22 @@ def train_model(trainset, devset, device, writer):
             #Preprosessing of the input and target for the model
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
             #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
-            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True,  padding_value= FLAGS.pad).to(device)
+            y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
             
             #To take into account the length of the batch dimension and for gradient accumulation
             #print(len(X))
             sum_batch_size += len(X)
 
             
-            #Shifting target for input decoder and loss
+            #Forward Model 
             tgt= y[:,:-1]
             target= y[:,1:]
-
-            #Prediction
-            out_enc, out_dec = model(example['lengths'], device, x_raw=X, y=tgt)
+            out_enc, out_dec = model(example['lengths'] , device, x_raw=X, y=tgt)
 
             #Encoder Loss
             out_enc = F.log_softmax(out_enc, 2)
             out_enc = out_enc.transpose(1,0)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones)  
             
             
             #Decoder Loss
@@ -142,8 +140,8 @@ def train_model(trainset, devset, device, writer):
                 #Collect the data
                 X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
                 #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
-                y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
-            
+                y = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
+                
                 #Forward Model 
                 tgt= y[:,:-1]
                 target= y[:,1:]
@@ -152,7 +150,7 @@ def train_model(trainset, devset, device, writer):
                 #Encoder Loss
                 out_enc = F.log_softmax(out_enc, 2)
                 out_enc = out_enc.transpose(1,0)
-                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones) 
+                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], example['text_int_lengths'], blank = n_phones)  
                     
                 #Decoder Loss
                 out_dec=out_dec.permute(0,2,1)
@@ -242,13 +240,13 @@ def train_model(trainset, devset, device, writer):
 
         #Reporting PER
         logging.info(f'----Prediction Evaluation-----')
-        logging.info(f'Evaluation Prediction: {predictions_eval[0]} ---> \n  Evaluation Reference: {references_eval[0]}  (Evaluation PER: {jiwer.cer(references_eval[0], predictions_eval[0])}) \n Evaluation Reference Text: {text_eval[0]}')
+        logging.info(f'Evaluation Prediction: {predictions_eval[0]} ---> \n  Evaluation Reference: {references_eval[0]}  (Evaluation CER: {jiwer.cer(references_eval[0], predictions_eval[0])}) \n Evaluation Reference Text: {text_eval[0]}')
         logging.info(f'----Prediction Training-----')
-        logging.info(f'Training Prediction: {predictions_train[0]} ---> \n Training Reference: {references_train[0]}  (Training PER: {jiwer.cer(references_train[0], predictions_train[0])}) \n Training Reference Text: {text_train[0]}')
-        writer.add_scalar('PhonemeErrorRate/Training', jiwer.cer(references_train, predictions_train), batch_idx)
-        writer.add_scalar('PhonemeErrorRate/Evaluation', jiwer.cer(references_eval, predictions_eval), batch_idx)
-        writer.add_scalar('PhonemeErrorRate_Epoch/Training', jiwer.cer(references_train, predictions_train), epoch_idx)
-        writer.add_scalar('PhonemeErrorRate_Epoch/Evaluation', jiwer.cer(references_eval, predictions_eval), epoch_idx)
+        logging.info(f'Training Prediction: {predictions_train[0]} ---> \n Training Reference: {references_train[0]}  (Training CER: {jiwer.cer(references_train[0], predictions_train[0])}) \n Training Reference Text: {text_train[0]}')
+        writer.add_scalar('CharacterErrorRate/Training', jiwer.cer(references_train, predictions_train), batch_idx)
+        writer.add_scalar('CharacterErrorRate/Evaluation', jiwer.cer(references_eval, predictions_eval), batch_idx)
+        writer.add_scalar('CharacterErrorRate_Epoch/Training', jiwer.cer(references_train, predictions_train), epoch_idx)
+        writer.add_scalar('CharacterErrorRate_Epoch/Evaluation', jiwer.cer(references_eval, predictions_eval), epoch_idx)
         writer.add_scalar('Accuracy_Epoch/Training', round(100 * running_correct_train / running_total_train,1), epoch_idx)
         writer.add_scalar('Accuracy_Epoch/Evaluation', round(100 * running_correct_eval / running_total_eval,1), epoch_idx)
         
@@ -265,14 +263,35 @@ def train_model(trainset, devset, device, writer):
         running_total_eval = 0
         running_correct_eval = 0
 
+    def report_WER():
+        nonlocal references_eval, predictions_eval
 
+        model.eval()
+        with torch.no_grad():
+            for example in dataloader_evaluation:
+                X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
+                #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
+                tgt = nn.utils.rnn.pad_sequence(example['text_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
+                out_enc, _ = model(example['lengths'] , device, x_raw=X, y=tgt)
+                out_enc = F.log_softmax(out_enc, 2)
+
+                beam_results, _, _, out_lens = decoder.decode(out_enc)
+                pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
+                pred_text = devset.text_transform.int_to_text(pred_int)
+                target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""})])(example['text'][0])
+                references_eval.append(target_text)
+                predictions_eval.append(pred_text)  
+
+        logging.info(f'----Prediction Evaluation Beam Search-----')
+        logging.info(f'Evaluation Prediction: {predictions_eval[0]} ---> \n  Evaluation Reference: {references_eval[0]}  (Evaluation WER: {jiwer.wer(references_eval[0], predictions_eval[0])}) \n')
+        writer.add_scalar('Word_Error_Rate_Epoch/Evaluation', jiwer.wer(references_eval, predictions_eval), epoch_idx)
     ################################################### TRAINING MODEL BELOW ########################################################################       
 
     ##INITIALIZATION##
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.85; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.90; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -282,6 +301,7 @@ def train_model(trainset, devset, device, writer):
     
     #Define model and loss function
     n_phones = len(devset.text_transform.chars)
+    decoder = CTCBeamDecoder(devset.text_transform.chars+'_', blank_id=n_phones, log_probs_input=True,model_path=FLAGS.lang_model, alpha=1.5, beta=1.85)
     model = Model(devset.num_features, n_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
@@ -307,14 +327,13 @@ def train_model(trainset, devset, device, writer):
         #PER
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
+            report_WER()
         #Change learning rate
         #lr_sched.step()
         #Mean of the main loss and logging
         logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
         #Save the Best Model
-        if curr_eval_PER < best_eval_PER:
-            torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
-            best_eval_PER= curr_eval_PER
+        torch.save(model.state_dict(), os.path.join(FLAGS.output_directory,'model.pt'))
         #Stop if Training loss reaches convergence
         if round(np.mean(losses), 1) == 0.00:
             break
@@ -369,7 +388,7 @@ def evaluate_saved_ctc_beam_search():
     predictions = []
     model.eval()
     blank_id = len(testset.text_transform.chars)
-    decoder = CTCBeamDecoder(testset.text_transform.chars + '_', blank_id=blank_id, log_probs_input=True,model_path=FLAGS.lang_model, alpha=1.5, beta=1.85)
+    decoder = CTCBeamDecoder(testset.text_transform.chars + '_', blank_id=blank_id, log_probs_input=True, alpha=1.5, beta=1.85)
      
     with torch.no_grad():
         for example in dataloader:
@@ -379,10 +398,12 @@ def evaluate_saved_ctc_beam_search():
             out_enc, _ = model(example['lengths'] , device, x_raw=X, y=tgt)
             out_enc = F.log_softmax(out_enc, 2)
 
+            #out_enc=torch.concatenate([out_enc[:,:,:-4],out_enc[:,:,-1:]], dim= 2)
             beam_results, _, _, out_lens = decoder.decode(out_enc)
             pred_int = beam_results[0,0,:out_lens[0,0]].tolist()
             pred_text = testset.text_transform.int_to_text(pred_int)
             if len(example['text'][0]) != 5:
+                pred_text=jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""})])(pred_text)
                 target_text =jiwer.Compose([ jiwer.ToLowerCase(), jiwer.RemovePunctuation(), jiwer.SubstituteRegexes({r"=": r"", r"\+": r""})])(example['text'][0])
                 references.append(target_text)
                 predictions.append(pred_text)  
