@@ -52,7 +52,11 @@ Prediction:i stopped at the group of people ---> Reference:i stopped at the grou
 Prediction:said ---> Reference:x  (WER: 1.0)
 Prediction:i found a little crowd of perhaps twenty people surrounding the huge all i had been to the sill under lay ---> Reference:i found a little crowd of perhaps twenty people surrounding the huge hole in which the cylinder lay  (WER: 0.3888888888888889)
 Prediction:when half see vaguely i raised my head above water and the martians hood pointed at the batteries that were still firing across the river and as it advanced its walk loose which must have been the generator of the heat ray ---> Reference:when half suffocated i raised my head above water the martians hood pointed at the batteries that were still firing across the river and as it advanced it swung loose what must have been the generator of the heatray  (WER: 0.20512820512820512)
+<<<<<<< HEAD
 Prediction:i could not quest ease ---> Reference:i could not credit it  (WER: 0.4)
+=======
+Prediction:i could not you s is ---> Reference:i could not credit it  (WER: 0.6)
+>>>>>>> 1165c1e9327e56aa4cac00948bc52792b3c5b1d5
 Prediction:that was said ---> Reference:that was it  (WER: 0.3333333333333333)
 Prediction:e e e e e ---> Reference:xiii  (WER: 5.0)
 Prediction:for my own part i had been lee excited all head ---> Reference:for my own part i had been feverishly excited all day  (WER: 0.18181818181818182)
