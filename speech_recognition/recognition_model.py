@@ -42,17 +42,16 @@ flags.DEFINE_integer('report_loss', 50, "How many step train to report plots")
 #Hyperparameters
 flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
 flags.DEFINE_integer('learning_rate_warmup', 1500, 'steps of linear warmup')
-flags.DEFINE_float('l2', 0., 'weight decay')
 flags.DEFINE_float('threshold_alpha_loss', 0.05, 'threshold parameter alpha for the two losses')
-flags.DEFINE_float('grad_clipping', 5.0 , 'parameter for gradient clipping')
 flags.DEFINE_integer('batch_size_grad', 100, 'batch size for gradient accumulation')
 flags.DEFINE_integer('n_epochs', 200, 'number of epochs')
 flags.DEFINE_integer('n_buckets', 16, 'number of buckets in the dataset')
 flags.DEFINE_integer('max_batch_length', 80000, 'maximum batch length')
+flags.DEFINE_float('alpha_loss', 0.2, 'weight of CTC loss')
 
 def train_model(trainset, devset, device, writer):    
     def training_loop():
-        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps, alpha_loss
+        nonlocal batch_idx, train_loss, train_dec_loss, train_enc_loss, run_train_steps
 
         #Warmup phase methods
         def set_lr(new_lr):
@@ -76,11 +75,9 @@ def train_model(trainset, devset, device, writer):
             
             #Preprosessing of the input and target for the model
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             y=example['phonemes_int']
             
-            #To take into account the length of the batch dimension and for gradient accumulation
-            #print(len(X))
+            #To take into account the length of the batch dimension for gradient accumulation
             sum_batch_size += len(X)
 
             
@@ -98,7 +95,7 @@ def train_model(trainset, devset, device, writer):
             phonemes_int_lengths=[item - 2 for item in example['phonemes_int_lengths']]
             y=[item[1:-1] for item in y]
             y = nn.utils.rnn.pad_sequence(y, batch_first=True, padding_value= FLAGS.pad).to(device)
-            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_ctc_phones) 
+            loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_phones) 
             
             
             #Decoder Loss
@@ -107,7 +104,7 @@ def train_model(trainset, devset, device, writer):
 
                 
             #Combination the two losses   
-            loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
+            loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
             losses.append(loss.item())
             train_loss += loss.item()
             train_dec_loss += loss_dec.item()
@@ -115,7 +112,6 @@ def train_model(trainset, devset, device, writer):
 
             #Alternative Gradient Update
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), FLAGS.grad_clipping)
             if sum_batch_size >= FLAGS.batch_size_grad:
                 optim.step()
                 optim.zero_grad()
@@ -133,7 +129,7 @@ def train_model(trainset, devset, device, writer):
         
         
     def evaluation_loop():
-        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train, alpha_loss
+        nonlocal eval_loss, eval_dec_loss, eval_enc_loss, run_eval_steps, predictions_eval, references_eval, predictions_train, references_train
 
         #Evaluation loop
         model.eval()
@@ -142,7 +138,6 @@ def train_model(trainset, devset, device, writer):
                 torch.cuda.empty_cache()
                 #Collect the data
                 X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-                #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
                 y = example['phonemes_int']
             
                 #Forward Model 
@@ -157,14 +152,14 @@ def train_model(trainset, devset, device, writer):
                 phonemes_int_lengths=[item - 2 for item in example['phonemes_int_lengths']]
                 y=[item[1:-1] for item in y]
                 y = nn.utils.rnn.pad_sequence(y, batch_first=True, padding_value= FLAGS.pad).to(device)
-                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_ctc_phones) 
+                loss_enc = F.ctc_loss(out_enc, y, example['lengths'], phonemes_int_lengths, blank = n_phones) 
                     
                 #Decoder Loss
                 out_dec=out_dec.permute(0,2,1)
                 loss_dec = loss_fn(out_dec, target)
 
                 #Combination the two losses
-                loss = (1 - alpha_loss) * loss_dec + alpha_loss * loss_enc
+                loss = (1 - FLAGS.alpha_loss) * loss_dec + FLAGS.alpha_loss * loss_enc
                 eval_loss += loss.item()
                 eval_dec_loss += loss_dec.item()
                 eval_enc_loss += loss_enc.item()
@@ -212,7 +207,6 @@ def train_model(trainset, devset, device, writer):
         for step,example in enumerate(dataloader_training):
             torch.cuda.empty_cache()
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
             
             target= y[:,1:]
@@ -231,7 +225,6 @@ def train_model(trainset, devset, device, writer):
         for step, example in enumerate(dataloader_evaluation):
             torch.cuda.empty_cache()
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model using Greedy Approach not teacher forcing
@@ -274,10 +267,10 @@ def train_model(trainset, devset, device, writer):
 
     ################################################### TRAINING MODEL BELOW ########################################################################       
 
-    ##INITIALIZATION##
+    ######INITIALIZATION######
     
     #Buffer variables initizialiation
-    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; alpha_loss=0.20; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
+    batch_idx = 0; train_loss= 0; train_dec_loss= 0; train_enc_loss= 0; eval_loss = 0; eval_dec_loss = 0; eval_enc_loss = 0; run_train_steps=0; run_eval_steps=0; predictions_train=[]; references_train=[]; predictions_eval=[]; references_eval=[]; losses = []; best_eval_PER=10; curr_eval_PER=0; text_eval=[]; text_train=[]
 
     #Define Dataloader
     dynamicBatchTrainingSampler=DynamicBatchSampler(trainset, FLAGS.max_batch_length, FLAGS.n_buckets, shuffle=True, batch_ordering='random')
@@ -287,10 +280,8 @@ def train_model(trainset, devset, device, writer):
     
     #Define model and loss function
     n_phones = len(devset.phone_transform.phoneme_inventory)
-    n_ctc_phones = len(devset.phone_transform.phoneme_inventory) - 3
-    model = Model(devset.num_features, n_ctc_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
+    model = Model(devset.num_features, n_phones + 1, n_phones, device) # plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
-    #loss_fn=nn.CrossEntropyLoss(ignore_index=FLAGS.pad)
     loss_fn = LabelSmoothingLoss(epsilon=0.1, num_classes=n_phones)
 
     #If it is enable and you want to start from a pre-trained model
@@ -299,10 +290,9 @@ def train_model(trainset, devset, device, writer):
         model.load_state_dict(state_dict, strict=False)
 
     #Define optimizer and scheduler for the learning rate
-    optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate, weight_decay=FLAGS.l2)
-    lr_sched = torch.optim.lr_scheduler.MultiStepLR(optim, milestones=[18], gamma=.1)
+    optim = torch.optim.AdamW(model.parameters(), lr=FLAGS.learning_rate)
     
-    ##MODEL TRAINING##
+    #####MODEL TRAINING#######
     
     optim.zero_grad()
     for epoch_idx in range(FLAGS.n_epochs):
@@ -314,13 +304,6 @@ def train_model(trainset, devset, device, writer):
         #PER
         if epoch_idx % FLAGS.report_PER == 0:  
             report_PER()
-        #Change learning rate
-        #lr_sched.step()
-        '''
-        if epoch_idx % 3 == 0:
-            alpha_loss += -0.1
-            alpha_loss=max(alpha_loss,0.1)
-        '''
         #Mean of the main loss and logging
         logging.info(f'-----finished epoch {epoch_idx+1} - training loss: {np.mean(losses):.4f}------')
         #Save the Best Model
@@ -337,10 +320,8 @@ def train_model(trainset, devset, device, writer):
 def evaluate_saved_beam_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
     testset = EMGDataset(test=True)
-    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
-    n_ctc_phones= len(testset.phone_transform.phoneme_inventory) - 3
-    model = Model(testset.num_features, n_ctc_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
+    model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     tree = PrefixTree.init_tree(FLAGS.phonesSet,FLAGS.vocabulary,FLAGS.dict)
     language_model = PrefixTree.init_language_model(FLAGS.lang_model)
@@ -353,7 +334,6 @@ def evaluate_saved_beam_search():
     with torch.no_grad():
         for example in dataloader:
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True, padding_value= FLAGS.pad).to(device)
             tgt = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value= FLAGS.pad).to(device)
 
             target= tgt[:,1:]
@@ -372,10 +352,8 @@ def evaluate_saved_beam_search():
 def evaluate_saved_greedy_search():
     device = 'cuda' if torch.cuda.is_available() and not FLAGS.debug else 'cpu'
     testset = EMGDataset(test=True)
-    #testset = EMGDataset(dev=False,test=False)
     n_phones = len(testset.phone_transform.phoneme_inventory)
-    n_ctc_phones= len(testset.phone_transform.phoneme_inventory) - 3
-    model = Model(testset.num_features, n_ctc_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
+    model = Model(testset.num_features, n_phones + 1, n_phones, device) #plus 1 for the blank symbol of CTC loss in the encoder
     model=nn.DataParallel(model).to(device)
     model.load_state_dict(torch.load(FLAGS.evaluate_saved_greedy_search))
     dataloader = torch.utils.data.DataLoader(testset, collate_fn=EMGDataset.collate_raw, shuffle=False, batch_size=1)
@@ -389,7 +367,6 @@ def evaluate_saved_greedy_search():
         for idx, example in enumerate(dataloader):
             #Collect the data
             X=combine_fixed_length(example['raw_emg'], 200*8).to(device)
-            #X=nn.utils.rnn.pad_sequence(example['emg'], batch_first=True,  padding_value= FLAGS.pad).to(device)
             y = nn.utils.rnn.pad_sequence(example['phonemes_int'], batch_first=True, padding_value=FLAGS.pad).to(device)
         
             #Forward Model
@@ -403,7 +380,7 @@ def evaluate_saved_greedy_search():
             running_correct += sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item()
             logging.info(f'Prediction:{phones_seq} ---> Reference:{example["phonemes"]}  (PER: {jiwer.wer(phones_seq, example["phonemes"])} and Accuracy: {round(100 * sum([sum(item) for item in torch.eq(new_word_seq_idx,y)]).item() / (y.shape[0] * y.shape[1]),1)})')
 
-    print(f'PER: {jiwer.wer(references, predictions)} and accuracy: {round(100 * running_correct / running_total,1)}')
+    logging.info(f'PER: {jiwer.wer(references, predictions)} and accuracy: {round(100 * running_correct / running_total,1)}')
 
 def main():
     os.makedirs(FLAGS.output_directory, exist_ok=True)

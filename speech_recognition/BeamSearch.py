@@ -16,7 +16,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer('BeamWidth', 100, 'width for pruning the prefix_tree')
 flags.DEFINE_boolean('Constrained', True, 'flag to enable language model and vocaboulary')
 flags.DEFINE_float('LMWeight', 0.3, 'importance for language model scoring')
-flags.DEFINE_float('LMPenalty', 0.0, 'penalty to penalize short words insertion')
+flags.DEFINE_float('RunningLengthPenalty', 0.85, 'penalty to penalize short words during exploration')
+flags.DEFINE_float('FinalLengthPenalty', 0.95, 'penalty to penalize short words as soon as they are saved')
     
 # Helpers
 def replicate(l,t):
@@ -44,14 +45,6 @@ def run_single_bs(model,data,target,vocab_size,tree,language_model,device,length
         assert h.probs.shape[0] == h.histories.shape[0]
         assert h.probs.shape[1] == step
         assert len(h.words) == h.histories.shape[0]
-
-        #assert len(h.memory[0]) == 1 # no idea why we have an extra list with only one element here
-        # note: state is always (hidden_state,att,annotation) (some of these might be unused)
-        # the hidden state is a LIST of one element, that element is a tuple (for the two-part hidden state),
-        # each tuple element has the number of current histories as first dimension
-        #real_state = h.state[0][0]
-        #assert real_state[0].shape[0] == h.histories.shape[0]
-        #assert real_state[1].shape[0] == h.histories.shape[0]
 
     def update_hypos(old_hypos,filter_list,this_step_probs,dct):
         assert type(old_hypos) == HypoHolder
@@ -206,9 +199,9 @@ def save_finished_hypos(hypos,finished_hypos,end_tok, language_model, max_len):
 
 def save_finished_hypo(finished_hypos,history, probs, words, language_model, max_len):
     sentence= jiwer.ToLowerCase()(' '.join([item.name for item in words]))
-    logprob=language_model.score(sentence,bos = True, eos = True) + ((len(sentence) + 1)**0.95)
+    logprob=language_model.score(sentence,bos = True, eos = True) + ((len(sentence) + 1)**FLAGS.FinalLengthPenalty)
     final_prob = torch.clone(probs)
-    final_prob[-1] += (logprob * FLAGS.LMWeight) + FLAGS.LMPenalty
+    final_prob[-1] += (logprob * FLAGS.LMWeight)
 
     if FLAGS.Constrained:
         tup = (history,[x.name for x in words])
@@ -244,7 +237,7 @@ def check_words(tree, hypos, language_model,device):
 
             # collect info for new hypo
             cp_probs = torch.clone(hypos.probs[hypo_pos])
-            cp_probs[-1] += (logprob_lm * FLAGS.LMWeight) + FLAGS.LMPenalty
+            cp_probs[-1] += (logprob_lm * FLAGS.LMWeight)
             new_probs.append(cp_probs)
             new_words.append(hypos.words[hypo_pos] + [ wd ])
             new_nodes.append(tree._root)

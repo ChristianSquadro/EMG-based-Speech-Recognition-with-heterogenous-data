@@ -1,0 +1,14 @@
+1- Run this command if you want to run beam search (with the optimal hyperparameter) on the pretrained model saved in the "model_to_save" folder:
+    CUDA_VISIBLE_DEVICES=0 python speech_recognition/recognition_model.py --output_directory ./models/recognition_model/ --evaluate_saved_beam_search ./model_to_save/FINAL_MODEL.pt
+
+2- Run this command if you want to run greedy search on the pretrained model saved in the "model_to_save" folder:
+    CUDA_VISIBLE_DEVICES=0 python speech_recognition/recognition_model.py --output_directory ./models/recognition_model/ --evaluate_saved_greedy_search ./model_to_save/FINAL_MODEL.pt
+
+3-Run this command if you want to train the model with the optimal hyperparameters:
+    CUDA_VISIBLE_DEVICES=0 python speech_recognition/recognition_model.py --output_directory ./models/recognition_model/
+
+4-Run this command to install the anaconda environment:
+    conda env create -f environment.yml
+
+5-If you want to modify any hyperparameter you can use "--hyperparameter_name  hyperparameter_value", for intstance:
+    CUDA_VISIBLE_DEVICES=0 python speech_recognition/recognition_model.py --output_directory ./models/recognition_model/ --learning_rate  3e-5

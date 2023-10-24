@@ -5,6 +5,9 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+from absl import flags
+FLAGS = flags.FLAGS
+
 class TransformerEncoderLayer(nn.Module):
     # Adapted from pytorch source
     r"""TransformerEncoderLayer is made up of self-attn and feedforward network.
@@ -400,16 +403,11 @@ class LearnedRelativePositionalEmbedding(nn.Module):
             return x[:, 1:, :]
         
 
-########
-# Taken from:
-# https://pytorch.org/tutorials/beginner/transformer_tutorial.html
-# or also here:
-# https://github.com/pytorch/examples/blob/master/word_language_model/model.py
 class PositionalEncoding(nn.Module):
 
     def __init__(self, d_model, dropout=0.2, max_len=5000):
         super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(p=dropout)
+        self.dropout = nn.Dropout(p=FLAGS.dropout_pos_emb)
         self.d_model=d_model
         self.max_len = max_len
 

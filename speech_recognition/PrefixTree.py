@@ -6,6 +6,9 @@ import Phones
 import Dictionary
 import jiwer
 
+from absl import flags
+FLAGS = flags.FLAGS
+
 class Node:
     _id = 0 
 
@@ -201,68 +204,6 @@ def node_step(old_nodes, filter_list, dct):
         new_nodes.append(this_child_node)
 
     return new_nodes
-    
-# MOVED TO MAIN SCIRIPT!
-def old_check_words(tree, histories, flt_align, flt_state, flt_annotation, nodes, words, flt_probs, language_model, LMWeight, LMPenalty, pr, len_target, all_att_weights):
-    
-    for i in range(len(nodes)):
-        node = nodes[i]
-        
-        for w in node.words:
-            # resize to get element to duplicate
-            dup_h = histories[i][None]
-            dup_p = flt_probs[i][None]
-            dup_nann = flt_annotation[i][None]
-            
-            # add the duplicates
-            flt_probs = torch.cat((flt_probs, dup_p))
-            histories = torch.cat((histories, dup_h))
-            flt_annotation = torch.cat((flt_annotation, dup_nann))
-
-            for a in range(len(flt_align)):
-                dup_na = flt_align[a][i][None]
-                flt_align[a] = torch.cat((flt_align[a], dup_na))
-    
-            for n in range(len(flt_state)):
-                for l in range(len(flt_state[n])):
-                    flt_state[n] = list(flt_state[n])
-                    dup_ns = flt_state[n][l][i][None]
-                    flt_state[n][l] = torch.cat((flt_state[n][l], dup_ns))
-                    flt_state[n] = tuple(flt_state[n])
-            
-            new_idx = len(histories) - 1 
-            # at new_idx I go back to the root for a new word (as if there was no continuation) so i save this prefix as word a
-            # and save root id
-            nodes.append(tree._root)
-
-            words.append(words[i][:])
-            if pr:
-                print("Found the word : ")
-                print(w.name)
-                tmp1 = flt_probs[new_idx][len(flt_probs[i])-1]
-                print("Prob before LM: ", tmp1)
-            
-            words[new_idx].append(w.name) # Since at new_idx i start a new word, i save the word that I have in the node
-            logprob_lm = check_language_model(language_model, words[new_idx], w.name)
-            cov_pen = len(w.name)
-            # Update probs
-            
-            flt_probs[new_idx][len(flt_probs[i])-1] += (logprob_lm * LMWeight) - LMPenalty # *cov_pen
-            
-            if pr:
-               print("Logprob LM: ", logprob_lm) 
-               print("Coverage Penalty: ", cov_pen)
-               print("Coverage Penalty with Penalty: ", cov_pen*LMPenalty)
-               tmp2 = flt_probs[new_idx][len(flt_probs[i])-1] 
-               print("Prob after LM: ", tmp2)
-            
-            # flt_probs[new_idx][len(flt_probs)-1] = flt_probs[new_idx][len(flt_probs)-1] + logprob_lm
-
-    state = (flt_state,flt_align,flt_annotation)
-#     hypos = histories[:,-1]
-    probs = flt_probs
-    accu_probs = torch.sum(probs,1)
-    return histories, nodes, words, accu_probs, state, probs
 
 def coverage_penalty():
     return 0
@@ -270,7 +211,7 @@ def coverage_penalty():
 def check_language_model(lm, sentence):
     # tranform from list of word into a string (lm accepts only string)
     sentence= jiwer.ToLowerCase()(' '.join(sentence))
-    logprob = lm.score(sentence, bos = True, eos = False) + ((len(sentence) + 1)**0.85)
+    logprob = lm.score(sentence, bos = True, eos = False) + ((len(sentence) + 1)**FLAGS.RunningLengthPenalty)
     return logprob
 
 
@@ -342,10 +283,6 @@ def get_filtered_lm(newLm, voc):
                 newfile.write(t)
     
     print("done with 3 grams")
-
-    
-    
-
 
 
 def init_language_model(lmFile):

@@ -243,7 +243,7 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
             g = torch.Generator()
             g.manual_seed(self._seed + self._epoch)
             sampler = torch.randperm(
-                len(self._batches), generator=g).tolist()  # type: ignore
+                len(self._batches), generator=g).tolist() 
             tmp = []
             for idx in sampler:
                 tmp.append(self._batches[idx])
@@ -291,7 +291,7 @@ class DynamicBatchSampler(torch.utils.data.Sampler):
             item_len = self._ex_lengths[str(idx)]
             # bucket to fill up most padding
             bucket_id = np.searchsorted(self._bucket_boundaries, item_len)
-            # fill audio's duration into that bucket
+            # fill EMG's duration into that bucket
             bucket_batches[bucket_id].append(idx)
 
             stats_tracker[bucket_id]["min"] = min(

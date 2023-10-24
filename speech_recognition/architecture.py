@@ -8,10 +8,6 @@ from transformer import TransformerEncoderLayer, TransformerDecoderLayer, Positi
 from data_utils import decollate_tensor
 from absl import flags
 
-#---Try Conformer Encoder
-#from fairseq.modules import RelPositionalEncoding
-#from fairseq.modules.conformer_layer import ConformerEncoderLayer
-
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('model_size',  768, 'number of hidden dimensions')
 flags.DEFINE_integer('feed_forward_layer_size', 3072, 'feed-forward dimensions')
@@ -20,7 +16,8 @@ flags.DEFINE_integer('num_layers_decoder', 6, 'number of decoder layers')
 flags.DEFINE_integer('n_heads_encoder', 8, 'number of heads encoder')
 flags.DEFINE_integer('n_heads_decoder', 8, 'number of heads decoder')
 flags.DEFINE_integer('relative_distance', 300, 'relative positional distance')
-flags.DEFINE_float('dropout', .3, 'dropout')
+flags.DEFINE_float('dropout_model', .2, 'dropout')
+flags.DEFINE_float('dropout_pos_emb', .2, 'dropout')
 
 class ResBlock(nn.Module):
     def __init__(self, num_ins, num_outs, stride=1):
@@ -66,8 +63,8 @@ class Model(nn.Module):
         self.embedding_tgt = nn.Embedding(num_outs_dec, FLAGS.model_size, padding_idx=FLAGS.pad)
         self.pos_decoder = PositionalEncoding(FLAGS.model_size)
 
-        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_encoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
-        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_decoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout)
+        encoder_layer = TransformerEncoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_encoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout_model)
+        decoder_layer = TransformerDecoderLayer(d_model=FLAGS.model_size, nhead=FLAGS.n_heads_decoder, relative_positional_distance=FLAGS.relative_distance, dim_feedforward=FLAGS.feed_forward_layer_size, dropout=FLAGS.dropout_model)
         self.transformerEncoder = nn.TransformerEncoder(encoder_layer, FLAGS.num_layers_encoder)
         self.transformerDecoder = nn.TransformerDecoder(decoder_layer, FLAGS.num_layers_decoder)
         self.w_aux = nn.Linear(FLAGS.model_size, num_outs_enc)
@@ -115,7 +112,6 @@ class Model(nn.Module):
         x_raw = self.w_raw_in(x_raw)
         x = x_raw
         
-        
         #Momentary solution to handle the padding problem of VRAM overusage
         x=decollate_tensor(x, length_raw_signal)
         x=nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=FLAGS.pad).to(device)
@@ -125,9 +121,6 @@ class Model(nn.Module):
         self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
         self.memory_key_padding_mask = self.src_key_padding_mask
         self.tgt_mask = nn.Transformer.generate_square_subsequent_mask(y.shape[1]).to(self.device)
-
-        #Projection from emg input to the expected number of hidden dimension
-        #x=self.emg_projection(x_raw)
 
         #Embedding and positional encoding of tgt
         tgt=self.embedding_tgt(y)
@@ -150,7 +143,7 @@ class Model(nn.Module):
         # y shape is (batch, sequence_length)      
 
         if part == 'encoder':
-               #CNN
+            #CNN
             if self.training:
                 r = random.randrange(8)
                 if r > 0:
@@ -170,7 +163,6 @@ class Model(nn.Module):
             
             #Projection from emg input to the expected number of hidden dimension
             self.src_key_padding_mask = self.create_src_padding_mask(x[:,:,0]).to(self.device)
-            #x=self.emg_projection(x_raw)
             x = x.transpose(0,1) # put time first
             x_encoder = self.transformerEncoder(x, src_key_padding_mask= self.src_key_padding_mask)
             
